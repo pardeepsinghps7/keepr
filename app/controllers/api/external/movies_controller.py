@@ -25,7 +25,7 @@ def get_all_movies():
         if response_data.get("success") == False:
             return jsonify({"status": False, "error": response_data.get("status_message")	})
         
-        data = [movie['title'] for movie in response_data.get("results", [])]
+        data = [{"title": movie.get("title")} for movie in response_data.get("results", [])]
 
         return jsonify({"status": True,"data": data})
     
