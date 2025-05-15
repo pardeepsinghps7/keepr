@@ -2,7 +2,6 @@ from flask import jsonify,request
 from dotenv import load_dotenv
 import os,requests,json
 
-TMDB_BEARER_TOKEN = os.environ.get("TMDB_API_KEY")
 def get_all_movies():
 
     title = request.args.get("title")  
@@ -14,7 +13,7 @@ def get_all_movies():
 
     headers = {
         "accept": "application/json",
-        "Authorization": f"Bearer {TMDB_BEARER_TOKEN}"
+        "Authorization": f"Bearer {os.environ.get('TMDB_API_KEY')}"
     }
 
     try:
@@ -27,7 +26,7 @@ def get_all_movies():
         
         data = [{"title": movie.get("title")} for movie in response_data.get("results", [])]
 
-        return jsonify({"status": True,"data": data})
+        return jsonify({"status": True,"data": data}), 200
     
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}),500
