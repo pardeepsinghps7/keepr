@@ -1,4 +1,5 @@
 from flask import jsonify,request
+from dotenv import load_dotenv
 import os,requests,json
 
 TMDB_BEARER_TOKEN = os.environ.get("TMDB_API_KEY")
@@ -7,7 +8,6 @@ def get_all_movies():
     title = request.args.get("title")  
     page = request.args.get("page") 
     
-
     url = f"https://api.themoviedb.org/3/search/movie?query={title}&include_adult=false&language=en-US&page={page}"
 
     # return url
