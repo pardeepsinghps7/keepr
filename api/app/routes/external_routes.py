@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from ..controllers.api.external.movies_controller import get_all_movies
 from ..controllers.api.external.books_controller import get_all_books
+from ..controllers.api.external.tv_shows_controller import get_all_tv_shows
 
 api = Blueprint("api", __name__)
 
@@ -15,5 +16,9 @@ def getMovies():
 @api.route('get-books', methods=["GET"])
 def getBooks():
     return get_all_books()
+
+@api.route('get-tv-shows', methods=["GET"])
+def getTvShows():
+    return get_all_tv_shows()
 
 
