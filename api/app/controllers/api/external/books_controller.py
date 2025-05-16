@@ -1,56 +1,60 @@
-from flask import jsonify,request
+from flask import jsonify, request
 import requests
 
-def get_all_books():
-    
-    query = request.args.get("title")  
-    page = request.args.get("page") 
-    url = f"https://openlibrary.org/search.json?q={query}&page={page}"
-
+def fetch_data(url):
+    """Fetch data from a given URL and return JSON response."""
     try:
         response = requests.get(url)
         response.raise_for_status()
-        
-        # Return the JSON response
-        response_data = response.json()
-        books = response_data.get("docs", [])
-        
-        # Check if the response is not empty
+        return response.json()
+    except requests.RequestException as e:
+        raise Exception(f"Error fetching data: {e}")
+
+def format_books(data, source="open_library"):
+    """Format book data based on the source (Open Library or Google Books)."""
+    books = []
+
+    if source == "open_library":
+        for book in data.get("docs", []):
+            title = book.get("title", "Unknown Title")
+            authors = book.get("author_name", ["Unknown Author"])
+            books.append({
+                "title": title,
+                "authors": ", ".join(authors)
+            })
+    elif source == "google_books":
+        for item in data.get("items", []):
+            volume_info = item.get("volumeInfo", {})
+            title = volume_info.get("title", "Unknown Title")
+            authors = volume_info.get("authors", ["Unknown Author"])
+            books.append({
+                "title": title,
+                "authors": ", ".join(authors)
+            })
+
+    return books
+
+def get_all_books():
+    """Fetch books from Open Library and Google Books if needed."""
+    query = request.args.get("title", "").strip()
+    page = request.args.get("page", "1").strip()
+
+    if not query:
+        return jsonify({"status": False, "message": "Title is required"}), 400
+
+    try:
+        # Fetch from Open Library first
+        open_library_url = f"https://openlibrary.org/search.json?q='{query}'&page={page}"
+        data = fetch_data(open_library_url)
+        books = format_books(data, "open_library")
+
+        # Fallback to Google Books if Open Library is empty
         if not books:
             google_books_url = f"https://www.googleapis.com/books/v1/volumes?q={query}"
-            google_response = requests.get(google_books_url)
-            google_response.raise_for_status()
-            google_data = google_response.json()
-            
-            # Extract items from Google Books
-            items = google_data.get("items", [])
-            if not items:
-                return jsonify({"status": True,"data": []}), 200
-            
-            # Format Google Books data
-            data = []
-            for item in items:
-                volume_info = item.get("volumeInfo", {})
-                title = volume_info.get("title", "Unknown Title")
-                authors = volume_info.get("authors", ["Unknown Author"])
-                data.append({
-                    "title": title,
-                    "authors": ", ".join(authors)
-                })
-            
-            return jsonify({"status": True,"data": data}), 200
-        
-        # Extract titles and author names
-        data = []
-        for book in books:
-            title = book.get("title", "Unknown Title")
-            author_names = book.get("author_name", ["Unknown Author"])
-            data.append({
-                "title": title,
-                "authors": ", ".join(author_names)
-            })
-        
-        # Return the formatted results
-        return jsonify({"status": True,"data": data}), 200
-    except requests.RequestException as e:
-        return jsonify({"error": str(e)}), 500
+            data = fetch_data(google_books_url)
+            books = format_books(data, "google_books")
+
+        return jsonify({"status": True, "data": books}), 200
+
+    except Exception as e:
+        return jsonify({"status": False, "error": str(e)}), 500
