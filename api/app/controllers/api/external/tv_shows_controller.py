@@ -3,18 +3,17 @@ import requests
 
 def get_all_tv_shows():
 
-    title = request.args.get("title", "").strip()
+    name = request.args.get("name", "").strip()
 
-    if not title:
-        return jsonify({"status": False, "error": "Title is required"}), 400
+    if not name:
+        return jsonify({"status": False, "error": "Name is required"}), 400
     
     url = f"https://api.tvmaze.com/search/shows"
 
     params = {
-        "q": title,
+        "q": name,
     }
 
-    print(params)
 
     try:
 
@@ -27,9 +26,9 @@ def get_all_tv_shows():
 
         for item in response_data:
             show = item.get('show')
-            title = show.get("name", "Unknown Title")
+            name = show.get("name", "Unknown Name")
             shows.append({
-                "title" : title
+                "name" : name
             })
         
         return jsonify({"status": True, "data": shows}), 200
