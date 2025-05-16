@@ -3,6 +3,7 @@ from ..controllers.api.external.movies_controller import get_all_movies
 from ..controllers.api.external.books_controller import get_all_books
 from ..controllers.api.external.tv_shows_controller import get_all_tv_shows
 from ..controllers.api.external.restaurants_controller import get_all_restaurants
+from ..controllers.api.external.beer_controller import get_all_beers
 
 api = Blueprint("api", __name__)
 
@@ -25,5 +26,9 @@ def getTvShows():
 @api.route('get-restaurants', methods=["GET"])
 def getRestaurants():
     return get_all_restaurants()
+
+@api.route('get-beers', methods=['GET'])
+def getBeers():
+    return get_all_beers()
 
 
