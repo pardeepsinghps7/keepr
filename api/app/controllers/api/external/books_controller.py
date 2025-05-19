@@ -17,19 +17,19 @@ def format_books(data, source="open_library"):
     if source == "open_library":
         for book in data.get("docs", []):
             title = book.get("title", "Unknown Title")
-            authors = book.get("author_name", ["Unknown Author"])
+            author = book.get("author_name", ["Unknown Author"])
             books.append({
                 "title": title,
-                "authors": ", ".join(authors)
+                "author": ", ".join(author)
             })
     elif source == "google_books":
         for item in data.get("items", []):
             volume_info = item.get("volumeInfo", {})
             title = volume_info.get("title", "Unknown Title")
-            authors = volume_info.get("authors", ["Unknown Author"])
+            author = volume_info.get("authors", ["Unknown Author"])
             books.append({
                 "title": title,
-                "authors": ", ".join(authors)
+                "author": ", ".join(author)
             })
 
     return books
