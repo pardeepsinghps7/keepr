@@ -7,11 +7,11 @@ import Link from "next/link";
 const userColumns = (handleView, handleDelete) => [
     {
         header: 'Avatar',
-        accessorKey: 'url',
+        accessorKey: 'path',
         cell: ({ row }) => {
             const item = row.original;
             return (
-                <img src={item.avatar} alt="" className="w-20 h-20 rounded-full" />
+                <img src={item.path} alt="" className="w-20 h-20 rounded-full" />
             );
         }
     },
@@ -37,7 +37,7 @@ const userColumns = (handleView, handleDelete) => [
                     </button>
 
                     <Link href={
-                        `${item.avatar}`
+                        `${item.path}`
                     } target="_blank" className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500">
                         <svg
                             className="fill-current"

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { supabaseClient } from "@/lib/supabaseClient";
@@ -9,7 +9,51 @@ import { useRouter } from "next/navigation";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   const router = useRouter();
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+        error,
+      } = await supabaseClient.auth.getUser();
+
+      if (user) {
+        setUserEmail(user.email ?? "");
+      }
+    };
+
+    getUser();
+  }, []);
+
+  const handleChangePassword = async () => {
+    setError("");
+    setSuccess("");
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setSuccess("Password updated successfully.");
+      setNewPassword("");
+      setConfirmPassword("");
+      setShowPasswordModal(false);
+    }
+  };
+
+
   const handleLogout = async () => {
     await supabaseClient.auth.signOut();
     router.push("/signin");
@@ -34,12 +78,10 @@ export default function UserDropdown() {
           <Image
             width={44}
             height={44}
-            src="/images/user/owner.jpg"
+            src="/images/user/admin.png"
             alt="User"
           />
         </span>
-
-        <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
@@ -68,14 +110,15 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Musharof Chowdhury
+            Admin
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            randomuser@pimjo.com
+            {userEmail || "Loading..."}
           </span>
         </div>
 
         <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
+          {/*}
           <li>
             <DropdownItem
               onItemClick={closeDropdown}
@@ -101,9 +144,13 @@ export default function UserDropdown() {
               Edit profile
             </DropdownItem>
           </li>
+          */}
           <li>
             <DropdownItem
-              onItemClick={closeDropdown}
+              onItemClick={() => {
+                closeDropdown();
+                setShowPasswordModal(true);
+              }}
               tag="a"
               href="/profile"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
@@ -123,9 +170,10 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              Account settings
+              Change Password
             </DropdownItem>
           </li>
+          { /*}
           <li>
             <DropdownItem
               onItemClick={closeDropdown}
@@ -150,7 +198,7 @@ export default function UserDropdown() {
               </svg>
               Support
             </DropdownItem>
-          </li>
+          </li> */}
         </ul>
         <button
           onClick={handleLogout}
@@ -174,6 +222,54 @@ export default function UserDropdown() {
           Sign out
         </button>
       </Dropdown>
+      {showPasswordModal && (
+          <div
+              className="fixed inset-0 flex items-center justify-center p-5 overflow-y-auto modal z-99999">
+            <div
+                className="modal-close-btn fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]"></div>
+            <div className="relative w-full max-w-[600px] rounded-3xl bg-white p-6 dark:bg-gray-900 lg:p-10">
+              <button onClick={() => setShowPasswordModal(false)} className="absolute right-3 top-3 z-999 flex h-9.5 w-9.5 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white sm:right-6 sm:top-6 sm:h-11 sm:w-11">
+                <svg className="fill-current" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M6.04289 16.5413C5.65237 16.9318 5.65237 17.565 6.04289 17.9555C6.43342 18.346 7.06658 18.346 7.45711 17.9555L11.9987 13.4139L16.5408 17.956C16.9313 18.3466 17.5645 18.3466 17.955 17.956C18.3455 17.5655 18.3455 16.9323 17.955 16.5418L13.4129 11.9997L17.955 7.4576C18.3455 7.06707 18.3455 6.43391 17.955 6.04338C17.5645 5.65286 16.9313 5.65286 16.5408 6.04338L11.9987 10.5855L7.45711 6.0439C7.06658 5.65338 6.43342 5.65338 6.04289 6.0439C5.65237 6.43442 5.65237 7.06759 6.04289 7.45811L10.5845 11.9997L6.04289 16.5413Z" fill=""></path>
+                </svg>
+              </button>
+              <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">Change Password</h4>
+              <div
+                  className="grid grid-cols-1">
+                <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="New password"
+                    className="w-full p-2 mb-3 border rounded dark:bg-gray-700 dark:text-white"
+                />
+                <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm password"
+                    className="w-full p-2 mb-3 border rounded dark:bg-gray-700 dark:text-white"
+                />
+              {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+              {success && <p className="text-green-500 text-sm mb-2">{success}</p>}
+              <div className="flex justify-end gap-2">
+                <button
+                    onClick={() => setShowPasswordModal(false)}
+                    className="px-4 py-2 text-sm text-gray-700 dark:text-white border rounded hover:bg-gray-100 dark:hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                    onClick={handleChangePassword}
+                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Update
+                </button>
+              </div>
+            </div>
+          </div>
+          </div>
+      )}
     </div>
   );
 }

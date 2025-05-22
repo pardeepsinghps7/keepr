@@ -33,7 +33,7 @@ export default function SignInForm() {
 
     const user = data?.user;
     const isAdmin = user?.app_metadata?.role === "admin";
-console.log(data);
+
     if(!isAdmin) {
       setErrorMsg("Access denied: not an admin");
       await supabaseClient.auth.signOut();

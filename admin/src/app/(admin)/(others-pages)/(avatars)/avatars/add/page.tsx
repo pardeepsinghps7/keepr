@@ -11,7 +11,7 @@ export default function AddAvatar() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     global: {
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6InBwaHlpV2NrQWtPeVlGRFQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3J0c3NndnJvaW1lZ3h0eWpham1pLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJmOTlkMDkxMy1iNDlmLTRjZjgtODU3MS03ODAwZTE3YmY4MmEiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ3NzI2NjAyLCJpYXQiOjE3NDc3MjMwMDIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWV9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzQ3NzIzMDAyfV0sInNlc3Npb25faWQiOiJhYmVkYzk3My0xYWMxLTQxMjAtYmQyYy1jN2Y1NTA5YmNjODMiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.9V6jJrtVolYACAqKkCsW1kJIkDA6XN9Fra6S1tqAWnY`,
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6InBwaHlpV2NrQWtPeVlGRFQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3J0c3NndnJvaW1lZ3h0eWpham1pLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxNGRhMzU3MS0zNjZlLTQ3NDAtYjc1ZC03MTYxOWQ4MzEzZTUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ3ODI3NDYzLCJpYXQiOjE3NDc4MjM4NjMsImVtYWlsIjoiYWRtaW5AYWRtaW4uY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdLCJyb2xlIjoiYWRtaW4ifSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZX0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDc4MjM4NjN9XSwic2Vzc2lvbl9pZCI6IjMxMWI0ZWRhLTY4MjAtNGM5My05Y2U2LTBiMzBkYTk3NzZiYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.-pUt1LjQAy1IqN89Y03dFILAl7jpTqSTdzxlVh89398`,
       },
     },
   });
@@ -40,7 +40,7 @@ export default function AddAvatar() {
       const publicUrl = data.publicUrl;
       const { error: insertError } = await supabase
           .from('avatars')
-          .insert([{ url: publicUrl }]);
+          .insert([{ path: publicUrl }]);
 
       if (insertError) {
         alert('Failed to save avatar URL: ' + insertError.message);

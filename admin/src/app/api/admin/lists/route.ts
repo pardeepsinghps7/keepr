@@ -1,9 +1,17 @@
 // app/api/admin/users/route.ts
 import { NextResponse } from 'next/server'
 import { supabaseClient } from '@/lib/supabaseClient';
+import {createClient} from "@supabase/supabase-js";
 
 export async function GET() {
-    const { data, error } = await supabaseClient.from('avatars').select()
+    const { data, error } = await supabaseClient.from('lists').select(`
+    id,
+    label,
+    icon,
+    is_default,
+    created_at,
+    items(count)
+  `).order('created_at', { ascending: false });
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -14,7 +22,10 @@ export async function GET() {
     const formattedData = data
         .map((item) => ({
             id: item.id,
-            path: item.path,
+            label: item.label,
+            icon: item.icon,
+            is_default: item.is_default == true ? 'Yes' : 'No',
+            items_count: item.items[0].count,
             created_at: new Intl.DateTimeFormat('en-US', {
                 dateStyle: 'medium',
                 timeStyle: 'short',
