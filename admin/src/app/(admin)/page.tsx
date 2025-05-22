@@ -9,6 +9,9 @@ import DemographicCard from "@/components/ecommerce/DemographicCard";
 import { Dashboard } from "@/components/ecommerce/Dashboard";
 import LineChart from "./(others-pages)/(chart)/line-chart/page";
 import DonutChartOne from "@/components/charts/donut/DonutChartOne";
+import TimeBasedChart from "@/components/charts/bar/TimeBasedChart";
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import ComponentCard from "@/components/common/ComponentCard";
 
 export const metadata: Metadata = {
   title:
@@ -18,12 +21,22 @@ export const metadata: Metadata = {
 
 export default function Ecommerce() {
   return (
-    <div className="grid grid-cols-12 gap-4 md:gap-6">
-      <div className="col-span-12 space-y-6 xl:col-span-7">
-        <Dashboard />
+    <div>
+      <PageBreadcrumb pageTitle="Dashboard" />
+      <div className="space-y-6">
+        <ComponentCard title="">
+          <Dashboard />
+        </ComponentCard>
       </div>
-      <div className="col-span-12 xl:col-span-7">
-        <DonutChartOne />
+      <div className="space-y-6">
+        <ComponentCard title="Items count by List">
+          <DonutChartOne />
+        </ComponentCard>
+      </div>
+      <div className="space-y-6">
+        <ComponentCard title="Item count by Time">
+          <TimeBasedChart />
+        </ComponentCard>
       </div>
     </div>
   );
