@@ -47,7 +47,7 @@ export default function AddAvatar() {
       } else {
         alert('Avatar uploaded!');
         setFile(null);
-        fileInputRef.current && (fileInputRef.current.value = '');
+        // fileInputRef.current && (fileInputRef.current.value = '');
       }
     }
     setUploading(false);

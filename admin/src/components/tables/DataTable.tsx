@@ -9,6 +9,9 @@ import {
     getSortedRowModel,
     getPaginationRowModel,
     flexRender,
+    ColumnDef,
+    SortingState,
+    ColumnFiltersState,
 } from '@tanstack/react-table';
 
 interface DataTableProps<TData> {
@@ -18,8 +21,8 @@ interface DataTableProps<TData> {
 
 export function DataTable<TData>({ data, columns }: DataTableProps<TData>) {
     const [globalFilter, setGlobalFilter] = useState('');
-    const [sorting, setSorting] = useState([]);
-    const [columnFilters, setColumnFilters] = useState([]);
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
     const table = useReactTable({
         data,
