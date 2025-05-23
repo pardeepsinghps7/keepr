@@ -4,11 +4,11 @@ import { DataTable } from '@/components/tables/DataTable'
 import { useEffect, useState } from 'react'
 import Link from "next/link";
 
-const userColumns = (handleView, handleDelete) => [
+const userColumns = (handleView : boolean, handleDelete : boolean) => [
     {
         header: 'Icon',
         accessorKey: 'icon',
-        cell: ({ row }) => {
+        cell: ({ row } : any) => {
             const item = row.original;
 
             return (
@@ -38,7 +38,7 @@ const userColumns = (handleView, handleDelete) => [
     {
         header: 'Actions',
         id: 'actions',
-        cell: ({ row }) => {
+        cell: ({ row } : any) => {
             const item = row.original;
 
             return (
