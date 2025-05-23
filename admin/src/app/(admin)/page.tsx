@@ -13,6 +13,7 @@ import TimeBasedChart from "@/components/charts/bar/TimeBasedChart";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import RecentItemsTable from "@/components/tables/RecentItemsTable";
+import RecentUsersTable from "@/components/tables/RecentUSersTable";
 
 export const metadata: Metadata = {
   title:
@@ -37,6 +38,11 @@ export default function Ecommerce() {
       <div className="space-y-6">
         <ComponentCard title="Item count by Time">
           <TimeBasedChart />
+        </ComponentCard>
+      </div>
+      <div className="space-y-6">
+        <ComponentCard title="Recent Users">
+          <RecentUsersTable />
         </ComponentCard>
       </div>
       <div className="space-y-6">
