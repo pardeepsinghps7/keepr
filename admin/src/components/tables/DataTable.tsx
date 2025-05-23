@@ -48,7 +48,7 @@ export function DataTable<TData>({ data, columns }: DataTableProps<TData>) {
 
     return (
         <div className="space-y-5 sm:space-y-6">
-            <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] ">
+            <div className="mb-4 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] ">
                 <div className="space-y-6">
                     <div className="overflow-hidden  dark:bg-white/[0.03] rounded-xl">
                 <div className="p-4 border-t border-gray-100 dark:border-gray-800 sm:p-6">
@@ -158,10 +158,10 @@ export function DataTable<TData>({ data, columns }: DataTableProps<TData>) {
                     {table.getRowModel().rows.map((row) => (
                         <tr key={row.id}>
                             {row.getVisibleCells().map((cell) => (
-                                <td key={cell.id} className=" px-4 py-3 border border-gray-100 dark:border-white/[0.05] whitespace-nowrap">
+                                <td key={cell.id} className=" px-4 py-3 border border-gray-100 dark:text-white dark:border-white/[0.05] whitespace-nowrap">
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </td>
-                            ))}
+                            ))} 
                         </tr>
                     ))}
                     </tbody>

@@ -71,7 +71,7 @@ export default function TimeBasedChart() {
             onClick={() => setView(v as ViewType)}
             className={`px-4 py-2 rounded-lg ${
               view === v
-                ? "bg-blue-600 text-white"
+                ? "bg-brand-600 text-white"
                 : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white"
             }`}
           >
