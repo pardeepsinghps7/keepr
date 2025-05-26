@@ -7,11 +7,14 @@ const supabaseAdmin = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export async function GET() {
+export async function GET(req: Request) {
     /*const { data, error } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
         app_metadata: { role: "admin" }
     });*/
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers()
+    const { searchParams } = new URL(req.url);
+    const limit = searchParams.get('limit') || false;
+    const options: any = limit ? { perPage: parseInt(limit) } : {};
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers(options)
     const formattedUsers = data.users
         .filter((user) => user.app_metadata?.role !== 'admin')
         .map((user) => ({
