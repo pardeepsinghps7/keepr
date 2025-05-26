@@ -162,7 +162,7 @@ export default function RecentItemsTable() {
           <div className="mt-4 flex justify-center">
             <Link
               href="/lists" // Replace with your actual route
-              className="inline-flex items-center mb-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
+              className="inline-flex items-center mb-4 px-4 py-2 text-sm font-medium text-white bg-brand-900 rounded-md hover:bg-brand-500 transition"
             >
               View All
             </Link>
