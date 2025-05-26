@@ -110,7 +110,7 @@ export function DataTable<TData>({ data, columns }: DataTableProps<TData>) {
                                                 }
                                             }}
                                         >
-                                        <p className="font-medium text-gray-700 text-theme-xs dark:text-gray-400">
+                                        <p className="font-medium text-gray-700 text-theme-lg dark:text-gray-400">
                                                 {flexRender(header.column.columnDef.header, header.getContext())}
                                             </p>
                                             {header.column.getCanSort() && (
@@ -167,7 +167,7 @@ export function DataTable<TData>({ data, columns }: DataTableProps<TData>) {
                     {table.getRowModel().rows.map((row) => (
                         <tr key={row.id}>
                             {row.getVisibleCells().map((cell) => (
-                                <td key={cell.id} className=" px-4 py-3 border border-gray-100 dark:text-white dark:border-white/[0.05] whitespace-nowrap">
+                                <td key={cell.id} className=" px-4 py-3 border border-gray-100 dark:text-gray-200 dark:border-white/[0.05] whitespace-nowrap">
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </td>
                             ))} 

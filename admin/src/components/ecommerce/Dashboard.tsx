@@ -30,34 +30,34 @@ export const Dashboard = () => {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">
       {/* <!-- Metric Item Start --> */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+      <div className="flex gap-x-2 items justify-between rounded-2xl border border-gray-200 bg-brand-200 p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+        <div className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-xl dark:bg-gray-800">
           <GroupIcon className="text-gray-800 size-6 dark:text-white/90" />
         </div>
 
-        <div className="flex items justify-between mt-5">
-          <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items justify-between">
+          <div className="text-right">
+            <span className="text-lg text-white dark:text-white xl:text-xl md:text-theme-xl ">
               Users
             </span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+            <h4 className="mt-2 font-bold text-white text-right text-title-md dark:text-white/90 xl:text-title-lg md:text-title-md">
               {data?.user_count ?? "N/A"}
             </h4>
           </div>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+      <div className="flex gap-x-2 items justify-between rounded-2xl border border-gray-200 bg-brand-700 p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+        <div className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-xl dark:bg-gray-800">
           <GridIcon className="text-gray-800 size-6 dark:text-white/90" />
         </div>
 
-        <div className="flex items justify-between mt-5">
-          <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items justify-between">
+          <div className="text-right">
+            <span className="text-lg text-white dark:text-white xl:text-xl md:text-theme-xl">
               Pre Defined Lists
             </span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+            <h4 className="mt-2 font-bold text-white text-right text-title-md dark:text-white/90 xl:text-title-lg md:text-title-md">
               {data?.pre_defined_list ?? "N/A"}
             </h4>
           </div>
@@ -66,16 +66,16 @@ export const Dashboard = () => {
       {/* <!-- Metric Item End --> */}
 
       {/* <!-- Metric Item Start --> */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+      <div className="flex gap-x-2 items justify-between rounded-2xl border border-gray-200 bg-brand-900 p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+        <div className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-xl dark:bg-gray-800">
           <BoxIconLine className="text-gray-800 dark:text-white/90" />
         </div>
-        <div className="flex items-end justify-between mt-5">
-          <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items justify-between">
+          <div className="text-right">
+            <span className="text-lg text-white dark:text-white xl:text-xl md:text-theme-xl ">
               Custom Lists
             </span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+            <h4 className="mt-2 font-bold text-white text-right text-title-md dark:text-white/90 xl:text-title-lg md:text-title-md">
               {data?.custom_list ?? "N/A"}
             </h4>
           </div>
