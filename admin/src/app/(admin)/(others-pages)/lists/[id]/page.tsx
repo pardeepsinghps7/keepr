@@ -1,52 +1,65 @@
-'use client'
+'use client';
 
-import { DataTable } from '@/components/tables/DataTable'
-import { useEffect, useState } from 'react'
-import Link from "next/link";
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { supabaseClient } from '@/lib/supabaseClient';
+import { DataTable } from '@/components/tables/DataTable';
+import {useRouter, usePathname} from "next/navigation";
 
-const userColumns = (handleView : boolean, handleDelete : boolean) => [
-    {
-        header: 'Icon',
-        accessorKey: 'icon',
-        cell: ({ row } : any) => {
-            const item = row.original;
+interface ListItem {
+    id: string;
+    title: string;
+    status: string;
+    rating: number;
+    save_for_later: boolean;
+    created_at: string;
+}
 
-            return (
-                <div className="w-5 h-5 overflow-hidden">
-                    <img src={item.icon} alt={item.label}/>
-                </div>
-            );
-        },
-        enableSorting: false,
-    },
-    {
-        header: 'Label',
-        accessorKey: 'label',
-    },
-    {
-        header: 'Pre-defined',
-        accessorKey: 'is_default',
-    },
-    {
-        header: 'Items',
-        accessorKey: 'items_count',
-    },
-    {
-        header: 'Created At',
-        accessorKey: 'created_at',
-    },
-    {
-        header: 'Actions',
-        id: 'actions',
-        cell: ({ row } : any) => {
-            const item = row.original;
+interface FormattedItem {
+    id: string;
+    title: string;
+    status: string;
+    rating: string | number;
+    save_for_later: string;
+    created_at: string;
+}
 
-            return (
-                <div className="flex items-center gap-2">
+export default function ItemsPage() {
+    const router = useRouter()
+    const searchParams = usePathname();
+    const listId = searchParams.split('/').pop()
+    const [items, setItems] = useState<FormattedItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const columns = useMemo(
+        () => [
+            {
+                header: 'Title/Name',
+                accessorKey: 'title',
+            },
+            {
+                header: 'Status',
+                accessorKey: 'status',
+            },
+            {
+                header: 'Rating',
+                accessorKey: 'rating',
+            },
+            {
+                header: 'Save for Later',
+                accessorKey: 'save_for_later',
+            },
+            {
+                header: 'Created At',
+                accessorKey: 'created_at',
+            },
+            {
+                header: 'Actions',
+                id: 'actions',
+                cell: ({ row }: any) => (
                     <Link
-                        href={
-                            `lists/${item.id}`
-                        }
+                        href={`lists/${row.original.id}`}
                         className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
                     >
                         <svg
@@ -65,53 +78,69 @@ const userColumns = (handleView : boolean, handleDelete : boolean) => [
                             />
                         </svg>
                     </Link>
-                </div>
-            );
-        },
-        enableSorting: false,
+                ),
+                enableSorting: false,
+            },
+        ],
+        []
+    );
+    function toWords(str: string) {
+        return str
+            .replace(/_/g, ' ') // Replace underscores with spaces
+            .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize each word
     }
-]
-
-export default function UsersPage() {
-    const [items, setItems] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
-
     useEffect(() => {
+        if (!listId) return;
         const fetchData = async () => {
-            setLoading(true)
-            try {
-                const res = await fetch('/api/admin/lists')
-                const data = await res.json()
-                if (res.ok) {
-                    setItems(data)
-                } else {
-                    throw new Error(data.error)
-                }
-            } catch (err: any) {
-                setError(err.message)
-            } finally {
-                setLoading(false)
-            }
-        }
+            setLoading(true);
+            setError(null);
 
-        fetchData()
-    }, [])
+            const { data, error } = await supabaseClient
+                .from('items')
+                .select(`*, lists(label)`)
+                .eq('list_id', listId)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Supabase error:', error.message);
+                setError('Failed to fetch data.');
+                setLoading(false);
+                return;
+            }
+
+            const formatted: FormattedItem[] = (data as ListItem[]).map((item) => ({
+                id: item.id,
+                title: item.title,
+                status: toWords(item.status),
+                rating: item.rating > 0 ? item.rating : '',
+                save_for_later: item.save_for_later ? 'Yes' : 'No',
+                created_at: new Intl.DateTimeFormat('en-US', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                }).format(new Date(item.created_at)),
+            }));
+
+            setItems(formatted);
+            setLoading(false);
+        };
+
+        fetchData();
+    }, [router, listId]);
 
     return (
         <div>
             <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">Lists</h2>
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+                    Items
+                </h2>
             </div>
 
             {error && <p className="text-red-500">Error: {error}</p>}
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <>
-                    <DataTable data={items} columns={userColumns(false, false)}/>
-                </>
+                <DataTable data={items} columns={columns} />
             )}
         </div>
-    )
+    );
 }
