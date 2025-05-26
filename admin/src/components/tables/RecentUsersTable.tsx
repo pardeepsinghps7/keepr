@@ -8,10 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-
-import Badge from "../ui/badge/Badge";
-import Image from "next/image";
-import { supabaseClient } from "@/lib/supabaseClient";
 import Link from "next/link";
 
 interface ListUser {
@@ -33,35 +29,25 @@ export default function RecentUsersTable() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async() => {
-      setLoading(true);
-      setError(null);
-
-      const {data, error} = await supabaseClient.auth.admin.listUsers()
-
-      if (error) {
-        console.error('Supabase error:', error.message);
-        setError('Failed to fetch data.');
-        setLoading(false);
-        return;
+    const fetchUsers = async () => {
+      setLoading(true)
+      try {
+        const res = await fetch('/api/admin/users?limit=5')
+        const data = await res.json()
+        if (res.ok) {
+          setUsers(data)
+        } else {
+          throw new Error(data.error)
+        }
+      } catch (err: any) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
       }
+    }
 
-      const formatted : FormattedUSer[] = (data as unknown as ListUser[]).map((user) => ({
-        id: user.id,
-        email: user.email,
-        created_at: new Intl.DateTimeFormat('en-US', {
-          dateStyle: 'medium',
-          timeStyle: 'short',
-        }).format(new Date(user.created_at)),
-      }));
-
-      setUsers(formatted);
-      setLoading(false);
-
-
-    };
-    fetchData();
-  }, []);
+    fetchUsers()
+  }, [])
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -73,21 +59,27 @@ export default function RecentUsersTable() {
               <TableRow>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-lg dark:text-gray-400"
-                >
-                  Id
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-lg dark:text-gray-400"
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Email
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-lg dark:text-gray-400"
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Email Confirmed
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Created At
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Last Sign In At
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -96,15 +88,20 @@ export default function RecentUsersTable() {
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-200">
-                    {user.id}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-200">
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     {user.email}
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-200">
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {user.email_confirmed}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <div className="flex -space-x-2">
                       {user.created_at}
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    <div className="flex -space-x-2">
+                      {user.last_sign_in_at}
                     </div>
                   </TableCell>
                 </TableRow>
