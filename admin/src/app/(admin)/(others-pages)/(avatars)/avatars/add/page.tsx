@@ -25,10 +25,7 @@ export default function AddAvatar() {
 
     
     if (!file){
-      console.log(file);
-      return toast.error("Please select a file",{
-        duration: 50000,
-      }) ;
+      return toast.error("Please select a file") ;
     }
       
     setUploading(true);
@@ -55,17 +52,13 @@ export default function AddAvatar() {
       if (insertError) {
         toast.error('Failed to save avatar URL: ' + insertError.message);
       } else {
-        toast.success('Avatar uploaded!', { duration: 5000000});
+        toast.success('Avatar uploaded!');
         setFile(null);
         // fileInputRef.current && (fileInputRef.current.value = '');
       }
     }
     setUploading(false);
   };
-
-  useEffect(() => {
- 
-  });
 
   return (
     <div>
