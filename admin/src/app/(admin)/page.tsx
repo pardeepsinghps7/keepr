@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
-import { EcommerceMetrics } from "@/components/ecommerce/EcommerceMetrics";
 import React from "react";
-import MonthlyTarget from "@/components/ecommerce/MonthlyTarget";
-import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
-import StatisticsChart from "@/components/ecommerce/StatisticsChart";
-import RecentOrders from "@/components/ecommerce/RecentOrders";
-import DemographicCard from "@/components/ecommerce/DemographicCard";
 import { Dashboard } from "@/components/ecommerce/Dashboard";
-import LineChart from "./(others-pages)/(chart)/line-chart/page";
 import DonutChartOne from "@/components/charts/donut/DonutChartOne";
 import TimeBasedChart from "@/components/charts/bar/TimeBasedChart";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import RecentItemsTable from "@/components/tables/RecentItemsTable";
-import RecentUsersTable from "@/components/tables/RecentUSersTable";
+import RecentUsersTable from "@/components/tables/RecentUsersTable";
 
 export const metadata: Metadata = {
   title:
@@ -42,7 +35,7 @@ export default function Ecommerce() {
       </div>
       <div className="space-y-6">
         <ComponentCard title="Recent Users">
-          <RecentUsersTable />
+          <RecentUsersTable/>
         </ComponentCard>
       </div>
       <div className="space-y-6">

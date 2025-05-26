@@ -17,10 +17,15 @@ export async function GET() {
         .map((user) => ({
             id: user.id,
             email: user.email,
+            email_confirmed: user.email_confirmed_at ? 'Yes' : 'No',
             created_at: new Intl.DateTimeFormat('en-US', {
                 dateStyle: 'medium',
                 timeStyle: 'short',
             }).format(new Date(user.created_at)),
+            last_sign_in_at: user.last_sign_in_at ? new Intl.DateTimeFormat('en-US', {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+            }).format(new Date(user.last_sign_in_at)) : '',
         }))
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
