@@ -4,6 +4,7 @@ import { DataTable } from '@/components/tables/DataTable'
 import { useEffect, useState } from 'react'
 import Link from "next/link";
 import { supabaseClient } from '@/lib/supabaseClient';
+import { toast } from 'react-hot-toast';
 
 const userColumns = (handleView : (item: any) => void, handleDelete : (item: any) => void) => [
     {
@@ -110,7 +111,9 @@ export default function UsersPage() {
 
         if (error) {
             console.error('Delete failed:', error.message);
-            alert('Failed to delete the avatar. Please try again.');
+            
+            toast.error("Failed to delete the avatar. Please try again.");
+            // alert('Failed to delete the avatar. Please try again.');
             return;
         }
 

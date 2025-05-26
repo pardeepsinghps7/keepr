@@ -1,51 +1,58 @@
 'use client'
 
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Label from "@/components/form/Label";
 import ComponentCard from "@/components/common/ComponentCard";
 import {createClient} from "@supabase/supabase-js";
+import { toast } from 'react-hot-toast';
+import { supabaseClient } from "@/lib/supabaseClient";
 
 export default function AddAvatar() {
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
-    global: {
-      headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6InBwaHlpV2NrQWtPeVlGRFQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3J0c3NndnJvaW1lZ3h0eWpham1pLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxNGRhMzU3MS0zNjZlLTQ3NDAtYjc1ZC03MTYxOWQ4MzEzZTUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ3ODI3NDYzLCJpYXQiOjE3NDc4MjM4NjMsImVtYWlsIjoiYWRtaW5AYWRtaW4uY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdLCJyb2xlIjoiYWRtaW4ifSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZX0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDc4MjM4NjN9XSwic2Vzc2lvbl9pZCI6IjMxMWI0ZWRhLTY4MjAtNGM5My05Y2U2LTBiMzBkYTk3NzZiYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.-pUt1LjQAy1IqN89Y03dFILAl7jpTqSTdzxlVh89398`,
-      },
-    },
-  });
+  // const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  //     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+  //   global: {
+  //     headers: {
+  //       Authorization: `Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6InBwaHlpV2NrQWtPeVlGRFQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3J0c3NndnJvaW1lZ3h0eWpham1pLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxNGRhMzU3MS0zNjZlLTQ3NDAtYjc1ZC03MTYxOWQ4MzEzZTUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ3ODI3NDYzLCJpYXQiOjE3NDc4MjM4NjMsImVtYWlsIjoiYWRtaW5AYWRtaW4uY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdLCJyb2xlIjoiYWRtaW4ifSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZX0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDc4MjM4NjN9XSwic2Vzc2lvbl9pZCI6IjMxMWI0ZWRhLTY4MjAtNGM5My05Y2U2LTBiMzBkYTk3NzZiYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.-pUt1LjQAy1IqN89Y03dFILAl7jpTqSTdzxlVh89398`,
+  //     },
+  //   },
+  // });
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
   const handleUpload = async () => {
-    if (!file) return alert('Please select a file');
+
+    
+    if (!file){
+      return toast.error("Please select a file") ;
+    }
+      
     setUploading(true);
     const allowedTypes = ['image/png', 'image/jpg', 'image/jpeg'];
     if (!allowedTypes.includes(file.type)) {
-      return alert('Only PNG, JPG, and JPEG files are allowed.');
+      return toast.error("Only PNG, JPG, and JPEG files are allowed.");
     }
 
     const filePath = `${Date.now()}_${file.name}`;
 
-    const { error } = await supabase.storage
+    const { error } = await supabaseClient.storage
         .from('avatars')
         .upload(filePath, file);
 
     if (error) {
-      alert('Upload failed: ' + error.message);
+      toast.error('Upload failed: ' + error.message);
     } else {
-      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      const { data } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
       const publicUrl = data.publicUrl;
-      const { error: insertError } = await supabase
+      const { error: insertError } = await supabaseClient
           .from('avatars')
           .insert([{ path: publicUrl }]);
 
       if (insertError) {
-        alert('Failed to save avatar URL: ' + insertError.message);
+        toast.error('Failed to save avatar URL: ' + insertError.message);
       } else {
-        alert('Avatar uploaded!');
+        toast.success('Avatar uploaded!');
         setFile(null);
         // fileInputRef.current && (fileInputRef.current.value = '');
       }
