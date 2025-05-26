@@ -45,7 +45,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <ListIcon />,
-    name: "Item List",
+    name: "Lists",
     path: "/lists",
   },
   // {

@@ -5,16 +5,20 @@ import { useEffect, useState } from 'react'
 
 const userColumns = [
     {
-        header: 'ID',
-        accessorKey: 'id',
-    },
-    {
         header: 'Email',
         accessorKey: 'email',
     },
     {
+        header: 'Email Confirmed',
+        accessorKey: 'email_confirmed',
+    },
+    {
         header: 'Created At',
         accessorKey: 'created_at',
+    },
+    {
+        header: 'Last Sign In At',
+        accessorKey: 'last_sign_in_at',
     },
 ]
 

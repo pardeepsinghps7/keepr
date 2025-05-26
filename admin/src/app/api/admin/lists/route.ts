@@ -1,7 +1,5 @@
-// app/api/admin/users/route.ts
 import { NextResponse } from 'next/server'
 import { supabaseClient } from '@/lib/supabaseClient';
-import {createClient} from "@supabase/supabase-js";
 
 export async function GET() {
     const { data, error } = await supabaseClient.from('lists').select(`
