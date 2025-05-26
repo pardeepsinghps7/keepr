@@ -41,14 +41,14 @@
   --color-brand-25: #f2f7ff;
   --color-brand-50: #ecf3ff;
   --color-brand-100: #0B1017;
-  --color-brand-200: #c2d6ff;
+  --color-brand-200: #68abf5;
   --color-brand-300: #9cb9ff;
-  --color-brand-400: #7592ff;
+  --color-brand-400: #738191;
   --color-brand-500: #B3C7DD;
   --color-brand-600: #5478a0;
-  --color-brand-700: #2a31d8;
+  --color-brand-700: #6a8aad;
   --color-brand-800: #6f8398;
-  --color-brand-900: #262e89;
+  --color-brand-900: #263b52;
 
   --color-blue-light-25: #f5fbff;
   --color-blue-light-50: #f0f9ff;
@@ -208,7 +208,7 @@
 }
 
 @utility menu-item-icon-active {
-  @apply text-brand-500 dark:text-white;
+  @apply text-brand-600 dark:text-white;
 }
 
 @utility menu-item-icon-inactive {
