@@ -99,13 +99,21 @@ export function DataTable<TData>({ data, columns }: DataTableProps<TData>) {
                                 <th key={header.id} className=" px-4 py-3 border border-gray-100 dark:border-white/[0.05]">
                                     {header.isPlaceholder ? null : (
                                         <div
-                                            className="flex items-center justify-between cursor-pointer"
-                                            onClick={() => header.column.toggleSorting()}
+                                            className={
+                                                header.column.getCanSort()
+                                                    ? 'flex items-center justify-between cursor-pointer'
+                                                    : 'flex items-center justify-between'
+                                            }
+                                            onClick={() => {
+                                                if (header.column.getCanSort()) {
+                                                    header.column.toggleSorting();
+                                                }
+                                            }}
                                         >
-                                            <p className="font-medium text-gray-700 text-theme-xs dark:text-gray-400">
+                                        <p className="font-medium text-gray-700 text-theme-xs dark:text-gray-400">
                                                 {flexRender(header.column.columnDef.header, header.getContext())}
                                             </p>
-
+                                            {header.column.getCanSort() && (
                                             <button className="flex flex-col gap-0.5 ml-2">
                                                 {/* Ascending Arrow (up) */}
                                                 <svg
@@ -145,6 +153,7 @@ export function DataTable<TData>({ data, columns }: DataTableProps<TData>) {
                                                     />
                                                 </svg>
                                             </button>
+                                            )}
                                         </div>
                                     )}
                                 </th>

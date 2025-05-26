@@ -14,7 +14,8 @@ const userColumns = (handleView : (item: any) => void, handleDelete : (item: any
             return (
                 <img src={item.path} alt="" className="w-20 h-20 rounded-full" />
             );
-        }
+        },
+        enableSorting: false,
     },
     {
         header: 'Created At',
@@ -58,7 +59,8 @@ const userColumns = (handleView : (item: any) => void, handleDelete : (item: any
                     </Link>
                 </div>
             );
-        }
+        },
+        enableSorting: false,
     }
 ]
 
