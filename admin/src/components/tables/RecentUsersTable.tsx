@@ -14,12 +14,16 @@ interface ListUser {
   id: string;
   email: string;
   created_at: string;
+  email_confirmed: string;
+  last_sign_in_at: string;
 }
 
 interface FormattedUSer {
   id: string;
   email: string;
   created_at: string;
+  email_confirmed: string;
+  last_sign_in_at: string;
 }
 
 export default function RecentUsersTable() {
