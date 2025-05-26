@@ -269,7 +269,7 @@ export default function UserDropdown() {
                 </button>
                 <button
                     onClick={handleChangePassword}
-                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="px-4 py-2 text-sm bg-brand-900 text-white rounded hover:bg-brand-500"
                 >
                   Update
                 </button>
