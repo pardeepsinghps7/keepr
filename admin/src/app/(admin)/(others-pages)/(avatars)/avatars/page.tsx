@@ -17,6 +17,7 @@ const userColumns = (handleView : (item: any) => void, handleDelete : (item: any
             );
         },
         enableSorting: false,
+        enableGlobalFilter: false
     },
     {
         header: 'Created At',
@@ -132,7 +133,7 @@ export default function UsersPage() {
                 <p>Loading...</p>
             ) : (
                 <>
-                    <DataTable data={items} columns={userColumns(handleView, handleDelete)}/>
+                    <DataTable data={items} columns={userColumns(handleView, handleDelete)} showExport={false}/>
                     {showModal && selectedItem && (
                         <div
                             className="fixed inset-0 flex items-center justify-center p-5 overflow-y-auto modal z-99999">
