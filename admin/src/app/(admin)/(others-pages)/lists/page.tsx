@@ -38,7 +38,7 @@ export default function UsersPage() {
           </div>
       ),
       enableSorting: false,
-      enableColumnFilter: false,
+      enableGlobalFilter: false
     },
     { header: 'Label', accessorKey: 'label' },
     { header: 'Pre-defined', accessorKey: 'is_default' },
