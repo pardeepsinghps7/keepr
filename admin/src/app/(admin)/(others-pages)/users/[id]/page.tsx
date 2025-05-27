@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { supabaseClient } from '@/lib/supabaseClient';
 import { DataTable } from '@/components/tables/DataTable';
 import { LIST_IDS } from '@/contants/lists';
+import Image from "next/image";
 
 interface ListItem {
     id: string;
@@ -198,7 +199,9 @@ const ItemModal = ({ item, onClose }: { item: FormattedItem; onClose: () => void
                     {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(item.list_id) && (
                         <div>
                             <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Image</p>
-                            <img src={item.image_url} alt="" className="overflow-hidden w-full max-w-25" />
+                            {item.image_url && (
+                                <Image src={item.image_url} alt="" className="overflow-hidden w-full max-w-25"/>
+                            )}
                         </div>
                     )}
                     <Detail label="Created At" value={item.created_at} />
