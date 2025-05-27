@@ -37,39 +37,46 @@ export default function DonutChartOne() {
   const options: ApexOptions = {
     chart: {
       type: "donut",
+      foreColor: "#000",
+      fontFamily: 'Arial, sans-serif',
+      toolbar: { show: true },
+      animations: { enabled: false },
+      sparkline: { enabled: false },
+      defaultLocale: 'en',
     },
     labels: chartData.map(item => item.label),
     colors: [
-  "#1f77b4", // blue
-  "#ff7f0e", // orange
-  "#2ca02c", // green
-  "#d62728", // red
-  "#9467bd", // purple
-  "#8c564b", // brown
-  "#e377c2", // pink
-  "#7f7f7f", // gray
-  "#bcbd22", // yellow-green
-  "#17becf", // cyan
-  "#aec7e8", // light blue
-  "#ffbb78", // light orange
-  "#98df8a", // light green
-  "#ff9896", // light red
-  "#c5b0d5", // light purple
-  "#c49c94", // light brown
-  "#f7b6d2", // light pink
-  "#c7c7c7", // light gray
-  "#dbdb8d", // pale yellow
-  "#9edae5"  // light cyan
-],
+      "#1f77b4", // blue
+      "#ff7f0e", // orange
+      "#2ca02c", // green
+      "#d62728", // red
+      "#9467bd", // purple
+      "#8c564b", // brown
+      "#e377c2", // pink
+      "#7f7f7f", // gray
+      "#bcbd22", // yellow-green
+      "#17becf", // cyan
+      "#aec7e8", // light blue
+      "#ffbb78", // light orange
+      "#98df8a", // light green
+      "#ff9896", // light red
+      "#c5b0d5", // light purple
+      "#c49c94", // light brown
+      "#f7b6d2", // light pink
+      "#c7c7c7", // light gray
+      "#dbdb8d", // pale yellow
+      "#9edae5"  // light cyan
+    ],
     legend: {
       position: "bottom",
     },
     dataLabels: {
       enabled: true,
       style: {
-        fontSize: '16px',   // Increase size for clarity
+        fontSize: '16px',
         fontWeight: 'bold',
-        colors: ['#000'],   // Black text for contrast
+        fontFamily: 'Arial, sans-serif',
+        colors: ['#000'],
       },
     },
     plotOptions: {

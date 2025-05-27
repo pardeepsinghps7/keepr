@@ -44,7 +44,7 @@ def get_all_books():
 
     try:
         # Fetch from Open Library first
-        open_library_url = f"https://openlibrary.org/search.json?q='{query}'&page={page}"
+        open_library_url = f"https://openlibrary.org/search.json?title='{query}'&page={page}"
         data = fetch_data(open_library_url)
         books = format_books(data, "open_library")
 

@@ -1,8 +1,18 @@
 'use client'
 
 import { DataTable } from '@/components/tables/DataTable'
+import { supabaseClient } from '@/lib/supabaseClient'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+
+interface FormattedUser {
+  id: string;
+  email: string;
+  email_confirmed: string;
+  created_at: string;
+  last_sign_in_at: string;
+  items_count: number;
+}
 
 const userColumns = [
     {
@@ -20,6 +30,10 @@ const userColumns = [
     {
         header: 'Last Sign In At',
         accessorKey: 'last_sign_in_at',
+    },
+    {
+        header: 'Items',
+        accessorKey: 'item_count',
     },
     {
         header: 'Actions',
@@ -51,7 +65,7 @@ const userColumns = [
 ]
 
 export default function UsersPage() {
-    const [users, setUsers] = useState<any[]>([])
+    const [users, setUsers] = useState<FormattedUser[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
@@ -59,13 +73,31 @@ export default function UsersPage() {
         const fetchUsers = async () => {
             setLoading(true)
             try {
-                const res = await fetch('/api/admin/users')
-                const data = await res.json()
-                if (res.ok) {
-                    setUsers(data)
-                } else {
-                    throw new Error(data.error)
+
+                const {data,error} = await supabaseClient.rpc('get_users_with_item_count')
+
+                if (error) {
+                    throw new Error("RPC Error:", error)
                 }
+
+                console.log(data)
+
+                const formattedUser: FormattedUser[] = (data).map((user:any) => ({
+                    id: user.id,
+                    email: user.email,
+                    email_confirmed: user.email_confirmed_at ? 'Yes' : 'No',
+                    created_at: new Intl.DateTimeFormat('en-US', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                    }).format(new Date(user.created_at)),
+                    last_sign_in_at: user.last_sign_in_at ? new Intl.DateTimeFormat('en-US', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                    }).format(new Date(user.last_sign_in_at)) : 'N/A',
+                    item_count: user.item_count ?? 0
+                }));
+                
+                setUsers(formattedUser) 
             } catch (err: any) {
                 setError(err.message)
             } finally {
