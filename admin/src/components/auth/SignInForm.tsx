@@ -99,7 +99,7 @@ export default function SignInForm() {
                     <p className="text-sm text-error-500 font-medium">{errorMsg}</p>
                 )}
                 <div>
-                  <Button className="w-full" size="sm">
+                  <Button disabled={!email || !password} className="w-full" size="sm">
                     Sign in
                   </Button>
                 </div>
