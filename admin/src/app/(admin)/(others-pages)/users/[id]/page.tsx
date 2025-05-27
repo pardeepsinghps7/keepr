@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { supabaseClient } from '@/lib/supabaseClient';
 import { DataTable } from '@/components/tables/DataTable';
@@ -9,6 +9,7 @@ import { LIST_IDS } from '@/contants/lists';
 interface ListItem {
     id: string;
     list_id: string;
+    list_label: string;
     podcast_type: string;
     location: string;
     brewery: string;
@@ -24,58 +25,81 @@ interface ListItem {
     created_at: string;
     recommended_by: string;
     notes: string;
+    lists: { label: string }; // Adjusted to match your select('*, lists(label)')
 }
 
-interface FormattedItem {
-    id: string;
-    list_id: string;
+interface FormattedItem extends Omit<ListItem, 'save_for_later' | 'rating' | 'status' | 'podcast_type' | 'lists'> {
     podcast_type: string;
-    location: string;
-    brewery: string;
-    author: string;
-    year: string;
-    image_url: string;
-    title: string;
-    episode_title: string;
-    series_title: string;
     status: string;
     rating: string | number;
     save_for_later: string;
     created_at: string;
-    recommended_by: string;
-    notes: string;
+    list_label: string;
 }
 
+const toWords = (str: string) =>
+    str.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+
 export default function ItemsPage() {
-    const router = useRouter();
     const pathname = usePathname();
-    const listId = pathname.split('/').pop();
+    const userId = pathname.split('/').pop();
 
     const [items, setItems] = useState<FormattedItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedItem, setSelectedItem] = useState<FormattedItem | null>(null);
-    const [showModal, setShowModal] = useState(false);
 
-    const handleView = (item: FormattedItem) => {
-        setSelectedItem(item);
-        setShowModal(true);
-    };
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
-    const toWords = (str: string) =>
-        str.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+            const { data, error } = await supabaseClient
+                .from('items')
+                .select('*, lists(label)')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false });
 
-    const columns = [
+            if (error) throw error;
+
+            const formatted: FormattedItem[] = (data as ListItem[]).map((item) => ({
+                ...item,
+                podcast_type: item.podcast_type ? toWords(item.podcast_type) : '',
+                list_label: toWords(item.lists.label),
+                status: toWords(item.status),
+                rating: item.rating > 0 ? item.rating : '',
+                save_for_later: item.save_for_later ? 'Yes' : 'No',
+                created_at: new Intl.DateTimeFormat('en-US', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                }).format(new Date(item.created_at)),
+            }));
+
+            setItems(formatted);
+        } catch (err) {
+            console.error(err);
+            setError('Failed to fetch data.');
+        } finally {
+            setLoading(false);
+        }
+    }, [userId]);
+
+    useEffect(() => {
+        if (userId) fetchData();
+    }, [userId, fetchData]);
+
+    const columns = useMemo(() => [
         {
             header: 'Title/Name',
             accessorKey: 'title',
             cell: ({ row }: { row: any }) => {
                 const item = row.original;
-                return listId === LIST_IDS.Podcasts
+                return item.list_id === LIST_IDS.Podcasts
                     ? `${item.episode_title} (${item.series_title})`
                     : item.title;
             },
         },
+        { header: 'List', accessorKey: 'list_label' },
         { header: 'Status', accessorKey: 'status' },
         { header: 'Rating', accessorKey: 'rating' },
         { header: 'Save for Later', accessorKey: 'save_for_later' },
@@ -85,7 +109,7 @@ export default function ItemsPage() {
             id: 'actions',
             cell: ({ row }: { row: any }) => (
                 <button
-                    onClick={() => handleView(row.original)}
+                    onClick={() => setSelectedItem(row.original)}
                     className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
                 >
                     <svg
@@ -106,46 +130,7 @@ export default function ItemsPage() {
             ),
             enableSorting: false,
         },
-    ];
-
-    useEffect(() => {
-        if (!listId) return;
-
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
-
-            const { data, error } = await supabaseClient
-                .from('items')
-                .select('*')
-                .eq('list_id', listId)
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                console.error(error);
-                setError('Failed to fetch data.');
-                setLoading(false);
-                return;
-            }
-
-            const formatted = (data as ListItem[]).map((item) => ({
-                ...item,
-                podcast_type: item.podcast_type ? toWords(item.podcast_type) : '',
-                status: toWords(item.status),
-                rating: item.rating > 0 ? item.rating : '',
-                save_for_later: item.save_for_later ? 'Yes' : 'No',
-                created_at: new Intl.DateTimeFormat('en-US', {
-                    dateStyle: 'medium',
-                    timeStyle: 'short',
-                }).format(new Date(item.created_at)),
-            }));
-
-            setItems(formatted);
-            setLoading(false);
-        };
-
-        fetchData();
-    }, [listId, router]);
+    ], []);
 
     return (
         <div>
@@ -159,12 +144,8 @@ export default function ItemsPage() {
             ) : (
                 <>
                     <DataTable data={items} columns={columns} />
-                    {showModal && selectedItem && (
-                        <ItemModal
-                            item={selectedItem}
-                            onClose={() => setShowModal(false)}
-                            listId={listId!}
-                        />
+                    {selectedItem && (
+                        <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} />
                     )}
                 </>
             )}
@@ -172,16 +153,7 @@ export default function ItemsPage() {
     );
 }
 
-// Extracted Modal Component for clarity and reusability
-const ItemModal = ({
-                       item,
-                       onClose,
-                       listId,
-                   }: {
-    item: FormattedItem;
-    onClose: () => void;
-    listId: string;
-}) => (
+const ItemModal = ({ item, onClose }: { item: FormattedItem; onClose: () => void }) => (
     <div className="fixed inset-0 flex items-center justify-center p-5 overflow-y-auto modal z-99999">
         <div className="fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]" />
         <div className="relative w-full max-w-[600px] rounded-3xl bg-white p-6 dark:bg-gray-900 lg:p-10">
@@ -205,36 +177,28 @@ const ItemModal = ({
             </button>
 
             <div>
-                <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">
-                    Item Detail
-                </h4>
+                <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">Item Detail</h4>
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
-                    {listId === LIST_IDS.Podcasts && (
+                    {item.list_id === LIST_IDS.Podcasts && (
                         <>
                             <Detail label="Podcast Type" value={item.podcast_type} />
                             <Detail label="Series Title" value={item.series_title} />
                             <Detail label="Episode Title" value={item.episode_title} />
                         </>
                     )}
-                    {listId !== LIST_IDS.Podcasts && <Detail label="Title/Name" value={item.title} />}
-                    {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(listId) && <Detail label="Year" value={item.year} />}
-                    {listId === LIST_IDS.Restaurants && (
-                        <Detail label="Location" value={item.location} />
-                    )}
-                    {listId === LIST_IDS.Beer && <Detail label="Brewery" value={item.brewery} />}
-                    {listId === LIST_IDS.Books && <Detail label="Author" value={item.author} />}
+                    {item.list_id !== LIST_IDS.Podcasts && <Detail label="Title/Name" value={item.title} />}
+                    {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(item.list_id) && <Detail label="Year" value={item.year} />}
+                    {item.list_id === LIST_IDS.Restaurants && <Detail label="Location" value={item.location} />}
+                    {item.list_id === LIST_IDS.Beer && <Detail label="Brewery" value={item.brewery} />}
+                    {item.list_id === LIST_IDS.Books && <Detail label="Author" value={item.author} />}
                     <Detail label="Save for Later" value={item.save_for_later} />
                     <Detail label="Status" value={item.status} />
                     <Detail label="Rating" value={item.rating} />
                     <Detail label="Recommended by" value={item.recommended_by} />
-                    {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(listId) && (
+                    {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(item.list_id) && (
                         <div>
                             <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Image</p>
-                            <img
-                                src={item.image_url}
-                                alt=""
-                                className="overflow-hidden w-full max-w-25"
-                            />
+                            <img src={item.image_url} alt="" className="overflow-hidden w-full max-w-25" />
                         </div>
                     )}
                     <Detail label="Created At" value={item.created_at} />
@@ -257,17 +221,9 @@ const ItemModal = ({
     </div>
 );
 
-const Detail = ({
-                    label,
-                    value,
-                }: {
-    label: string;
-    value: string | number;
-}) => (
+const Detail = ({ label, value }: { label: string; value: string | number }) => (
     <div>
         <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">{label}</p>
-        <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-            {value}
-        </p>
+        <p className="text-sm font-medium text-gray-800 dark:text-white/90">{value}</p>
     </div>
 );
