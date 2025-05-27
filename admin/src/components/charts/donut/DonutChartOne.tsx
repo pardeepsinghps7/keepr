@@ -42,6 +42,42 @@ export default function DonutChartOne() {
     legend: {
       position: "bottom",
     },
+    dataLabels: {
+      enabled: true,
+      style: {
+        fontSize: '16px',   // Increase size for clarity
+        fontWeight: 'bold',
+        colors: ['#000'],   // Black text for contrast
+      },
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          labels: {
+            show: true,
+            name: {
+              show: true,
+              fontSize: '16px',
+            },
+            value: {
+              show: true,
+              fontSize: '18px',
+              fontWeight: 600,
+              color: '#111',
+            },
+            total: {
+              show: true,
+              label: 'Total Items',
+              fontSize: '16px',
+              color: '#777',
+              formatter: function(w) {
+                return w.globals.seriesTotals.reduce((a:any, b:any) => a + b, 0).toString();
+              },
+            }
+          }
+        }
+      }
+    }
   };
 
   const series = chartData.map(item => item.item_count);
