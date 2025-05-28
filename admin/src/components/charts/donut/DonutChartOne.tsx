@@ -46,26 +46,25 @@ export default function DonutChartOne() {
     },
     labels: chartData.map(item => item.label),
     colors: [
-      "#1f77b4", // blue
-      "#ff7f0e", // orange
-      "#2ca02c", // green
-      "#d62728", // red
-      "#9467bd", // purple
-      "#8c564b", // brown
-      "#e377c2", // pink
-      "#7f7f7f", // gray
-      "#bcbd22", // yellow-green
-      "#17becf", // cyan
-      "#aec7e8", // light blue
-      "#ffbb78", // light orange
-      "#98df8a", // light green
-      "#ff9896", // light red
-      "#c5b0d5", // light purple
-      "#c49c94", // light brown
-      "#f7b6d2", // light pink
-      "#c7c7c7", // light gray
-      "#dbdb8d", // pale yellow
-      "#9edae5"  // light cyan
+      "#ADD8E6", // light blue
+      "#FFDAB9", // peach
+      "#90EE90", // light green
+      "#E6E6FA", // lavender
+      "#FFB6C1", // light pink
+      "#D3D3D3", // light gray
+      "#E0FFFF", // light cyan
+      "#F5DEB3", // wheat
+      "#F08080", // light coral
+      "#F0E68C", // khaki
+      "#D8BFD8", // thistle
+      "#B0E0E6", // powder blue
+      "#FFE4E1", // misty rose
+      "#EEDD82", // light goldenrod
+      "#AFEEEE", // pale turquoise
+      "#F5F5DC", // beige
+      "#FFF0F5", // lavender blush
+      "#FAFAD2", // light v yellow
+      "#E6F0FA"  // very light blue
     ],
     legend: {
       position: "bottom",
@@ -73,10 +72,13 @@ export default function DonutChartOne() {
     dataLabels: {
       enabled: true,
       style: {
-        fontSize: '16px',
+        fontSize: '14px',
         fontWeight: 'bold',
         fontFamily: 'Arial, sans-serif',
-        colors: ['#000'],
+        colors: ['#fff'],
+      },
+      dropShadow: {
+        enabled: false,
       },
     },
     plotOptions: {

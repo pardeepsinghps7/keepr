@@ -24,14 +24,17 @@ export default function Ecommerce() {
         </ComponentCard>
       </div>
       <div className="space-y-6">
-        <ComponentCard title="Items count by List">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
+        <ComponentCard title="Items Count by List">
           <DonutChartOne />
         </ComponentCard>
-      </div>
-      <div className="space-y-6">
-        <ComponentCard title="Item count by Time">
+        <ComponentCard title="Items Count by Time">
           <TimeBasedChart />
         </ComponentCard>
+        </div>
+      </div>
+      <div className="space-y-6">
+        
       </div>
       <div className="space-y-6">
         <ComponentCard title="Recent Users">

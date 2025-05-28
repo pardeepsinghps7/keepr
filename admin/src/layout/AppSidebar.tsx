@@ -39,12 +39,12 @@ const navItems: NavItem[] = [
     name: "Avatars",
     subItems: [
       {
-        name: "list",
+        name: "List",
         path: "/avatars",
         pro: false
       },
       {
-        name: "add",
+        name: "Add",
         path: "/avatars/add",
         pro: false
       },

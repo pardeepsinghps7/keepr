@@ -14,7 +14,7 @@ type ViewType = "weekly" | "monthly" | "yearly";
 
 export default function TimeBasedChart() {
 
-  const [view, setView] = useState<ViewType>("monthly");
+  const [view, setView] = useState<ViewType>("weekly");
   const [data, setData] = useState<{ label: string, count: number }[]>([]);
 
 
