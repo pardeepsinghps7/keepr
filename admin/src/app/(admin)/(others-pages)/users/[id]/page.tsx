@@ -68,7 +68,7 @@ export default function ItemsPage() {
                 podcast_type: item.podcast_type ? toWords(item.podcast_type) : '',
                 list_label: toWords(item.lists.label),
                 status: toWords(item.status),
-                rating: item.rating > 0 ? item.rating : '',
+                rating: item.rating > 0 ? item.rating : 'N/A',
                 save_for_later: item.save_for_later ? 'Yes' : 'No',
                 created_at: new Intl.DateTimeFormat('en-US', {
                     dateStyle: 'medium',
@@ -194,8 +194,8 @@ const ItemModal = ({ item, onClose }: { item: FormattedItem; onClose: () => void
                     {item.list_id === LIST_IDS.Books && <Detail label="Author" value={item.author} />}
                     <Detail label="Save for Later" value={item.save_for_later} />
                     <Detail label="Status" value={item.status} />
-                    <Detail label="Rating" value={item.rating} />
-                    <Detail label="Recommended by" value={item.recommended_by} />
+                    <Detail label="Rating" value={item?.rating ?? "N/A"} />
+                    <Detail label="Recommended by" value={item.recommended_by ? item.recommended_by : "N/A"} />
                     {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(item.list_id) && (
                         <div>
                             <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Image</p>
@@ -207,7 +207,7 @@ const ItemModal = ({ item, onClose }: { item: FormattedItem; onClose: () => void
                     <Detail label="Created At" value={item.created_at} />
                 </div>
                 <div className="grid grid-cols-1 gap-4 mt-3">
-                    <Detail label="Notes" value={item.notes} />
+                    <Detail label="Notes" value={item.notes ? item.notes : "N/A"} />
                 </div>
             </div>
 

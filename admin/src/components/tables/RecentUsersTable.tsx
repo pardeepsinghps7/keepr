@@ -62,25 +62,25 @@ export default function RecentUsersTable() {
               <TableRow>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-lg dark:text-gray-400"
                 >
                   Email
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-lg dark:text-gray-400"
                 >
                   Email Confirmed
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-lg dark:text-gray-400"
                 >
                   Created At
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-lg dark:text-gray-400"
                 >
                   Last Sign In At
                 </TableCell>
@@ -104,7 +104,7 @@ export default function RecentUsersTable() {
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <div className="flex -space-x-2">
-                      {user.last_sign_in_at}
+                      {user.last_sign_in_at ? user.last_sign_in_at : "N/A"}
                     </div>
                   </TableCell>
                 </TableRow>
