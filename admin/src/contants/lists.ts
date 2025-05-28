@@ -6,5 +6,5 @@ export const LIST_IDS: Record<string, string> = {
     'Movies' : '560de520-57e1-4c7d-bb9e-e6f723f6cd6c',
     'Podcasts' : '68d6cf9d-77cf-4c7b-8379-1403975a111b',
     'TV Shows' : 'd9d0d96d-c86d-4954-81a6-fe0a2ffc6cfa',
-    'Beer' : 'e051e5d8-7175-4953-b3a5-7a05b6a21691'
+    'Beer' : 'a4040858-98b2-4bd5-a0ec-65e0afdcedcc'
 };
