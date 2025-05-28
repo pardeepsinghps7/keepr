@@ -51,6 +51,7 @@ export default function UsersPage() {
           <Link
               href={`lists/${row.original.id}`}
               className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
+              title='View Items'
           >
             <svg
                 className="fill-current"

@@ -112,6 +112,7 @@ export default function ItemsPage() {
                 <button
                     onClick={() => setSelectedItem(row.original)}
                     className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
+                    title='View Detail'
                 >
                     <svg
                         className="fill-current"
