@@ -77,7 +77,7 @@ export default function AddAvatar() {
             <button
                 onClick={handleUpload}
                 disabled={uploading}
-                className="px-4 py-2 bg-brand-500 text-white rounded"
+                className="px-4 py-2 bg-brand-900 text-white rounded hover:bg-brand-500"
             >
               {uploading ? 'Uploading...' : 'Upload File'}
             </button>
