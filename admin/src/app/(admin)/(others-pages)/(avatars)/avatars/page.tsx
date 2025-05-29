@@ -75,13 +75,18 @@ export default function AvatarsPage() {
         const fetchAvatars = async () => {
             setLoading(true)
             try {
-                const res = await fetch('/api/admin/avatars')
-                const data = await res.json()
-                if (res.ok) {
-                    setItems(data)
-                } else {
-                    throw new Error(data.error)
-                }
+                const { data, error } = await supabaseClient.from('avatars').select()
+                if (error) throw new Error(error.message);
+                const formattedData = data
+                    .map((item) => ({
+                        id: item.id,
+                        path: item.path,
+                        created_at: new Intl.DateTimeFormat('en-US', {
+                            dateStyle: 'medium',
+                            timeStyle: 'short',
+                        }).format(new Date(item.created_at)),
+                    }))
+                setItems(formattedData);
             } catch (err: any) {
                 setError(err.message)
             } finally {
