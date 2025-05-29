@@ -81,12 +81,10 @@ export default function UsersPage() {
                     throw new Error("RPC Error:", error)
                 }
 
-                console.log(data)
-
                 const formattedUser: FormattedUser[] = (data).map((user:any) => ({
                     id: user.id,
                     email: user.email,
-                    email_confirmed: user.email_confirmed_at ? 'Yes' : 'No',
+                    email_confirmed: user.email_confirmed ? 'Yes' : 'No',
                     created_at: new Intl.DateTimeFormat('en-US', {
                         dateStyle: 'medium',
                         timeStyle: 'short',
