@@ -1,13 +1,17 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { supabaseClient } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import {EyeCloseIcon, EyeIcon} from "@/icons";
+import Label from "@/components/form/Label";
+import Input from "@/components/form/input/InputField";
 
 export default function UserDropdown() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showCPassword, setShowCPassword] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -126,33 +130,6 @@ export default function UserDropdown() {
         </div>
 
         <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
-          {/*}
-          <li>
-            <DropdownItem
-              onItemClick={closeDropdown}
-              tag="a"
-              href="/profile"
-              className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-            >
-              <svg
-                className="fill-gray-500 group-hover:fill-gray-700 dark:fill-gray-400 dark:group-hover:fill-gray-300"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M12 3.5C7.30558 3.5 3.5 7.30558 3.5 12C3.5 14.1526 4.3002 16.1184 5.61936 17.616C6.17279 15.3096 8.24852 13.5955 10.7246 13.5955H13.2746C15.7509 13.5955 17.8268 15.31 18.38 17.6167C19.6996 16.119 20.5 14.153 20.5 12C20.5 7.30558 16.6944 3.5 12 3.5ZM17.0246 18.8566V18.8455C17.0246 16.7744 15.3457 15.0955 13.2746 15.0955H10.7246C8.65354 15.0955 6.97461 16.7744 6.97461 18.8455V18.856C8.38223 19.8895 10.1198 20.5 12 20.5C13.8798 20.5 15.6171 19.8898 17.0246 18.8566ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM11.9991 7.25C10.8847 7.25 9.98126 8.15342 9.98126 9.26784C9.98126 10.3823 10.8847 11.2857 11.9991 11.2857C13.1135 11.2857 14.0169 10.3823 14.0169 9.26784C14.0169 8.15342 13.1135 7.25 11.9991 7.25ZM8.48126 9.26784C8.48126 7.32499 10.0563 5.75 11.9991 5.75C13.9419 5.75 15.5169 7.32499 15.5169 9.26784C15.5169 11.2107 13.9419 12.7857 11.9991 12.7857C10.0563 12.7857 8.48126 11.2107 8.48126 9.26784Z"
-                  fill=""
-                />
-              </svg>
-              Edit profile
-            </DropdownItem>
-          </li>
-          */}
           <li>
             <DropdownItem
               onItemClick={() => {
@@ -180,32 +157,6 @@ export default function UserDropdown() {
               Change Password
             </DropdownItem>
           </li>
-          { /*}
-          <li>
-            <DropdownItem
-              onItemClick={closeDropdown}
-              tag="a"
-              href="/profile"
-              className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-            >
-              <svg
-                className="fill-gray-500 group-hover:fill-gray-700 dark:fill-gray-400 dark:group-hover:fill-gray-300"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M3.5 12C3.5 7.30558 7.30558 3.5 12 3.5C16.6944 3.5 20.5 7.30558 20.5 12C20.5 16.6944 16.6944 20.5 12 20.5C7.30558 20.5 3.5 16.6944 3.5 12ZM12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM11.0991 7.52507C11.0991 8.02213 11.5021 8.42507 11.9991 8.42507H12.0001C12.4972 8.42507 12.9001 8.02213 12.9001 7.52507C12.9001 7.02802 12.4972 6.62507 12.0001 6.62507H11.9991C11.5021 6.62507 11.0991 7.02802 11.0991 7.52507ZM12.0001 17.3714C11.5859 17.3714 11.2501 17.0356 11.2501 16.6214V10.9449C11.2501 10.5307 11.5859 10.1949 12.0001 10.1949C12.4143 10.1949 12.7501 10.5307 12.7501 10.9449V16.6214C12.7501 17.0356 12.4143 17.3714 12.0001 17.3714Z"
-                  fill=""
-                />
-              </svg>
-              Support
-            </DropdownItem>
-          </li> */}
         </ul>
         <button
           onClick={handleLogout}
@@ -242,39 +193,72 @@ export default function UserDropdown() {
               </button>
               <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">Change Password</h4>
               <div
-                  className="grid grid-cols-1">
-                <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="New password"
-                    className="w-full p-2 mb-3 border rounded dark:bg-gray-700 dark:text-white"
-                />
-                <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm password"
-                    className="w-full p-2 mb-3 border rounded dark:bg-gray-700 dark:text-white"
-                />
-              {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-              {success && <p className="text-green-500 text-sm mb-2">{success}</p>}
-              <div className="flex justify-end gap-2">
-                <button
-                    onClick={() => setShowPasswordModal(false)}
-                    className="px-4 py-2 text-sm text-gray-700 dark:text-white border rounded hover:bg-gray-100 dark:hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-                <button
-                    onClick={handleChangePassword}
-                    className="px-4 py-2 text-sm bg-brand-900 text-white rounded hover:bg-brand-500"
-                >
-                  Update
-                </button>
+                  className="grid grid-cols-1 space-y-6">
+                <div>
+                  <Label>
+                    New Password <span className="text-error-500">*</span>{" "}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="New password"
+                        defaultValue={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                    <span
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                    >
+                      {showPassword ? (
+                          <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
+                      ) : (
+                          <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <Label>
+                    Confirm Password <span className="text-error-500">*</span>{" "}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                        type={showCPassword ? "text" : "password"}
+                        placeholder="Confirm password"
+                        defaultValue={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                    <span
+                        onClick={() => setShowCPassword(!showCPassword)}
+                        className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                    >
+                      {showCPassword ? (
+                          <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
+                      ) : (
+                          <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
+                      )}
+                    </span>
+                  </div>
+                </div>
+                {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+                {success && <p className="text-green-500 text-sm mb-2">{success}</p>}
+                <div className="flex justify-end gap-2">
+                  <button
+                      onClick={() => setShowPasswordModal(false)}
+                      className="px-4 py-2 text-sm text-gray-700 dark:text-white border rounded hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                      onClick={handleChangePassword}
+                      className="px-4 py-2 text-sm bg-brand-900 text-white rounded hover:bg-brand-500"
+                  >
+                    Update
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
           </div>
       )}
     </div>
