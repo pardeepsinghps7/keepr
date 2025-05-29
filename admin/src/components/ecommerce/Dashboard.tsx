@@ -1,11 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Badge from "../ui/badge/Badge";
-import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GridIcon, GroupIcon } from "@/icons";
+import { BoxIconLine, GridIcon, GroupIcon } from "@/icons";
 import { supabaseClient } from "@/lib/supabaseClient";
 
 export const Dashboard = () => {
-
+  const [loading, setLoading] = useState(true)
   const [data, setData] = useState<{
     user_count: number;
     pre_defined_list: number;
@@ -14,6 +13,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     const fetchDashboardData = async() => {
+      setLoading(true)
       const {data,error} = await supabaseClient.rpc('get_dashboard_summary');
 
       if (error) {
@@ -22,6 +22,7 @@ export const Dashboard = () => {
       }
 
       setData(data?.[0]);
+      setLoading(false)
     };
 
     fetchDashboardData();
@@ -40,9 +41,11 @@ export const Dashboard = () => {
             <span className="text-lg text-white dark:text-white xl:text-xl md:text-theme-xl ">
               Users
             </span>
-            <h4 className="mt-2 font-bold text-white text-right text-title-md dark:text-white/90 xl:text-title-lg md:text-title-md">
-              {data?.user_count ?? "N/A"}
-            </h4>
+              <h4 className="mt-2 font-bold text-white text-right text-title-md dark:text-white/90 xl:text-title-lg md:text-title-md">
+                {loading ? ( '...' ) : (
+                data?.user_count
+                )}
+              </h4>
           </div>
         </div>
       </div>
@@ -58,7 +61,9 @@ export const Dashboard = () => {
               Pre Defined Lists
             </span>
             <h4 className="mt-2 font-bold text-white text-right text-title-md dark:text-white/90 xl:text-title-lg md:text-title-md">
-              {data?.pre_defined_list ?? "N/A"}
+              {loading ? ( '...' ) : (
+                  data?.pre_defined_list
+              )}
             </h4>
           </div>
         </div>
@@ -76,7 +81,9 @@ export const Dashboard = () => {
               Custom Lists
             </span>
             <h4 className="mt-2 font-bold text-white text-right text-title-md dark:text-white/90 xl:text-title-lg md:text-title-md">
-              {data?.custom_list ?? "N/A"}
+              {loading ? ( '...' ) : (
+                  data?.custom_list
+              )}
             </h4>
           </div>
         </div>

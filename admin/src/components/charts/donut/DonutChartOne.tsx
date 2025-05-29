@@ -114,7 +114,7 @@ export default function DonutChartOne() {
   const series = chartData.map(item => item.item_count);
 
   if (series.length === 0) {
-    return <div className="text-gray-500 dark:text-gray-400">No data available</div>;
+    return <div className="text-gray-500 dark:text-gray-400">Loading...</div>;
   }
 
   return (

@@ -82,7 +82,7 @@ export default function TimeBasedChart() {
         {data.length > 0 ? (
         <ReactApexChart options={options} series={series} type="bar" height={350} />
       ) : (
-        <p className="text-center text-gray-500 dark:text-gray-400">No data available</p>
+        <p className="text-center text-gray-500 dark:text-gray-400">Loading...</p>
       )}
       </div>
     </div>
