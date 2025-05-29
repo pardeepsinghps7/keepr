@@ -118,13 +118,13 @@ export default function DonutChartOne() {
   }
 
   return (
-    <div className="max-w-full overflow-x-auto custom-scrollbar">
+    <div className="max-w-full">
       <div id="chartEight" className="">
         <ReactApexChart
           options={options}
           series={series}
           type="donut"
-          height={320}
+          height={420}
         />
       </div>
     </div>
