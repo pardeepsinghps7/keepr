@@ -3,7 +3,7 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabaseClient";
 
@@ -13,15 +13,6 @@ export default function SignInForm() {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
-
-  useEffect(() => {
-    const emailInput = document.querySelector<HTMLInputElement>('input[type="email"]');
-    const passwordInput = document.querySelector<HTMLInputElement>('input[type="password"]');
-
-    if (emailInput?.value) setEmail(emailInput.value);
-    if (passwordInput?.value) setPassword(passwordInput.value);
-  }, []);
-
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,19 +86,11 @@ export default function SignInForm() {
                     </span>
                   </div>
                 </div>
-                {/*<div className="flex items-center justify-between">
-                  <Link
-                    href="/reset-password"
-                    className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>*/}
                 {errorMsg && (
                     <p className="text-sm text-error-500 font-medium">{errorMsg}</p>
                 )}
                 <div>
-                  <Button disabled={!email || !password} className="w-full bg-brand-900 shadow-theme-xs hover:bg-brand-500" size="sm">
+                  <Button className="w-full bg-brand-900 shadow-theme-xs hover:bg-brand-500" size="sm">
                     Sign in
                   </Button>
                 </div>
