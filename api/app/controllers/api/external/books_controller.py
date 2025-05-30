@@ -18,18 +18,22 @@ def format_books(data, source="open_library"):
         for book in data.get("docs", []):
             title = book.get("title", "Unknown Title")
             author = book.get("author_name", ["Unknown Author"])
+            client_id = book.get("key", [""])
             books.append({
+                "client_id": client_id,
                 "title": title,
-                "author": ", ".join(author)
+                "author": ", ".join(author),
             })
     elif source == "google_books":
         for item in data.get("items", []):
             volume_info = item.get("volumeInfo", {})
+            client_id = item.get("id", "")
             title = volume_info.get("title", "Unknown Title")
             author = volume_info.get("authors", ["Unknown Author"])
             books.append({
+                "client_id": client_id,
                 "title": title,
-                "author": ", ".join(author)
+                "author": ", ".join(author),
             })
 
     return books
