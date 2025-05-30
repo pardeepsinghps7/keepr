@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabaseClient } from '@/lib/supabaseClient';
 import { DataTable } from '@/components/tables/DataTable';
+import { useSearchParams } from 'next/navigation';
 
 interface ListItem {
   id: string;
@@ -24,6 +25,8 @@ interface FormattedItem {
 }
 
 export default function UsersPage() {
+  const searchParams = useSearchParams();
+  const filter = searchParams.get('pre-defined');
   const [items, setItems] = useState<FormattedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,12 +77,13 @@ export default function UsersPage() {
   ], []);
 
   useEffect(() => {
+    console.log(filter)
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const { data, error } = await supabaseClient
+        const query = supabaseClient
             .from('lists')
             .select(`
             id,
@@ -90,6 +94,13 @@ export default function UsersPage() {
             items(count)
           `)
             .order('created_at', { ascending: false });
+
+        if (filter === 'yes') {
+          query.eq('is_default', true);
+        } else if (filter === 'no') {
+          query.eq('is_default', false);
+        }
+        const { data, error } = await query;
 
         if (error) throw new Error(error.message);
 
@@ -115,7 +126,7 @@ export default function UsersPage() {
     };
 
     fetchData();
-  }, []);
+  }, [filter]);
 
   return (
       <div>
