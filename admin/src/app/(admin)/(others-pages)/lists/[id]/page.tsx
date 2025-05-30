@@ -23,6 +23,7 @@ interface ListItem {
     rating: number;
     save_for_later: boolean;
     created_at: string;
+    updated_at: string;
     recommended_by: string;
     notes: string;
 }
@@ -43,6 +44,7 @@ interface FormattedItem {
     rating: string | number;
     save_for_later: string;
     created_at: string;
+    updated_at: string;
     recommended_by: string;
     notes: string;
 }
@@ -140,6 +142,10 @@ export default function ItemsPage() {
                     dateStyle: 'medium',
                     timeStyle: 'short',
                 }).format(new Date(item.created_at)),
+                updated_at: new Intl.DateTimeFormat('en-US', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                }).format(new Date(item.updated_at)),
             }));
 
             setItems(formatted);

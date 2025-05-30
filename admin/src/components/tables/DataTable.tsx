@@ -13,6 +13,7 @@ import {
     SortingState,
     ColumnFiltersState,
 } from '@tanstack/react-table';
+import { usePathname } from 'next/navigation';
 
 interface DataTableProps<TData> {
     data: TData[];
@@ -24,6 +25,7 @@ export function DataTable<TData>({ data, columns, showExport = true }: DataTable
     const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const pathname = usePathname();
 
     const table = useReactTable({
         data,
@@ -44,7 +46,9 @@ export function DataTable<TData>({ data, columns, showExport = true }: DataTable
 
     const handleExport = () => {
         const exportData = table.getRowModel().rows.map((row) => row.original);
-        exportToCSV(exportData, 'users.csv');
+        const segments = pathname.split('/').filter(Boolean);
+        const pageName = segments.length > 0 ? segments[segments.length - 1] : 'index';
+        exportToCSV(exportData, `${pageName}.csv`);
     };
 
     return (
