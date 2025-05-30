@@ -743,3 +743,11 @@ span.flatpickr-weekday,
   margin-top: 65px !important;
 }
 
+#chartEight .apexcharts-tooltip div:last-child{
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+#chartEight .apexcharts-tooltip *{
+  line-height: 24px !important;
+}
