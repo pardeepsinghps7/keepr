@@ -44,7 +44,7 @@ def get_all_movies():
             return jsonify({"status": False, "error": response_data.get("status_message")}), 400
         
         # Extract movie titles
-        data = [{"title": movie.get("title", "Unknown Title")} for movie in response_data.get("results", [])]
+        data = [{"client_id" : movie.get('id'),"title": movie.get("title", "Unknown Title")} for movie in response_data.get("results", [])]
 
         return jsonify({"status": True, "data": data}), 200
     
