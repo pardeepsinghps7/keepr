@@ -42,7 +42,7 @@ export default function Ecommerce() {
         </ComponentCard>
       </div>
       <div className="space-y-6">
-        <ComponentCard title="Recent Items">
+        <ComponentCard title="Recent Lists">
           <RecentItemsTable />
         </ComponentCard>
       </div>
