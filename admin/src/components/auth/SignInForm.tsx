@@ -3,8 +3,7 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
-import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabaseClient";
 
@@ -14,6 +13,15 @@ export default function SignInForm() {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    const emailInput = document.querySelector<HTMLInputElement>('input[type="email"]');
+    const passwordInput = document.querySelector<HTMLInputElement>('input[type="password"]');
+
+    if (emailInput?.value) setEmail(emailInput.value);
+    if (passwordInput?.value) setPassword(passwordInput.value);
+  }, []);
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
