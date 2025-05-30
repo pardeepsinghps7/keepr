@@ -168,15 +168,29 @@ export function DataTable<TData>({ data, columns, showExport = true }: DataTable
                     </thead>
 
                     <tbody>
-                    {table.getRowModel().rows.map((row) => (
-                        <tr key={row.id}>
-                            {row.getVisibleCells().map((cell) => (
-                                <td key={cell.id} className=" px-4 py-3 border border-gray-100 dark:text-gray-200 dark:border-white/[0.05] whitespace-nowrap">
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))} 
+                    {table.getRowModel().rows.length === 0 ? (
+                        <tr>
+                            <td
+                                colSpan={columns.length}
+                                className="text-center py-6 text-gray-500 dark:text-gray-400"
+                            >
+                                No record found
+                            </td>
                         </tr>
-                    ))}
+                    ) : (
+                        table.getRowModel().rows.map((row) => (
+                            <tr key={row.id}>
+                                {row.getVisibleCells().map((cell) => (
+                                    <td
+                                        key={cell.id}
+                                        className="px-4 py-3 border border-gray-100 dark:text-gray-200 dark:border-white/[0.05] whitespace-nowrap"
+                                    >
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))
+                    )}
                     </tbody>
                 </table>
             </div>
