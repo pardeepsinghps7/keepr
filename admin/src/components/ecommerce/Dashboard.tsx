@@ -53,7 +53,7 @@ export const Dashboard = () => {
       </div>
       </Link>
 
-      <Link href={`/lists/?pre-defined=yes`}>
+      <Link href={`/lists/pre-defined`}>
       <div className="flex gap-x-2 items justify-between rounded-2xl border border-gray-200 bg-brand-700 p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
         <div className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-xl dark:bg-gray-800">
           <GridIcon className="text-gray-800 size-6 dark:text-white/90" />
@@ -76,7 +76,7 @@ export const Dashboard = () => {
       {/* <!-- Metric Item End --> */}
 
       {/* <!-- Metric Item Start --> */}
-      <Link href={`/lists/?pre-defined=no`}>
+      <Link href={`/lists/custom`}>
       <div className="flex gap-x-2 items justify-between rounded-2xl border border-gray-200 bg-brand-900 p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
         <div className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-xl dark:bg-gray-800">
           <BoxIconLine className="text-gray-800 dark:text-white/90" />

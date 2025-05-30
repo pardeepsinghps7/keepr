@@ -41,7 +41,6 @@ export default function UsersPage() {
       enableGlobalFilter: false
     },
     { header: 'Label', accessorKey: 'label' },
-    { header: 'Pre-defined', accessorKey: 'is_default' },
     { header: 'Items', accessorKey: 'items_count' },
     { header: 'Created At', accessorKey: 'created_at' },
     {
@@ -85,10 +84,9 @@ export default function UsersPage() {
             id,
             label,
             icon,
-            is_default,
             created_at,
             items(count)
-          `)
+          `).eq('is_default', false)
             .order('created_at', { ascending: false });
 
         if (error) throw new Error(error.message);

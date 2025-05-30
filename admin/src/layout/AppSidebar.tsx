@@ -58,7 +58,23 @@ const navItems: NavItem[] = [
   {
     icon: <ListIcon />,
     name: "Lists",
-    path: "/lists",
+    subItems: [
+      {
+        name: "All",
+        path: "/lists",
+        pro: false
+      },
+      {
+        name: "Pre-defined",
+        path: "/lists/pre-defined",
+        pro: false
+      },
+      {
+        name: "Custom",
+        path: "/lists/custom",
+        pro: false
+      },
+    ]
   },
   // {
   //   icon: <UserCircleIcon />,
