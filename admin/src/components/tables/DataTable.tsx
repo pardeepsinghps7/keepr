@@ -200,6 +200,7 @@ export function DataTable<TData>({ data, columns, showExport = true }: DataTable
             </div>
 
             {/* Pagination */}
+            {data.length > 0 && (
             <div className="flex justify-between items-center mt-6">
                 <div className="flex items-center gap-2">
                     <button
@@ -221,9 +222,10 @@ export function DataTable<TData>({ data, columns, showExport = true }: DataTable
                     Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
                 </div>
             </div>
-                </div>
-                    </div>
-                </div>
+            )}
+        </div>
+        </div>
+        </div>
         </div>
         </div>
     );
