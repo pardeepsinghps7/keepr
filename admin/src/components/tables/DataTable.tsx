@@ -186,7 +186,8 @@ export function DataTable<TData>({ data, columns, showExport = true }: DataTable
                                 {row.getVisibleCells().map((cell) => (
                                     <td
                                         key={cell.id}
-                                        className="px-4 py-3 border border-gray-100 dark:text-gray-200 dark:border-white/[0.05] whitespace-nowrap"
+                                        className="px-4 py-3 border border-gray-100 dark:text-gray-200 dark:border-white/[0.05] break-words"
+                                        style={{ maxWidth: '300px' }}
                                     >
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </td>

@@ -751,3 +751,6 @@ span.flatpickr-weekday,
 #chartEight .apexcharts-tooltip *{
   line-height: 24px !important;
 }
+#chartOne .apexcharts-toolbar {
+  top: -56px !important;
+}

@@ -287,7 +287,7 @@ const Rating = ({
                         <svg
                             key={index}
                             className={`shrink-0 size-5 ${
-                                index < rating ? 'text-yellow-400' : 'text-gray-300'
+                                index < rating ? 'text-gray-800' : 'text-gray-300'
                             }`}
                             xmlns="http://www.w3.org/2000/svg"
                             width="16"
@@ -307,4 +307,3 @@ const Rating = ({
         </div>
     );
 };
-
