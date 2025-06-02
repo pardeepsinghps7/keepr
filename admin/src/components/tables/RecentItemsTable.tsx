@@ -129,7 +129,7 @@ export default function RecentItemsTable() {
                 <TableRow key={item.id}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 overflow-hidden">
+                      <div className="w-5 h-5 overflow-hidden">
                         <Image
                           width={40}
                           height={40}

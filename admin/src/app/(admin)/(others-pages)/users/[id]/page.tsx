@@ -182,7 +182,7 @@ const ItemModal = ({ item, onClose }: { item: FormattedItem; onClose: () => void
                     {item.list_id === LIST_IDS.Books && <Detail label="Author" value={item.author} />}
                     <Detail label="Save for Later" value={item.save_for_later} />
                     <Detail label="Status" value={item.status} />
-                    <Detail label="Rating" value={item?.rating ?? "N/A"} />
+                    <Rating label="Rating" value={item?.rating ?? "N/A"} />
                     <Detail label="Recommended by" value={item.recommended_by ? item.recommended_by : "N/A"} />
                     {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(item.list_id) && (
                         <div>
@@ -218,3 +218,45 @@ const Detail = ({ label, value }: { label: string; value: string | number }) => 
         <p className="text-sm font-medium text-gray-800 dark:text-white/90">{value}</p>
     </div>
 );
+
+const Rating = ({
+                    label,
+                    value,
+                }: {
+    label: string;
+    value: string | number | null | undefined;
+}) => {
+    const rating = Number(value);
+    const maxStars = 5;
+
+    const isValidRating = !isNaN(rating) && rating > 0;
+
+    return (
+        <div>
+            <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">{label}</p>
+            {isValidRating ? (
+                <div className="flex items-center">
+                    {[...Array(maxStars)].map((_, index) => (
+                        <svg
+                            key={index}
+                            className={`shrink-0 size-5 ${
+                                index < rating ? 'text-gray-800' : 'text-gray-300'
+                            }`}
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                        >
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+                        </svg>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {value}
+                </p>
+            )}
+        </div>
+    );
+};
