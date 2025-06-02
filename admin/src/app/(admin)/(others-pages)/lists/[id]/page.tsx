@@ -27,6 +27,7 @@ interface ListItem {
     updated_at: string;
     recommended_by: string;
     notes: string;
+    raw_json: any;
 }
 
 interface FormattedItem {
@@ -48,6 +49,7 @@ interface FormattedItem {
     updated_at: string;
     recommended_by: string;
     notes: string;
+    raw_json: any;
 }
 
 export default function ItemsPage() {
@@ -124,6 +126,7 @@ export default function ItemsPage() {
                 ...item,
                 podcast_type: item.podcast_type ? toWords(item.podcast_type) : '',
                 status: toWords(item.status),
+                raw_json: item.raw_json,
                 rating: item.rating > 0 ? item.rating : 'N/A',
                 save_for_later: item.save_for_later ? 'Yes' : 'No',
                 created_at: new Intl.DateTimeFormat('en-US', {
@@ -216,6 +219,9 @@ const ItemModal = ({
                     {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(listId) && <Detail label="Year" value={item.year} />}
                     {listId === LIST_IDS.Restaurants && (
                         <Detail label="Location" value={item.location} />
+                    )}
+                    {listId === LIST_IDS.Movies && item.raw_json?.release_date && (
+                        <Detail label="Release Date" value={item.raw_json.release_date} />
                     )}
                     {listId === LIST_IDS.Beer && <Detail label="Brewery" value={item.brewery} />}
                     {listId === LIST_IDS.Books && <Detail label="Author" value={item.author} />}
