@@ -27,6 +27,7 @@ interface ListItem {
     recommended_by: string;
     notes: string;
     lists: { label: string }; // Adjusted to match your select('*, lists(label)')
+    raw_json: any;
 }
 
 interface FormattedItem extends Omit<ListItem, 'save_for_later' | 'rating' | 'status' | 'podcast_type' | 'lists'> {
@@ -68,6 +69,7 @@ export default function ItemsPage() {
                 podcast_type: item.podcast_type ? toWords(item.podcast_type) : '',
                 list_label: toWords(item.lists.label),
                 status: toWords(item.status),
+                raw_json: item.raw_json,
                 rating: item.rating > 0 ? item.rating : 'N/A',
                 save_for_later: item.save_for_later ? 'Yes' : 'No',
                 created_at: new Intl.DateTimeFormat('en-US', {
@@ -178,8 +180,12 @@ const ItemModal = ({ item, onClose }: { item: FormattedItem; onClose: () => void
                     {item.list_id !== LIST_IDS.Podcasts && <Detail label="Title/Name" value={item.title} />}
                     {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(item.list_id) && <Detail label="Year" value={item.year} />}
                     {item.list_id === LIST_IDS.Restaurants && <Detail label="Location" value={item.location} />}
+                    {item.list_id === LIST_IDS.Movies && item.raw_json?.release_date && (
+                        <Detail label="Release Date" value={item.raw_json.release_date} />
+                    )}
                     {item.list_id === LIST_IDS.Beer && <Detail label="Brewery" value={item.brewery} />}
                     {item.list_id === LIST_IDS.Books && <Detail label="Author" value={item.author} />}
+
                     <Detail label="Save for Later" value={item.save_for_later} />
                     <Detail label="Status" value={item.status} />
                     <Rating label="Rating" value={item?.rating ?? "N/A"} />
