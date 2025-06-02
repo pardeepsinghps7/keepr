@@ -39,12 +39,14 @@ def get_all_movies():
         response.raise_for_status()  # Raise an exception for 4xx/5xx errors
         response_data = response.json()
 
+        # return response_data
+
         # Check for TMDb-specific errors
         if response_data.get("success") == False:
             return jsonify({"status": False, "error": response_data.get("status_message")}), 400
         
         # Extract movie titles
-        data = [{"client_id" : movie.get('id'),"title": movie.get("title", "Unknown Title")} for movie in response_data.get("results", [])]
+        data = [{"client_id" : movie.get('id'), "release_date" : movie.get('release_date'),"title": movie.get("title", "Unknown Title")} for movie in response_data.get("results", [])]
 
         return jsonify({"status": True, "data": data}), 200
     
