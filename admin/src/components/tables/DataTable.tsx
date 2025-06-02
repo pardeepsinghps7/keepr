@@ -9,7 +9,6 @@ import {
     getSortedRowModel,
     getPaginationRowModel,
     flexRender,
-    ColumnDef,
     SortingState,
     ColumnFiltersState,
 } from '@tanstack/react-table';
