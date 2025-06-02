@@ -31,6 +31,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ImageModal from '../../components/ImageModal';
 import { uploadAvatarToSupabase } from '../../lib/supabase';
 import { useSelector } from 'react-redux';
+import moment from 'moment';
 // import { FontAwesome } from '@expo/vector-icons';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
@@ -51,6 +52,7 @@ const QuickAddItemScreen = ({ navigation }) => {
   // const [status, setStatus] = useState(statusList[0]);
   // const [value, setValue] = useState(items[0].value);
 
+  const currentYear = moment().year();
   const [state, setState] = useState({
     title: '',
     recommendedBy: '',
@@ -74,13 +76,15 @@ const QuickAddItemScreen = ({ navigation }) => {
     episodeTitle: '',
     imageModalVisible: false,
     imageLoading: false,
+    clientId: '',
+    movieReleaseDate: '',
   });
 
   const {
     title, seriesTitle, episodeTitle, recommendedBy, notes, dataList,
     loading, selectedListId, selectedListLabel, location, brewery,
     author, statusList, status, value, year, imageUrl, podcastType,
-    searchList, showDropdown, imageModalVisible, imageLoading,
+    searchList, showDropdown, imageModalVisible, imageLoading, clientId,movieReleaseDate,
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -102,6 +106,8 @@ const QuickAddItemScreen = ({ navigation }) => {
     showDropdown: false,
     saveForLater: false,
     imageLoading: false,
+    clientId: '',
+    movieReleaseDate: '',
   }
 
   useFocusEffect(
@@ -186,6 +192,9 @@ const QuickAddItemScreen = ({ navigation }) => {
     }
     updateState({ loading: true });
     try {
+      const rawJson = {
+        release_date: movieReleaseDate,
+      };
       const payload = {
         list_id: selectedListId,
         title,
@@ -202,6 +211,8 @@ const QuickAddItemScreen = ({ navigation }) => {
         brewery,
         year,
         image_url: imageUrl,
+        client_id: clientId,
+        raw_json: rawJson,
       };
       const response = await actions.addItem(payload);
       console.log('addItem response:', response);
@@ -245,8 +256,8 @@ const QuickAddItemScreen = ({ navigation }) => {
   }
 
   const onChangeText = (text) => {
-    updateState({ title: text.replace(/[^A-Za-z0-9 ]/g, '') });
-
+    console.log('client id in change text', clientId);
+    updateState({ title: text.replace(/[^A-Za-z0-9 ]/g, ''), clientId: '' });
     if (text.length > 3
       && (selectedListLabel.toLowerCase() === MISC.books
         || selectedListLabel.toLowerCase() === MISC.movies)) {
@@ -260,8 +271,14 @@ const QuickAddItemScreen = ({ navigation }) => {
   };
 
   const handleSelectTitle = (item) => {
-    updateState({ title: item.title, showDropdown: false, searchList: [] });
-
+    updateState({
+      title: item?.title,
+      author: item?.author || '',
+      movieReleaseDate: item?.release_date || '',
+      clientId: item?.client_id || '',
+      showDropdown: false,
+      searchList: []
+    });
   }
 
   const renderItem = ({ item }) => (
@@ -297,6 +314,7 @@ const QuickAddItemScreen = ({ navigation }) => {
         keyboardVerticalOffset={0}
       >
         <ScrollView
+          nestedScrollEnabled
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 0, flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
@@ -340,13 +358,14 @@ const QuickAddItemScreen = ({ navigation }) => {
               mainViewProps={{ marginVertical: 12 }}
               onChangeText={onChangeText}
               keyboardType={'text'}
+              maxLength={100}
               // onChangeText={(val) => updateState({ title: val.replace(/[^A-Za-z0-9@. ]/g, '') })}
               label={(selectedListLabel.toLowerCase() === MISC.bourbon
                 || selectedListLabel.toLowerCase() === MISC.wine
                 || selectedListLabel.toLowerCase() === MISC.restaurants
                 || selectedListLabel.toLowerCase() === MISC.beer) ? LABELS.name : LABELS.title}
             />}
-            {showDropdown && dataList.length > 0 && (<View style={[styles.listAbsolute,]}>
+            {showDropdown && dataList.length > 0 && title.length > 0 && (<View style={[styles.listAbsolute,]}>
               <ScrollView horizontal
                 contentContainerStyle={{
                   maxHeight: 280, width: SCREEN_WIDTH,
@@ -358,14 +377,27 @@ const QuickAddItemScreen = ({ navigation }) => {
                   data={searchList}
                   keyExtractor={(item, index) => index.toString()}
                   renderItem={renderItem}
-                  contentContainerStyle={{ padding: 8, gap: 8 }}
+                  contentContainerStyle={{ padding: 8, gap: 8, flexGrow: 1 }}
+                  keyboardShouldPersistTaps="handled"
+                  showsHorizontalScrollIndicator={false}
+                  nestedScrollEnabled={true}
                 />
               </ScrollView>
             </View>
             )}
           </View>
-          {/* <PodcastsFields /> */}
 
+          {selectedListLabel.toLowerCase() === MISC.movies &&
+              <CustomInput
+                placeholder={LABELS.typeSomethingHere}
+                value={movieReleaseDate}
+                mainViewProps={{ marginVertical: 12 }}
+                onChangeText={(val) => updateState({ movieReleaseDate: val.replace(/[^A-Za-z0-9 -]/g, '') })}
+                label={LABELS.releaseDate}
+                isOptional={true}
+              />}
+
+          {/* <PodcastsFields /> */}
           {selectedListLabel.toLowerCase() === MISC.podcasts &&
             <>
               <Text style={styles.label}>Podcasts Type</Text>
@@ -431,7 +463,22 @@ const QuickAddItemScreen = ({ navigation }) => {
                 placeholder={LABELS.typeSomethingHere}
                 value={year}
                 mainViewProps={{ marginVertical: 12 }}
-                onChangeText={(val) => updateState({ year: val.replace(/[^0-9 \-]/g, '') })}
+                onChangeText={(val) => {
+                  // Allow only digits
+                  const filtered = val.replace(/[^0-9]/g, '');
+                  if (filtered.length <= 4) {
+                    updateState({ year: filtered });
+                    // Auto-validate when 4 digits are entered
+                    if (filtered.length === 4) {
+                      const yearNumber = parseInt(filtered);
+                      if (yearNumber < 1000 || yearNumber > currentYear) {
+                        Keyboard.dismiss(); // Hide keyboard
+                        showCustomToast(LABELS.error, `Year must be between 1000 and ${currentYear}`);
+                        updateState({ year: '' });
+                      }
+                    }
+                  }
+                }}
                 label={LABELS.year}
                 keyboardType={'numeric'}
                 maxLength={10}
@@ -532,6 +579,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                 mainViewProps={{ marginVertical: 12 }}
                 onChangeText={(val) => updateState({ imageUrl: val })}
                 label={LABELS.imageUrl}
+                maxLength={150}
                 isOptional={true}
                 icon={'cloud-upload-outline'}
                 iconPress={() => updateState({ imageModalVisible: true })}

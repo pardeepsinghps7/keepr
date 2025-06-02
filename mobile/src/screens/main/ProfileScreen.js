@@ -35,7 +35,7 @@ const ProfileScreen = ({ navigation }) => {
     modalVisible: false,
     avatar: null,
     loading: false,
-    imageLoading:false,
+    imageLoading: false,
     isUpdateAvatar: false,
     userDetails: {}
   });
@@ -130,6 +130,11 @@ const ProfileScreen = ({ navigation }) => {
       updateState({ loading: false });
     }
   }
+  const handleChangePassword = () => {
+    // Add your navigation or action here
+    // updateState({ addItemModalVisible: true });
+    navigation.navigate(ROUTES.changePasswordScreen);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -188,6 +193,10 @@ const ProfileScreen = ({ navigation }) => {
               placeholder={LABELS.emailPlaceholderText}
               mainViewProps={{ marginTop: 24 }}
             />
+
+            {/* <TouchableOpacity onPress={handleChangePassword} style={{ alignSelf: 'flex-end', paddingVertical: 8, paddingLeft: 8 }}>
+              <Text style={styles.changePassword}>Change Password?</Text>
+            </TouchableOpacity> */}
 
             {/* Sign Up Button */}
             <CustomButton
@@ -306,6 +315,8 @@ const styles = StyleSheet.create({
     color: COLORS.text_secondary,
     textAlign: 'center',
   },
+
+  changePassword: { fontWeight: '400', fontSize: 16, color: COLORS.accent, textDecorationLine: 'underline' },
   profileUploadContainer: {
     flexDirection: 'row',
     alignItems: 'center',

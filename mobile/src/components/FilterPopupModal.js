@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   View,
@@ -22,17 +22,23 @@ const horizontalPadding = 48;
 const totalSpacing = 10 * 2;
 const avatarItemSize = (screenWidth - horizontalPadding - totalSpacing) / 3;
 
-const FilterPopupModal = ({ modalVisible, setModalVisible, selectedItem, onView, onSave }) => {
+const FilterPopupModal = ({ statusList, modalVisible, setModalVisible, selectedItem, onView, onSave }) => {
   const { MISC, LABELS, BUTTONS } = STRINGS
 
   const [saveForLater, setSaveForLater] = useState(false);
   const [rating, setRating] = useState(0);
   const [open, setOpen] = useState(false);
-  const [statusList, setStatusList] = useState([
-    { key: 'watched', label: 'Watched' },
-    { key: 'to_watch', label: 'To Watch' }
-  ]);
-  const [status, setStatus] = useState(statusList[0]);
+  // const [statusList, setStatusList] = useState([
+  //   { key: 'watched', label: 'Watched' },
+  //   { key: 'to_watch', label: 'To Watch' }
+  // ]);
+  const [status, setStatus] = useState(statusList[0] || {});
+
+  useEffect(() => {
+    if (statusList?.length > 0) {
+      setStatus(statusList[0]);
+    }
+  }, [statusList]);
 
   return (
     <Modal
@@ -56,22 +62,26 @@ const FilterPopupModal = ({ modalVisible, setModalVisible, selectedItem, onView,
             <Text style={styles.checkboxLabel}>Save for Later</Text>
           </TouchableOpacity>
 
-          <Text style={styles.label}>Status</Text>
-          <View style={styles.radioGroup}>
-            {statusList
-              .map((item) => (
-                <TouchableOpacity
-                  key={item.key}
-                  onPress={() => setStatus(item)}
-                  style={styles.radioButton}
-                >
-                  <View style={styles.radioCircle(status.key === item.key)} />
-                  <Text style={styles.radioLabel}>{item.label}</Text>
-                </TouchableOpacity>
-              ))}
-          </View>
+          {statusList?.length > 0 &&
+            <>
+              <Text style={styles.label}>Status</Text>
+              <View style={styles.radioGroup}>
+                {statusList
+                  .map((item) => (
+                    <TouchableOpacity
+                      key={item.key}
+                      onPress={() => setStatus(item)}
+                      style={styles.radioButton}
+                    >
+                      <View style={styles.radioCircle(status?.key === item?.key)} />
+                      <Text style={styles.radioLabel}>{item.label}</Text>
+                    </TouchableOpacity>
+                  )
+                  )}
+              </View>
+            </>}
 
-          {status.key === 'watched' && <>
+          {statusList?.length > 0 && status?.key === statusList[0]?.key && <>
             <Text style={styles.label}>Rating</Text>
             <View style={styles.starContainer}>
               {[1, 2, 3, 4, 5].map((i) => (
@@ -100,15 +110,19 @@ const FilterPopupModal = ({ modalVisible, setModalVisible, selectedItem, onView,
                 value,
                 saveForLater,
               });
-              setRating(0);
-              setSaveForLater(false);
-              setStatus(statusList[0]);
+              // setRating(0);
+              // setSaveForLater(false);
+              // setStatus(statusList[0]);
               setModalVisible(false);
             }}
           />
 
           {/* Go Back */}
           <TouchableOpacity style={styles.goBack} onPress={() => {
+            onSave({
+              value: '',
+              saveForLater: false,
+            });
             setRating(0);
             setSaveForLater(false);
             setStatus(statusList[0]);

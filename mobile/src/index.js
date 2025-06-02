@@ -32,6 +32,7 @@ export { default as ListsScreen } from './screens/main/ListsScreen';
 export { default as ListDetailsScreen } from './screens/main/ListDetailsScreen';
 export { default as ItemDetailsScreen } from './screens/main/ItemDetailsScreen';
 export { default as ProfileScreen } from './screens/main/ProfileScreen';
+export { default as ChangePasswordScreen } from './screens/main/ChangePasswordScreen';
 export * from './lib/supabase';
 export * from './constants/colors';
 export * from './constants/strings';

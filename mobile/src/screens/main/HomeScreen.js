@@ -20,6 +20,9 @@ import actions from '../../redux/actions/index.js';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import moment from 'moment';
 import { useSelector } from 'react-redux';
+import { saveUserData } from '../../redux/actions/auth.js';
+import { setData } from '../../utils/utils.js';
+import constants from '../../constants/constants.js';
 
 const HomeScreen = ({ navigation }) => {
     const { LABELS, MISC } = STRINGS;
@@ -52,7 +55,17 @@ const HomeScreen = ({ navigation }) => {
             const response = await actions.getUserListWithItemCount();
             const userDetails = await actions.getProfileDetail();
             const latestItemResopnse = await actions.getLatestAddedItem();
-            console.log('getUserListWithItemCount response', response);
+            console.log('getUserListWithItemCount response', userDetails);
+            await setData(constants.USER_DATA, JSON.stringify({
+                ...userData,
+                email: userDetails[0]?.email,
+                avatar_url: userDetails[0]?.avatar_url
+            }));
+            saveUserData({
+                ...userData,
+                email: userDetails[0]?.email,
+                avatar_url: userDetails[0]?.avatar_url
+            });
             updateState({ dataList: response, latestItem: latestItemResopnse[0] });
         } catch (error) {
             console.log('getUserListWithItemCount failed:', error.message);
@@ -101,18 +114,22 @@ const HomeScreen = ({ navigation }) => {
                             </TouchableOpacity>
 
 
-                            <TouchableOpacity style={styles.card} onPress={() => latestItem?.title ?navigation.navigate(ROUTES.itemDetailsScreen, { item: latestItem }):null}>
+                            <TouchableOpacity style={styles.card} onPress={() =>
+                                (latestItem?.title || latestItem?.series_title || latestItem?.episode_title)
+                                    ? navigation.navigate(ROUTES.itemDetailsScreen, { item: latestItem })
+                                    : null}>
                                 <Text style={styles.latestTitle}>Latest Added</Text>
-                                {latestItem?.title && <><View style={styles.latestRow}>
-                                    <Image source={{ uri: latestItem?.lists?.icon }} style={styles.latestMovieImageStyle} />
-                                    <Text style={styles.latestText} numberOfLines={1}>{latestItem?.title || latestItem?.series_title || latestItem?.episode_title}</Text>
-                                </View>
-                                    <View style={[styles.latestRow,{marginTop:2}]}>
-                                        <Image source={imagesPath.watch} style={styles.watchImageStyle} />
-                                        <Text style={styles.latestSub} numberOfLines={1}>{latestItem?.status?.replace(/_/g, ' ')}</Text>
+                                {(latestItem?.title || latestItem?.series_title || latestItem?.episode_title) &&
+                                    <><View style={styles.latestRow}>
+                                        <Image source={{ uri: latestItem?.lists?.icon }} style={styles.latestMovieImageStyle} />
+                                        <Text style={styles.latestText} numberOfLines={1}>{latestItem?.title || latestItem?.series_title || latestItem?.episode_title}</Text>
                                     </View>
-                                    <Text style={styles.latestSub} numberOfLines={1}>{moment(latestItem?.updated_at ||latestItem?.created_at).fromNow()}</Text>
-                                </>}
+                                        <View style={[styles.latestRow, { marginTop: 2 }]}>
+                                            <Image source={imagesPath.watch} style={styles.watchImageStyle} />
+                                            <Text style={styles.latestSub} numberOfLines={1}>{latestItem?.status?.replace(/_/g, ' ')}</Text>
+                                        </View>
+                                        <Text style={styles.latestSub} numberOfLines={1}>{moment(latestItem?.updated_at || latestItem?.created_at).fromNow()}</Text>
+                                    </>}
                             </TouchableOpacity>
                         </View>
 

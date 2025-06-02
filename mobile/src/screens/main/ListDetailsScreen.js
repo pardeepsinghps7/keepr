@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import COLORS from '../../constants/colors';
 import { ROUTES, STRINGS } from '../../constants/strings';
-import { CustomButton, CustomRatings, EditListModal, FilterPopupModal, Header, ListPopupModal, Loader, showCustomToast, SortPopupModal, } from '../..';
+import { CustomButton, CustomRatings, EditListModal, FilterPopupModal, getStatusList, Header, ListPopupModal, Loader, showCustomToast, SortPopupModal, } from '../..';
 import { useSelector } from 'react-redux';
 import actions from '../../redux/actions';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -30,7 +30,6 @@ const ListDetailsScreen = ({ navigation, route }) => {
   const userData = useSelector((state) => state.auth.userData);
   const { params } = route
   const { item: listItem } = params
-  console.log('ghghfhfg', listItem)
   const { LABELS, TITLES, SIGNUP, MISC, VALIDATIONS, BUTTONS } = STRINGS;
   const [rating, setRating] = useState(0);
   const [state, setState] = useState({
@@ -47,6 +46,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
     filterModalVisible: false,
     editListModalVisible: false,
     isInitial: true,
+    statusList: [],
   });
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -65,6 +65,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
     filterModalVisible,
     editListModalVisible,
     isInitial,
+    statusList,
   } = state;
 
 
@@ -86,9 +87,10 @@ const ListDetailsScreen = ({ navigation, route }) => {
   const init = async () => {
     updateState({ loading: true });
     try {
+      const statusList = getStatusList(listItem?.label);
       const response = await actions.getItemListByListId(listItem.id + selectedSortItem + (isInitial ? '' : `&save_for_later=eq.${saveForLater}`));
       console.log('getItemListByListId response', response);
-      updateState({ dataList: response, });
+      updateState({ dataList: response, statusList: statusList });
     } catch (error) {
       console.log('getItemListByListId failed:', error.message);
       showCustomToast(LABELS.error, error.message);
@@ -128,7 +130,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
   const RatingWatchDetail = ({ item, index }) => {
     return (
       <View style={[styles.row, { gap: 16, }]}>
-        {!item?.status?.includes('not_') && !item?.status?.includes('to_') && !item?.status?.includes('want_to_') &&
+        {!item?.status?.includes('not_') && !item?.status?.includes('to_') && !item?.status?.includes('want_to_') && item?.rating>0 &&
           <CustomRatings list={[1, 2, 3, 4, 5]} rating={item?.rating || 0} setRating={setRating} selectedSize={16} unselectedSize={14} gap={2} isDisable={true} />}
         <View style={[styles.row, { gap: 8, }]}>
           <Image source={imagesPath.watch} style={styles.watchImageStyle} />
@@ -295,6 +297,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
       </KeyboardAvoidingView>
       {/* List Popup Modal */}
       <SortPopupModal
+        statusList={statusList}
         selectedItem={selectedSortItem}
         modalVisible={sortModalVisible}
         onSelectItem={(val) => {
@@ -307,6 +310,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
       />
       {/* List Popup Modal */}
       <FilterPopupModal
+        statusList={statusList}
         selectedItem={selectedSortItem}
         modalVisible={filterModalVisible}
         setModalVisible={(val) => updateState({ filterModalVisible: val })}
@@ -323,7 +327,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
 
       {/* Edit List Popup Modal */}
       <EditListModal
-        data={{ ...listItem, label: listTitle, icon: listIcon }}
+        data={{ label: listTitle, icon: listIcon }}
         selectedItem={selectedActionItem}
         modalVisible={editListModalVisible}
         setModalVisible={(val) => updateState({ editListModalVisible: val })}

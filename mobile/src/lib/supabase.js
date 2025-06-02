@@ -118,6 +118,29 @@ export const updatePassword = async (newPassword) => {
   return data;
 };
 
+export const updateCurrentPassword = async (email, currentPassword, newPassword) => {
+  // const session = supabase.auth.session(); // Get the current session
+  // if (!session) {
+  //   throw new Error('User is not authenticated');
+  // }
+
+  // const { access_token } = session; // Access the token from the session
+  // if (!access_token) {
+  //   throw new Error('Access token is not available');
+  // }
+  const { data: userData, error: loginError } = await supabase.auth.signIn(email, currentPassword);
+  if (loginError) throw new Error('Current password is invalid');
+  const { data, error } = await supabase.auth.api.updateUser(
+    // access_token, // Provide the Bearer token
+    {
+      password: newPassword,
+    }
+  );
+
+  if (error) throw error;
+  return data;
+};
+
 // Image upload function
 export const uploadAvatarToSupabase = async (uri) => {
   try {

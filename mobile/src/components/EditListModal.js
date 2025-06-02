@@ -62,10 +62,10 @@ const EditListModal = ({ data, modalVisible, setModalVisible, selectedItem, onSa
         // console.log('edit list index', item?.path, data?.icon, item?.path === data?.icon)
         return item?.path === data?.icon
       });
-
+ 
       // If not found, fallback to 0
       if (index === -1) index = 0;
-      updateState({ listIcon: response, selectedIcon: response[index] || {}, listName: data?.label });
+      updateState({ listIcon: response, selectedIcon: response[index] || {}, listName: data?.label || 'kuttt'});
       console.log('Icon List response', response);
     } catch (error) {
       console.log('Icon List failed Api:', error.message);
@@ -131,7 +131,7 @@ const EditListModal = ({ data, modalVisible, setModalVisible, selectedItem, onSa
                   label: listName.trim(),
                   icon: selectedIcon?.path,
                 });
-                updateState({ listName: '', selectedIcon: listIcon[0] }); // Reset
+                // updateState({ listName: '', selectedIcon: listIcon[0] }); // Reset
                 setModalVisible(false);
               }
             }}

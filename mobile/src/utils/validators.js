@@ -11,6 +11,14 @@ const RULES_CONFIG = {
       invalid: 'Invalid email format, email not associated with an account',
     },
   },
+  currentPassword: {
+    required: true,
+    rules: [is.not.empty],
+    messages: {
+      required: 'Please enter your current password',
+      invalid: 'Invalid current password',
+    },
+  },
   password: {
     required: true,
     rules: [

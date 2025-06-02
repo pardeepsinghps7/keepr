@@ -39,6 +39,7 @@ const AddNewListModal = ({ modalVisible, setModalVisible, selectedItem, onSave }
     listName: '',
     selectedIcon: {},
     listIcon: [],
+    error: false,
   });
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -48,6 +49,7 @@ const AddNewListModal = ({ modalVisible, setModalVisible, selectedItem, onSave }
     listIcon,
     listName,
     selectedIcon,
+    error,
   } = state;
 
   useEffect(() => {
@@ -96,10 +98,10 @@ const AddNewListModal = ({ modalVisible, setModalVisible, selectedItem, onSave }
           <CustomInput
             placeholder={LABELS.listNamePlaceholder}
             value={listName}
-            onChangeText={(val) => updateState({ listName: val.replace(/[^A-Za-z0-9@. ]/g, '') })}
+            onChangeText={(val) => updateState({ listName: val.replace(/[^A-Za-z0-9@. ]/g, ''), error: val.trim().length === 0 })}
             label={LABELS.listName}
-            mainViewProps={{ marginBottom: 16 }}
           />
+          {error && <Text style={{ color: COLORS.red, fontSize: 12 }}>List name field is mendatory</Text>}
           {/* Select Icon */}
           <Text style={styles.inputLabel}>{LABELS.selectIcon}</Text>
           <FlatList
@@ -115,22 +117,27 @@ const AddNewListModal = ({ modalVisible, setModalVisible, selectedItem, onSave }
           <CustomButton
             title={BUTTONS.saveList}
             style={{
-              backgroundColor: listName.trim() ? COLORS.primary : COLORS.lightBg
+              backgroundColor: COLORS.primary
             }}
             onPress={() => {
-              if (listName.trim()) {
+              if (listName.trim().length > 0) {
                 onSave({
                   id: selectedIcon?.id, // simple unique id
                   label: listName.trim(),
                   icon: selectedIcon?.path,
                 });
-                updateState({ listName: '', selectedIcon: listIcon[0] }); // Reset
+                updateState({ listName: '', selectedIcon: listIcon[0], error: false }); // Reset
                 setModalVisible(false);
+              } else {
+                updateState({ error: true })
               }
             }}
           />
           {/* Go Back */}
-          <TouchableOpacity style={styles.goBack} onPress={() => setModalVisible(false)}>
+          <TouchableOpacity style={styles.goBack} onPress={() => {
+            updateState({ listName: '', selectedIcon: listIcon[0], error: false });
+            setModalVisible(false)
+          }}>
             {/* <Icon name="arrow-back" size={16} color={COLORS.accent} /> */}
             <Text style={[styles.modalButtonText, { color: COLORS.accent }]}>
               ✕  Cancel
@@ -168,6 +175,9 @@ const styles = StyleSheet.create({
     color: COLORS.black,
     marginBottom: 20,
   },
+  inputLabel: {
+    marginTop: 16,
+  },
   itemCount: {
     fontSize: 12,
     fontWeight: '400',
@@ -199,6 +209,7 @@ const styles = StyleSheet.create({
   cameraImage: {
     width: 20,
     height: 20,
+    tintColor: COLORS.accent,
     resizeMode: 'contain'
   },
   image: {

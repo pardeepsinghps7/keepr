@@ -19,8 +19,10 @@ const Header = ({
     const { LABELS, MISC } = STRINGS
     const navigation = useNavigation();
     const userData = useSelector((state) => state.auth.userData);
-    console.log('Header userdata',userData)
-    
+
+    useEffect(() => {
+        console.log('Header userdata', userData)
+    }, [])
     return (
         <View style={styles.header}>
 

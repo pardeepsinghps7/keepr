@@ -34,6 +34,7 @@ import imagesPath from '../../constants/images';
 import ImageModal from '../../components/ImageModal';
 import { uploadAvatarToSupabase } from '../../lib/supabase';
 import { useSelector } from 'react-redux';
+import moment from 'moment';
 // import { FontAwesome } from '@expo/vector-icons';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
@@ -43,7 +44,6 @@ const AddScreen = ({ navigation, route }) => {
   const userData = useSelector((state) => state.auth.userData);
   const { LABELS, BUTTONS, MISC } = STRINGS
   const isFocused = useIsFocused();
-  const [rating, setRating] = useState(0);
   const [open, setOpen] = useState(false);
   const [podcastList, setPodcastList] = useState([
     { key: MISC.filterSeries, label: MISC.series },
@@ -62,6 +62,7 @@ const AddScreen = ({ navigation, route }) => {
   // ]);
   // const [value, setValue] = useState(items[0].value);
 
+  const currentYear = moment().year();
   const [state, setState] = useState({
     title: '',
     recommendedBy: '',
@@ -89,14 +90,19 @@ const AddScreen = ({ navigation, route }) => {
     saveForLater: false,
     imageModalVisible: false,
     imageLoading: false,
+    clientId: '',
+    rating: 0,
+    newelyAddedList: {},
+    movieReleaseDate: '',
   });
 
   const {
     title, recommendedBy, notes, dataList, loading, selectedListId, selectedItem,
     addItemModalVisible, needListTypeApiCall, seriesTitle, episodeTitle,
-    selectedListLabel, location, brewery,
+    selectedListLabel, location, brewery, rating,
     author, statusList, status, value, year, imageUrl, podcastType,
     searchList, showDropdown, saveForLater, imageModalVisible, imageLoading,
+    clientId, newelyAddedList, movieReleaseDate,
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -119,6 +125,8 @@ const AddScreen = ({ navigation, route }) => {
     showDropdown: false,
     saveForLater: false,
     imageLoading: false,
+    clientId: '',
+    movieReleaseDate: '',
   }
 
   useFocusEffect(
@@ -161,7 +169,10 @@ const AddScreen = ({ navigation, route }) => {
         value: item.id,
         key: item.id, // ensures unique key
       }));
-      let index = dropdownItems.findIndex(item => item?.key === params?.item?.id);
+      let index = dropdownItems.findIndex(item =>
+        item?.key === params?.item?.id
+        || item?.label === newelyAddedList?.label
+      );
 
       // If not found, fallback to 0
       if (index === -1) index = 0;
@@ -176,6 +187,8 @@ const AddScreen = ({ navigation, route }) => {
           value: dropdownItems[index]?.value,
           statusList: list,
           status: list[0], // Assuming list is not empty
+          newelyAddedList: {},
+
         });
       }
     } catch (error) {
@@ -220,6 +233,9 @@ const AddScreen = ({ navigation, route }) => {
     }
     updateState({ loading: true });
     try {
+      const rawJson = {
+        release_date: movieReleaseDate,
+      };
       const payload = {
         list_id: selectedListId,
         title,
@@ -236,11 +252,14 @@ const AddScreen = ({ navigation, route }) => {
         brewery,
         year,
         image_url: imageUrl,
+        client_id: clientId,
+        raw_json: rawJson,
       };
       const response = await actions.addItem(payload);
       console.log('addItem response:', response);
       navigation.goBack();
       showCustomToast(LABELS.success, MISC.itemAddedSuccessfully);
+
     } catch (error) {
       console.log('addItem failed:', error.message);
       showCustomToast(LABELS.error, error.message);
@@ -279,7 +298,7 @@ const AddScreen = ({ navigation, route }) => {
   }
 
   const onChangeText = (text) => {
-    updateState({ title: text.replace(/[^A-Za-z0-9 ]/g, '') });
+    updateState({ title: text.replace(/[^A-Za-z0-9 ]/g, ''), clientId: '' });
 
     if (text.length > 3
       && (selectedListLabel.toLowerCase() === MISC.books
@@ -294,7 +313,14 @@ const AddScreen = ({ navigation, route }) => {
   };
 
   const handleSelectTitle = (item) => {
-    updateState({ title: item?.title, author: item?.author, showDropdown: false, searchList: [] });
+    updateState({
+      title: item?.title,
+      author: item?.author || '',
+      movieReleaseDate: item?.release_date || '',
+      clientId: item?.client_id || '',
+      showDropdown: false,
+      searchList: []
+    });
 
   }
 
@@ -350,13 +376,9 @@ const AddScreen = ({ navigation, route }) => {
       // navigation.goBack();
       const key = Date.now().toString();
       updateState({
-        // dataList: [{
-        //   key: key,
-        //   label: newItem?.label,
-        //   value: key,
-        // }, ...dataList],
         addItemModalVisible: false,
         needListTypeApiCall: true,
+        newelyAddedList: payload,
       });
       showCustomToast(LABELS.success, MISC.listAddedSuccessfully)
     } catch (error) {
@@ -376,6 +398,7 @@ const AddScreen = ({ navigation, route }) => {
       >
 
         <ScrollView
+          nestedScrollEnabled
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 0, flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
@@ -413,7 +436,7 @@ const AddScreen = ({ navigation, route }) => {
               />
             </View>}
 
-            <TouchableOpacity onPress={handleAddPress}>
+            <TouchableOpacity onPress={handleAddPress} style={{ alignSelf: 'flex-end', paddingVertical: 8, paddingLeft: 8 }}>
               <Text style={styles.addNewList}>+ Add New List</Text>
             </TouchableOpacity>
 
@@ -432,7 +455,7 @@ const AddScreen = ({ navigation, route }) => {
                   || selectedListLabel.toLowerCase() === MISC.restaurants
                   || selectedListLabel.toLowerCase() === MISC.beer) ? LABELS.name : LABELS.title}
               />}
-              {showDropdown && dataList.length > 0 && (<View style={[styles.listAbsolute,]}>
+              {showDropdown && dataList.length > 0 && title.length > 0 && (<View style={[styles.listAbsolute,]}>
                 <ScrollView horizontal
                   contentContainerStyle={{
                     maxHeight: 280, width: SCREEN_WIDTH,
@@ -445,11 +468,24 @@ const AddScreen = ({ navigation, route }) => {
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={renderItem}
                     contentContainerStyle={{ padding: 8, gap: 8 }}
+                    showsHorizontalScrollIndicator={false}
+                    nestedScrollEnabled={true}
                   />
                 </ScrollView>
               </View>
               )}
             </View>
+
+            {selectedListLabel.toLowerCase() === MISC.movies &&
+              <CustomInput
+                placeholder={LABELS.typeSomethingHere}
+                value={movieReleaseDate}
+                mainViewProps={{ marginVertical: 12 }}
+                onChangeText={(val) => updateState({ movieReleaseDate: val.replace(/[^A-Za-z0-9 -]/g, '') })}
+                label={LABELS.releaseDate}
+                isOptional={true}
+              />}
+
             {selectedListLabel.toLowerCase() === MISC.podcasts &&
               <>
                 <Text style={styles.label}>Podcasts Type</Text>
@@ -515,10 +551,25 @@ const AddScreen = ({ navigation, route }) => {
                   placeholder={LABELS.typeSomethingHere}
                   value={year}
                   mainViewProps={{ marginVertical: 12 }}
-                  onChangeText={(val) => updateState({ year: val.replace(/[^0-9 \-]/g, '') })}
+                  onChangeText={(val) => {
+                    // Allow only digits
+                    const filtered = val.replace(/[^0-9]/g, '');
+                    if (filtered.length <= 4) {
+                      updateState({ year: filtered });
+                      // Auto-validate when 4 digits are entered
+                      if (filtered.length === 4) {
+                        const yearNumber = parseInt(filtered);
+                        if (yearNumber < 1000 || yearNumber > currentYear) {
+                          Keyboard.dismiss(); // Hide keyboard
+                          showCustomToast(LABELS.error, `Year must be between 1000 and ${currentYear}`);
+                          updateState({ year: '' });
+                        }
+                      }
+                    }
+                  }}
                   label={LABELS.year}
                   maxLength={10}
-                  keyboardType={'text'}
+                  keyboardType={'numeric'}
                   isOptional={true}
                 />
               </>
@@ -565,7 +616,7 @@ const AddScreen = ({ navigation, route }) => {
               </View>
               <View style={styles.starContainer}>
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <TouchableOpacity key={i} onPress={() => setRating(i)}>
+                  <TouchableOpacity key={i} onPress={() => updateState({ rating: i })}>
                     {i <= rating ? <Octicons
                       name={'star-fill'}
                       size={23}
@@ -590,6 +641,7 @@ const AddScreen = ({ navigation, route }) => {
               onChangeText={(val) => updateState({ recommendedBy: val.replace(/[^A-Za-z0-9 ]/g, '') })}
               label={LABELS.recommendedBy}
               mainViewProps={{ marginVertical: 12 }}
+              isOptional={true}
             />
 
             {/* Recommend Input */}
@@ -616,6 +668,7 @@ const AddScreen = ({ navigation, route }) => {
                   onChangeText={(val) => updateState({ imageUrl: val })}
                   label={LABELS.imageUrl}
                   isOptional={true}
+                  maxLength={150}
                   icon={'cloud-upload-outline'}
                   iconPress={() => updateState({ imageModalVisible: true })}
                 />
@@ -688,10 +741,9 @@ const styles = StyleSheet.create({
   },
   header: { fontSize: 18, fontWeight: '400', color: COLORS.black, marginBottom: 32 },
   label: { fontWeight: '400', marginBottom: 16, fontSize: 16, color: COLORS.black, },
-  addNewList: { fontWeight: '400', fontSize: 16, color: COLORS.accent, alignSelf: 'flex-end', textDecorationLine: 'underline' },
+  addNewList: { fontWeight: '400', fontSize: 16, color: COLORS.accent, textDecorationLine: 'underline' },
   dropdownContainer: {
     marginTop: 4,
-    marginBottom: 12
   },
   dropdown: {
     borderColor: COLORS.borderGray,
@@ -707,7 +759,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  checkboxLabel: { marginLeft: 8, fontSize: 16, fontWeight: '400', color: COLORS.black },
+  checkboxLabel: { marginLeft: 8, fontSize: 16, fontWeight: '400', color: COLORS.black, marginTop: 12 },
   radioGroup: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   radioCircle: (isSelected) => ({
     width: 20,
@@ -742,7 +794,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 16,
+    // marginBottom: 16,
   },
   inputLabel: {
     fontWeight: '400',

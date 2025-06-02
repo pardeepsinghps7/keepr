@@ -11,6 +11,7 @@ export const STRINGS = {
     error: 'error',
     emailAddress: 'Email Address (Username)',
     emailPlaceholderText: 'ex: johndoe@email.com',
+    currentPassword: 'Current Password',
     newPassword: 'New Password',
     confirmNewPassword: 'Confirm New Password',
     password: 'Password',
@@ -36,6 +37,7 @@ export const STRINGS = {
     author: 'Author',
     podcastsType: 'Podcasts Type',
     rating: 'Rating',
+    releaseDate:'Release Date',
   },
   ONBOARDING: {
     title1: 'Save what you love',
@@ -71,6 +73,10 @@ export const STRINGS = {
   },
   UPDATE_PASSWORD: {
     title: 'Secure Your Keepr',
+    subTitle: 'A new password to protect what you love.',
+  },
+  CHANGE_PASSWORD:{
+    title: 'Change Password',
     subTitle: 'A new password to protect what you love.',
   },
   VALIDATIONS: {
@@ -155,7 +161,7 @@ export const STRINGS = {
     toRead: 'To Read',
     read: 'Read',
     toListen: 'To Listen',
-    listen: 'Listen',
+    listen: 'Listened',
     notTried: 'Not Tried',
     tried: 'Tried',
     wantToVisit: 'Want to Visit',
@@ -165,9 +171,9 @@ export const STRINGS = {
     series: 'Series',
     episode: 'Episode',
     //sort by
-    sortDate: '&order=created_at.asc',
+    sortDate: '&order=created_at.desc',
     sortRating: '&order=rating.desc',
-    sortTitle: '&order=title.desc',
+    sortTitle: '&order=title.asc',
     sortStatus: '&order=status.asc',
     sortSaveForLater: '&order=save_for_later',
     //filter by
@@ -216,6 +222,7 @@ export const ROUTES = {
   discover: "Discover",
   quickAdd: "QuickAdd",
   profileScreen: "Profile",
+  changePasswordScreen: "ChangePasswordScreen",
   listDetailsScreen: 'ListDetailsScreen',
   itemDetailsScreen: 'ItemDetailsScreen',
   editItemScreen: 'EditItemScreen',

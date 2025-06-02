@@ -187,6 +187,12 @@ const ItemDetailsScreen = ({ navigation, route }) => {
                   </View>
                 </View>
 
+                {(dataList?.lists?.label?.toLowerCase() === MISC.movies) &&
+                  <View style={[styles.card,]}>
+                    <Text style={styles.cardTitle}>{LABELS.releaseDate}</Text>
+                    <Text style={styles.cardSubTitle}>{dataList?.raw_json?.release_date || 'N/A'}</Text>
+                  </View>}
+
                 {dataList?.rating > 0 && <View style={[styles.card,]}>
                   <Text style={styles.cardTitle}>{LABELS.rating}</Text>
                   <CustomRatings list={[1, 2, 3, 4, 5]} rating={dataList?.rating || 0} selectedSize={20} unselectedSize={18} gap={2} isDisable={true} />

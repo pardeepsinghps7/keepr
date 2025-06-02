@@ -4,6 +4,8 @@ import { STRINGS, ROUTES } from '../constants/strings';
 import imagesPath from '../constants/images';
 import COLORS from '../constants/colors';
 import { getData } from '../utils/utils';
+import { logout } from '../redux/actions/auth';
+import actions from '../redux/actions';
 
 export default function SplashScreen({ navigation, route }) {
   const { MISC } = STRINGS;

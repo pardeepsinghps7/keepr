@@ -6,7 +6,8 @@ import store from './src/redux/store';
 import Routes from './src/Navigations/Route';
 import { getUserData } from './src/utils/utils';
 import { saveUserData } from './src/redux/actions/auth';
-import { refreshSupabaseToken } from './src';
+import { logoutSupabase, refreshSupabaseToken } from './src';
+import actions from './src/redux/actions';
 
 const App = () => {
   useEffect(() => {
@@ -19,6 +20,8 @@ const App = () => {
     if (!!userData) {
       saveUserData(userData)
     }
+    // await logoutSupabase();
+    // actions.logout();
   }
   return (
     <Provider store={store}>

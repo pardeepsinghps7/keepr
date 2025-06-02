@@ -19,7 +19,10 @@ const horizontalPadding = 48;
 const totalSpacing = 10 * 2;
 const avatarItemSize = (screenWidth - horizontalPadding - totalSpacing) / 3;
 
-const ListPopupModal = ({ modalVisible, setModalVisible, selectedItem, onView, onEdit, onDelete,editText,deleteText }) => {
+const ListPopupModal = ({ modalVisible,
+  setModalVisible, selectedItem, onView, onEdit,
+  onDelete, editText, deleteText
+}) => {
   const { MISC } = STRINGS
 
   return (

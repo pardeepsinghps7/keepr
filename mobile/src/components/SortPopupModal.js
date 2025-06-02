@@ -20,7 +20,7 @@ const horizontalPadding = 48;
 const totalSpacing = 10 * 2;
 const avatarItemSize = (screenWidth - horizontalPadding - totalSpacing) / 3;
 
-const SortPopupModal = ({ modalVisible, setModalVisible, selectedItem, onSelectItem }) => {
+const SortPopupModal = ({ statusList, modalVisible, setModalVisible, selectedItem, onSelectItem }) => {
   const { MISC, LABELS } = STRINGS
 
   return (
@@ -62,7 +62,8 @@ const SortPopupModal = ({ modalVisible, setModalVisible, selectedItem, onSelectI
             <View style={styles.cameraContainer}>
               <Image source={imagesPath.sortStatus} style={styles.cameraImage} />
             </View>
-            <Text style={styles.modalButtonText}>{MISC.statusToWatchOrWatched}</Text>
+            <Text style={styles.modalButtonText}>
+              {`${MISC.status}${statusList.length > 0 ? ` (${statusList[0]?.label} → ${statusList[1]?.label})` : ''}`}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortSaveForLater)}>
