@@ -84,7 +84,7 @@ const QuickAddItemScreen = ({ navigation }) => {
     title, seriesTitle, episodeTitle, recommendedBy, notes, dataList,
     loading, selectedListId, selectedListLabel, location, brewery,
     author, statusList, status, value, year, imageUrl, podcastType,
-    searchList, showDropdown, imageModalVisible, imageLoading, clientId,movieReleaseDate,
+    searchList, showDropdown, imageModalVisible, imageLoading, clientId, movieReleaseDate,
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -116,21 +116,12 @@ const QuickAddItemScreen = ({ navigation }) => {
       updateState({
         ...resetPayloads,
       });
+      init();
     }, [])
   );
 
-  useEffect(() => {
-    let isActive = true;
-    init(isActive);
-    // if (isFocused) {
-    //   init(isActive);
-    // }
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
-  const init = async (isActive) => {
+  const init = async () => {
     updateState({ loading: true });
     try {
       const response = await actions.getUserList();
@@ -233,7 +224,13 @@ const QuickAddItemScreen = ({ navigation }) => {
         ? await actions.getSearchBooksList(query)
         : selectedListLabel.toLowerCase() === MISC.movies
           ? await actions.getSearchMoviesList(query)
-          : await actions.getSearchMoviesList(query);
+          : selectedListLabel.toLowerCase() === MISC.beer
+            ? await actions.getSearchBeerList(query)
+            : selectedListLabel.toLowerCase() === MISC.tvShows
+              ? await actions.getSearchTVShowsList(query)
+              : selectedListLabel.toLowerCase() === MISC.restaurants
+                ? await actions.getSearchRestaurantsList(query)
+                : await actions.getSearchMoviesList(query);
       console.log('getSearchBooksList response', response);
 
       if (response && response.data.length > 0) {
@@ -260,7 +257,10 @@ const QuickAddItemScreen = ({ navigation }) => {
     updateState({ title: text.replace(/[^A-Za-z0-9 ]/g, ''), clientId: '' });
     if (text.length > 3
       && (selectedListLabel.toLowerCase() === MISC.books
-        || selectedListLabel.toLowerCase() === MISC.movies)) {
+        || selectedListLabel.toLowerCase() === MISC.movies
+        || selectedListLabel.toLowerCase() === MISC.beer
+        || selectedListLabel.toLowerCase() === MISC.tvShows
+        || selectedListLabel.toLowerCase() === MISC.restaurants)) {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
       // Debounce API call by 500ms
@@ -272,9 +272,11 @@ const QuickAddItemScreen = ({ navigation }) => {
 
   const handleSelectTitle = (item) => {
     updateState({
-      title: item?.title,
+      title: item?.title || item?.name || '',
       author: item?.author || '',
+      brewery: item?.brewery || '',
       movieReleaseDate: item?.release_date || '',
+      location: item?.location?.formatted_address || '',
       clientId: item?.client_id || '',
       showDropdown: false,
       searchList: []
@@ -283,7 +285,7 @@ const QuickAddItemScreen = ({ navigation }) => {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleSelectTitle(item)}>
-      <Text style={styles.label}>{item.title}</Text>
+      <Text style={styles.label}>{item.title || item.name || item.series_title || item.episode_title}</Text>
     </TouchableOpacity>
   );
 
@@ -357,7 +359,6 @@ const QuickAddItemScreen = ({ navigation }) => {
               value={title}
               mainViewProps={{ marginVertical: 12 }}
               onChangeText={onChangeText}
-              keyboardType={'text'}
               maxLength={100}
               // onChangeText={(val) => updateState({ title: val.replace(/[^A-Za-z0-9@. ]/g, '') })}
               label={(selectedListLabel.toLowerCase() === MISC.bourbon
@@ -388,14 +389,14 @@ const QuickAddItemScreen = ({ navigation }) => {
           </View>
 
           {selectedListLabel.toLowerCase() === MISC.movies &&
-              <CustomInput
-                placeholder={LABELS.typeSomethingHere}
-                value={movieReleaseDate}
-                mainViewProps={{ marginVertical: 12 }}
-                onChangeText={(val) => updateState({ movieReleaseDate: val.replace(/[^A-Za-z0-9 -]/g, '') })}
-                label={LABELS.releaseDate}
-                isOptional={true}
-              />}
+            <CustomInput
+              placeholder={LABELS.typeSomethingHere}
+              value={movieReleaseDate}
+              mainViewProps={{ marginVertical: 12 }}
+              onChangeText={(val) => updateState({ movieReleaseDate: val.replace(/[^A-Za-z0-9 -]/g, '') })}
+              label={LABELS.releaseDate}
+              isOptional={true}
+            />}
 
           {/* <PodcastsFields /> */}
           {selectedListLabel.toLowerCase() === MISC.podcasts &&
@@ -584,7 +585,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                 icon={'cloud-upload-outline'}
                 iconPress={() => updateState({ imageModalVisible: true })}
               />
-              {imageUrl.length > 0 &&
+              {imageUrl.length > 0 && (imageUrl.includes('http://') || imageUrl.includes('https://')) &&
                 <View
                   style={{
                     borderWidth: 0.2, borderColor: COLORS.borderGray,

@@ -118,7 +118,7 @@ export const updatePassword = async (newPassword) => {
   return data;
 };
 
-export const updateCurrentPassword = async (email, currentPassword, newPassword) => {
+export const updateCurrentPassword = async (email, currentPassword, newPassword, access_token) => {
   // const session = supabase.auth.session(); // Get the current session
   // if (!session) {
   //   throw new Error('User is not authenticated');
@@ -128,16 +128,22 @@ export const updateCurrentPassword = async (email, currentPassword, newPassword)
   // if (!access_token) {
   //   throw new Error('Access token is not available');
   // }
-  const { data: userData, error: loginError } = await supabase.auth.signIn(email, currentPassword);
-  if (loginError) throw new Error('Current password is invalid');
+  const { data: userData, error: loginError } = await supabase.auth.signIn({ email, currentPassword });
+  if (loginError) {
+    console.log('current password', loginError.message)
+    if (loginError?.message?.includes('authenticate'))
+      throw new Error('Current password is invalid');
+    else
+      throw loginError;
+  }
   const { data, error } = await supabase.auth.api.updateUser(
-    // access_token, // Provide the Bearer token
+    access_token, // Provide the Bearer token
     {
       password: newPassword,
     }
   );
 
-  if (error) throw error;
+  if (error) throw error; //Failed to update password
   return data;
 };
 

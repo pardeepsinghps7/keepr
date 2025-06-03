@@ -21,9 +21,9 @@ export const STRINGS = {
     seriesTitle: 'Series Title',
     episodeTitle: 'Episode Title',
     year: 'Year',
-    imageUrl:'Image URL',
+    imageUrl: 'Image URL',
     location: 'Location',
-    brewery:'Brewery',
+    brewery: 'Brewery',
     typeSomethingHere: 'Type something here...',
     enterImageUrl: 'Enter image URL',
     recommendedBy: 'Recommended By',
@@ -37,7 +37,7 @@ export const STRINGS = {
     author: 'Author',
     podcastsType: 'Podcasts Type',
     rating: 'Rating',
-    releaseDate:'Release Date',
+    releaseDate: 'Release Date',
   },
   ONBOARDING: {
     title1: 'Save what you love',
@@ -75,7 +75,7 @@ export const STRINGS = {
     title: 'Secure Your Keepr',
     subTitle: 'A new password to protect what you love.',
   },
-  CHANGE_PASSWORD:{
+  CHANGE_PASSWORD: {
     title: 'Change Password',
     subTitle: 'A new password to protect what you love.',
   },
@@ -85,6 +85,7 @@ export const STRINGS = {
     signupLoaderText: 'Please wait...',
     loginLoaderText: 'Bringing back your memories...',
     updatePasswordSuccess: 'All set! Your Keepr is now more secure.',
+    changePasswordSuccess: 'Congratulations! your password has been changed successfully',
   },
   BUTTONS: {
     getStarted: 'Get Started',
@@ -153,7 +154,7 @@ export const STRINGS = {
     categories: 'Categories',
     status: 'Status',
     oops: 'Oops!',
-    comingSoon:'Coming Soon...',
+    comingSoon: 'Coming Soon...',
     somethingWentWrongWhileLoading: 'Something went wrong while loading your lists.',
     tryAgain: 'Try again',
     toWatch: 'To Watch',

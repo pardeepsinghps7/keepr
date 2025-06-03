@@ -28,4 +28,7 @@ export const PROFILE_BY_ID = getApiUrl('/profiles?id=eq');
 //external apis
 export const BOOKS = getExternalApiUrl('/get-books');
 export const MOVIES = getExternalApiUrl('/get-movies');
+export const BEERS = getExternalApiUrl('/get-beers');
+export const TV_SHOWS = getExternalApiUrl('/get-tv-shows');
+export const RESTAURANTS = getExternalApiUrl('/get-restaurants');
 // console.log('BOOKS',BOOKS)

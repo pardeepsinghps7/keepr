@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     toastContainer: {
         flex: 1,
         // position: 'absolute',
-        bottom: Platform.select({android:60,ios:80}),
+        bottom: Platform.select({android:60,ios:30}),
         // left: 20,
         // right: 20,
         padding: 14,

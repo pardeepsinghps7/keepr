@@ -13,10 +13,12 @@ const RULES_CONFIG = {
   },
   currentPassword: {
     required: true,
-    rules: [is.not.empty],
+    rules: [is.not.empty,
+    (val, data) => val !== data?.password,
+    ],
     messages: {
       required: 'Please enter your current password',
-      invalid: 'Invalid current password',
+      invalid: 'Current and new password cannot be the same',
     },
   },
   password: {

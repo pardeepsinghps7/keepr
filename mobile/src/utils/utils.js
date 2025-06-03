@@ -23,74 +23,53 @@ export async function getHeaders() {
 }
 
 export async function apiReq(endPoint, data, method, headers = {}, requestOptions = {}) {
-	return new Promise(async (res, rej) => {
-		const getTokenHeader = await getHeaders();
-		const isMultipart = data instanceof FormData;
+	const getTokenHeader = await getHeaders();
+	const isMultipart = data instanceof FormData;
 
-		headers = {
-			...headers,
-			...getTokenHeader,
-			...(isMultipart ? { "Content-Type": "multipart/form-data" } : {}),
-			apikey: supabaseKey,
-			Connection: 'close',
+	headers = {
+		...headers,
+		...getTokenHeader,
+		...(isMultipart ? { "Content-Type": "multipart/form-data" } : {}),
+		apikey: supabaseKey,
+		// Connection: 'close', // Remove unless required
+	};
+
+	const netState = await NetInfo.fetch();
+	if (!netState.isConnected) {
+		throw { code: 506, message: "Please check your connection and try again.", msg: "Please check your connection and try again." };
+	}
+
+	try {
+		const response = await axios({
+			method,
+			url: endPoint,
+			headers,
+			// timeout: 10000,
+			...(method.toLowerCase() === 'get' ? { params: data } : { data }),
+			...requestOptions,
+		});
+
+		if (response.data.status === false) {
+			throw response.data;
+		}
+		return response.data;
+	} catch (error) {
+		if (error?.response?.status === 401) {
+			clearUserData();
+			dispatch({ type: types.CLEAR_REDUX_STATE, payload: {} });
+			dispatch({ type: types.NO_INTERNET, payload: { internetConnection: true } });
+			throw { message: "Token expired. Kindly login again.", msg: "Token expired. Kindly login again." };
+		}
+		// else if (error.code === 'ECONNABORTED') {
+		// 	throw { message: 'Request timed out. Please try again.', msg: 'Request timed out. Please try again.' };
+		// }
+		throw {
+			message: error?.response?.data?.message || error.message || "Network Error",
+			msg: error?.response?.data?.message || error.message || "Network Error",
 		};
-
-		console.log("API Request:", endPoint, JSON.stringify(data), method, headers);
-
-		const makeRequest = async (attempt = 1) => {
-			// Check internet connection before making request
-			const netState = await NetInfo.fetch();
-			if (!netState.isConnected) {
-				// dispatch({
-				// 	type: types.NO_INTERNET,
-				// 	payload: { internetConnection: false },
-				// });
-				const errorMessage = "Please check your connection and try again.";
-				return rej({ code: 506, message: errorMessage, msg: errorMessage });
-			}
-			axios({
-				method,
-				url: endPoint,
-				headers,
-				...(method.toLowerCase() === 'get' ? { params: data } : { data }),
-				...requestOptions,
-			})
-				// axios[method](endPoint, data, { headers })
-				//     .then(result => {
-				//         const { data } = result;
-				//         if (data.status === false) return rej(data);
-				//         return res(data);
-				//     })
-				.then(result => {
-					console.log('insisisi')
-					const { data } = result;
-					if (data.status === false) return rej(data);
-					return res(data);
-				})
-				.catch(error => {
-					console.log(`Attempt ${attempt}:`, error.message, error?.response?.status);
-
-					if (error.message === "Network Error" && attempt === 1) {
-						console.log("Retrying request in 1 second...");
-						setTimeout(() => makeRequest(attempt + 1), 1000);
-					} else {
-						if (error?.response?.status === 401) {
-							clearUserData();
-							dispatch({ type: types.CLEAR_REDUX_STATE, payload: {} });
-							dispatch({ type: types.NO_INTERNET, payload: { internetConnection: true } });
-
-							const errorMessage = "Token expired. Kindly login again.";
-							return rej({ message: errorMessage, msg: errorMessage });
-						}
-						const errorMessage = error?.response?.data?.message || "Network Error";
-						return rej({ message: errorMessage, msg: errorMessage });
-					}
-				});
-		};
-
-		makeRequest();
-	});
+	}
 }
+
 
 
 export function apiPost(endPoint, data, headers = {}) {
@@ -161,13 +140,13 @@ export const getData = async (key) => {
 	return data
 }
 
-export const capitalizeEachWord = (str) =>{
+export const capitalizeEachWord = (str) => {
 	if (!str || typeof str !== 'string') return '';
 	return str.replace(/\b\w/g, char => char.toUpperCase()).toLowerCase()
-	   .replace(/(^\w{1})|(\s+\w{1})/g, match => match.toUpperCase());
+		.replace(/(^\w{1})|(\s+\w{1})/g, match => match.toUpperCase());
 }
 
 export const toSingular = (word) => {
 	if (!word) return '';
 	return pluralize.singular(word);
-  };
+};

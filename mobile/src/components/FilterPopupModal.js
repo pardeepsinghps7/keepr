@@ -110,9 +110,9 @@ const FilterPopupModal = ({ statusList, modalVisible, setModalVisible, selectedI
                 value,
                 saveForLater,
               });
-              // setRating(0);
-              // setSaveForLater(false);
-              // setStatus(statusList[0]);
+              setRating(0);
+              setSaveForLater(false);
+              setStatus(statusList[0]);
               setModalVisible(false);
             }}
           />

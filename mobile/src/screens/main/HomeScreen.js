@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -15,7 +15,7 @@ import imagesPath from '../../constants/images';
 import COLORS from '../../constants/colors';
 import { ROUTES, STRINGS } from '../../constants/strings';
 import { Header, Loader, showCustomToast } from '../../index.js';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import actions from '../../redux/actions/index.js';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import moment from 'moment';
@@ -38,18 +38,13 @@ const HomeScreen = ({ navigation }) => {
 
     const { dataList, loading, latestItem } = state;
 
-    useEffect(() => {
-        let isActive = true;
+    useFocusEffect(
+        useCallback(() => {
+            init();
+        }, [])
+    );
 
-        if (isFocused) {
-            init(isActive);
-        }
-        return () => {
-            isActive = false;
-        };
-    }, [isFocused]);
-
-    const init = async (isActive) => {
+    const init = async () => {
         updateState({ loading: true });
         try {
             const response = await actions.getUserListWithItemCount();

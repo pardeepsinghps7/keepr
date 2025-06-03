@@ -194,9 +194,9 @@ const ProfileScreen = ({ navigation }) => {
               mainViewProps={{ marginTop: 24 }}
             />
 
-            {/* <TouchableOpacity onPress={handleChangePassword} style={{ alignSelf: 'flex-end', paddingVertical: 8, paddingLeft: 8 }}>
+            <TouchableOpacity onPress={handleChangePassword} style={{ alignSelf: 'flex-end', paddingVertical: 8, paddingLeft: 8 }}>
               <Text style={styles.changePassword}>Change Password?</Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             {/* Sign Up Button */}
             <CustomButton

@@ -215,6 +215,7 @@ const EditItemScreen = ({ navigation, route }) => {
     }
   }
 
+
   const fetchResults = async (query) => {
     // updateState({ loading: true });
     try {
@@ -222,7 +223,13 @@ const EditItemScreen = ({ navigation, route }) => {
         ? await actions.getSearchBooksList(query)
         : selectedListLabel.toLowerCase() === MISC.movies
           ? await actions.getSearchMoviesList(query)
-          : await actions.getSearchMoviesList(query);
+          : selectedListLabel.toLowerCase() === MISC.beer
+            ? await actions.getSearchBeerList(query)
+            : selectedListLabel.toLowerCase() === MISC.tvShows
+              ? await actions.getSearchTVShowsList(query)
+              : selectedListLabel.toLowerCase() === MISC.restaurants
+                ? await actions.getSearchRestaurantsList(query)
+                : await actions.getSearchMoviesList(query);
       console.log('getSearchBooksList response', response);
 
       if (response && response.data.length > 0) {
@@ -245,11 +252,14 @@ const EditItemScreen = ({ navigation, route }) => {
   }
 
   const onChangeText = (text) => {
+    console.log('client id in change text', clientId);
     updateState({ title: text.replace(/[^A-Za-z0-9 ]/g, ''), clientId: '' });
-
     if (text.length > 3
       && (selectedListLabel.toLowerCase() === MISC.books
-        || selectedListLabel.toLowerCase() === MISC.movies)) {
+        || selectedListLabel.toLowerCase() === MISC.movies
+        || selectedListLabel.toLowerCase() === MISC.beer
+        || selectedListLabel.toLowerCase() === MISC.tvShows
+        || selectedListLabel.toLowerCase() === MISC.restaurants)) {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
       // Debounce API call by 500ms
@@ -261,9 +271,11 @@ const EditItemScreen = ({ navigation, route }) => {
 
   const handleSelectTitle = (item) => {
     updateState({
-      title: item.title,
+      title: item?.title || item?.name || '',
       author: item?.author || '',
+      brewery: item?.brewery || '',
       movieReleaseDate: item?.release_date || '',
+      location: item?.location?.formatted_address || '',
       clientId: item?.client_id || '',
       showDropdown: false,
       searchList: []
@@ -272,7 +284,7 @@ const EditItemScreen = ({ navigation, route }) => {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleSelectTitle(item)}>
-      <Text style={styles.label}>{item.title}</Text>
+      <Text style={styles.label}>{item.title || item.name || item.series_title || item.episode_title}</Text>
     </TouchableOpacity>
   );
 
@@ -358,52 +370,18 @@ const EditItemScreen = ({ navigation, route }) => {
           <Loader modalVisible={loading} />
           <Header title={MISC.editItem} isBack />
           <View style={styles.mainView}>
-
-            {/* <Text style={styles.label}>Select List Type</Text> */}
-
-            {/* <DropdownContainer /> */}
-            {/* {dataList.length > 0 && <View style={styles.dropdownContainer}>
-              <DropDownPicker
-                open={open}
-                value={value}
-                items={dataList}
-                setOpen={setOpen}
-                onSelectItem={(item) => {
-                  const list = getStatusList(item.label);
-                  updateState({
-                    selectedListId: item.key,
-                    selectedListLabel: item.label,
-                    statusList: list,
-                    status: list[0],
-                    value: item.value,
-                  })
-                }}
-                placeholder="Select a category"
-                style={styles.dropdown}
-                textStyle={{ fontSize: 16, color: COLORS.black }}
-                dropDownContainerStyle={styles.dropdownBox}
-                listMode="SCROLLVIEW"
-              />
-            </View>} */}
-
-            {/* <TouchableOpacity onPress={handleAddPress}>
-              <Text style={styles.addNewList}>+ Add New List</Text>
-            </TouchableOpacity> */}
-
-            {/* Title Input */}
             <View style={styles.searchBox}>
-              {selectedListLabel.toLowerCase() !== MISC.podcasts && <CustomInput
+              {selectedListLabel?.toLowerCase() !== MISC.podcasts && <CustomInput
                 placeholder={LABELS.typeSomethingHere}
                 value={title}
                 mainViewProps={{ marginVertical: 12 }}
                 onChangeText={onChangeText}
-                keyboardType={'text'}
                 maxLength={100}
                 // onChangeText={(val) => updateState({ title: val.replace(/[^A-Za-z0-9@. ]/g, '') })}
-                label={(selectedListLabel.toLowerCase() === MISC.bourbon
-                  || selectedListLabel.toLowerCase() === MISC.wine
-                  || selectedListLabel.toLowerCase() === MISC.restaurants
-                  || selectedListLabel.toLowerCase() === MISC.beer) ? LABELS.name : LABELS.title}
+                label={(selectedListLabel?.toLowerCase() === MISC.bourbon
+                  || selectedListLabel?.toLowerCase() === MISC.wine
+                  || selectedListLabel?.toLowerCase() === MISC.restaurants
+                  || selectedListLabel?.toLowerCase() === MISC.beer) ? LABELS.name : LABELS.title}
               />}
               {showDropdown && dataList.length > 0 && title.length > 0 && (<View style={[styles.listAbsolute,]}>
                 <ScrollView horizontal
@@ -623,7 +601,7 @@ const EditItemScreen = ({ navigation, route }) => {
                   icon={'cloud-upload-outline'}
                   iconPress={() => updateState({ imageModalVisible: true })}
                 />
-                {imageUrl.length > 0 &&
+              {imageUrl.length > 0 && (imageUrl.includes('http://') || imageUrl.includes('https://')) &&
                   <View
                     style={{
                       borderWidth: 0.2, borderColor: COLORS.borderGray,
@@ -711,7 +689,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  checkboxLabel: { marginLeft: 8, fontSize: 16, fontWeight: '400', color: COLORS.black, marginTop: 12 },
+  checkboxLabel: { marginLeft: 8, fontSize: 16, fontWeight: '400', color: COLORS.black },
   radioGroup: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   radioCircle: (isSelected) => ({
     width: 20,

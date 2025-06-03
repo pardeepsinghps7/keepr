@@ -207,6 +207,18 @@ const ItemDetailsScreen = ({ navigation, route }) => {
                   <Text style={styles.cardTitle}>{LABELS.notes}</Text>
                   <Text style={[styles.cardSubTitle, { fontSize: 16, lineHeight: 28 }]}>{dataList?.notes || 'N/A'}</Text>
                 </View>
+                {(dataList?.lists?.label?.toLowerCase() === MISC.bourbon
+                  || dataList?.lists?.label?.toLowerCase() === MISC.wine) &&
+                  <View style={[styles.card,]}>
+                    <Text style={styles.cardTitle}>{LABELS.imageUrl}</Text>
+                    <Text style={[styles.cardSubTitle, {
+                      fontSize: 16, lineHeight: 28,
+                      textTransform: dataList?.image_url?.length > 0 ? 'lowercase' : 'uppercase'
+                    }]}>
+                      {dataList?.image_url || 'N/A'}</Text>
+                  </View>}
+                {/* {dataList?.image_url?.length > 0 && <Image source={{ uri: dataList?.image_url }} style={styles.sampleImage} />} */}
+
               </View>
             </>
           }
@@ -325,11 +337,17 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: COLORS.black,
   },
-  cardSubTitleCantainer: { flexDirection: 'row', alignItems: 'center', gap: 12,flex:1,width:'80%' },
+  cardSubTitleCantainer: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, width: '80%' },
   cardSubTitle: {
     fontSize: 15,
     fontWeight: '400',
     color: COLORS.text_secondary,
     textTransform: 'capitalize'
+  },
+
+  sampleImage: {
+    width: 150,
+    height: 150,
+    resizeMode: 'contain'
   },
 });

@@ -16,7 +16,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import COLORS from '../../constants/colors'; // Assuming COLORS is defined elsewhere
 import { ROUTES, STRINGS } from '../../constants/strings'; // Assuming ROUTES is defined elsewhere
-import { CustomButton, CustomInput, showCustomToast, showSuccess, } from '../..';
+import { CustomButton, CustomInput, Header, showCustomToast, showSuccess, } from '../..';
 import imagesPath from '../../constants/images';
 import { updateCurrentPassword, updatePassword } from '../../lib/supabase';
 import validator from '../../utils/validators';
@@ -86,8 +86,9 @@ export default function ChangePasswordScreen({ navigation }) {
 
     updateState({ loading: true });
     try {
-      const data = await updateCurrentPassword(userData?.user?.email, currentPassword, password);
-      showCustomToast(LABELS.success, VALIDATIONS.updatePasswordSuccess);
+      const data = await updateCurrentPassword(userData?.user?.email,
+        currentPassword, password, userData?.access_token);//Admin@123
+      showCustomToast(LABELS.success, VALIDATIONS.changePasswordSuccess);
       navigation.goBack();
     } catch (error) {
       console.log('Failed: ' + error.message);
@@ -105,15 +106,16 @@ export default function ChangePasswordScreen({ navigation }) {
         keyboardShouldPersistTaps="handled"
       >
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+          <Header title={CHANGE_PASSWORD.title} isBack />
           <View style={styles.mainView}>
             {/* Logo */}
-            <View style={styles.logoContainer}>
+            {/* <View style={styles.logoContainer}>
               <Image source={imagesPath.logo} style={styles.image} />
               <Text style={styles.logoTitle}>{TITLES.appName}</Text>
-            </View>
+            </View> */}
 
-            <Text style={styles.mainTitle}>{CHANGE_PASSWORD.title}</Text>
-            <Text style={styles.subTitle}>{CHANGE_PASSWORD.subTitle}</Text>
+            {/* <Text style={styles.mainTitle}>{CHANGE_PASSWORD.title}</Text>
+            <Text style={styles.subTitle}>{CHANGE_PASSWORD.subTitle}</Text> */}
 
             {/* Current Password */}
             <CustomInput
@@ -208,7 +210,8 @@ const styles = StyleSheet.create({
   },
   mainView: {
     flexGrow: 1,
-    padding: 16
+    paddingHorizontal: 16,
+    paddingVertical: 32
   },
   logoContainer: {
     flexDirection: 'row',

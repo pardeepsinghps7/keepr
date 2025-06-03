@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux';
 import actions from '../../redux/actions';
 import Icon from 'react-native-vector-icons/Ionicons';
 import imagesPath from '../../constants/images';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import validator from '../../utils/validators';
 import { capitalizeEachWord, toSingular } from '../../utils/utils';
@@ -68,21 +68,12 @@ const ListDetailsScreen = ({ navigation, route }) => {
     statusList,
   } = state;
 
-
-  useEffect(() => {
-    if (isFocused) {
+  useFocusEffect(
+    useCallback(() => {
       init();
-    }
-  }, [isFocused]);
+    }, [saveForLater, selectedSortItem])
+  );
 
-  useEffect(() => {
-    console.log('selectedSortItem', selectedSortItem)
-    init();
-  }, [selectedSortItem]);
-
-  useEffect(() => {
-    init();
-  }, [saveForLater]);
 
   const init = async () => {
     updateState({ loading: true });
@@ -90,7 +81,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
       const statusList = getStatusList(listItem?.label);
       const response = await actions.getItemListByListId(listItem.id + selectedSortItem + (isInitial ? '' : `&save_for_later=eq.${saveForLater}`));
       console.log('getItemListByListId response', response);
-      updateState({ dataList: response, statusList: statusList });
+      updateState({ dataList: response, statusList: statusList, loading: false, });
     } catch (error) {
       console.log('getItemListByListId failed:', error.message);
       showCustomToast(LABELS.error, error.message);
@@ -130,7 +121,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
   const RatingWatchDetail = ({ item, index }) => {
     return (
       <View style={[styles.row, { gap: 16, }]}>
-        {!item?.status?.includes('not_') && !item?.status?.includes('to_') && !item?.status?.includes('want_to_') && item?.rating>0 &&
+        {!item?.status?.includes('not_') && !item?.status?.includes('to_') && !item?.status?.includes('want_to_') && item?.rating > 0 &&
           <CustomRatings list={[1, 2, 3, 4, 5]} rating={item?.rating || 0} setRating={setRating} selectedSize={16} unselectedSize={14} gap={2} isDisable={true} />}
         <View style={[styles.row, { gap: 8, }]}>
           <Image source={imagesPath.watch} style={styles.watchImageStyle} />
@@ -342,7 +333,6 @@ export default ListDetailsScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    paddingVertical: 16
   },
   card: {
     flexDirection: 'row',
