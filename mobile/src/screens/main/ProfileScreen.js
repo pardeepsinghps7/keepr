@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -20,9 +20,9 @@ import validator from '../../utils/validators';
 import { useSelector } from 'react-redux';
 import actions from '../../redux/actions';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { saveUserData } from '../../redux/actions/auth';
-import { setData } from '../../utils/utils';
+import { convertAvatarTimestamp, setData } from '../../utils/utils';
 import constants from '../../constants/constants';
 
 const ProfileScreen = ({ navigation }) => {
@@ -52,25 +52,20 @@ const ProfileScreen = ({ navigation }) => {
     userDetails,
   } = state;
 
-  useEffect(() => {
-    let isActive = true;
+  useFocusEffect(
+    useCallback(() => {
+      init();
+    }, [])
+  );
 
-    if (isFocused) {
-      init(isActive);
-    }
-    return () => {
-      isActive = false;
-    };
-  }, [isFocused]);
-
-  const init = async (isActive) => {
+  const init = async () => {
     updateState({ loading: true });
     try {
       const userDetails = await actions.getProfileDetail();
-      console.log('getProfileDetail response', userDetails, userData);
+      // console.log('getProfileDetail response', userDetails, userData);
       updateState({
         email: userDetails[0]?.email || userData?.user?.email,
-        avatar: userDetails[0]?.avatar_url || null,
+        avatar: convertAvatarTimestamp(userDetails[0]?.avatar_url) || null,
         isUpdateAvatar: userDetails[0]?.avatar_url,
         userDetails: userDetails[0],
       });
@@ -81,6 +76,13 @@ const ProfileScreen = ({ navigation }) => {
       updateState({ loading: false });
     }
   };
+
+  // 👇 Track avatar change and reset loading state
+  useEffect(() => {
+    if (avatar) {
+      updateState({ imageLoading: true });
+    }
+  }, [avatar]);
 
   const handleLogout = async () => {
     updateState({ isLoading: true })
@@ -110,7 +112,7 @@ const ProfileScreen = ({ navigation }) => {
         isUpdateAvatar
           ? await actions.updateProfileDetail(userDetails?.id, payload)
           : await actions.addProfileDetail(payload);
-        updateState({ avatar: avatarUrl.publicURL });
+        updateState({ avatar: convertAvatarTimestamp(avatarUrl.publicURL) });
         await setData(constants.USER_DATA, JSON.stringify({ ...userData, email: email, avatar_url: avatarUrl.publicURL }));
         saveUserData({ ...userData, email: email, avatar_url: avatarUrl.publicURL })
       } else {
@@ -118,7 +120,7 @@ const ProfileScreen = ({ navigation }) => {
         isUpdateAvatar
           ? await actions.updateProfileDetail(userDetails?.id, payload)
           : await actions.addProfileDetail(payload);
-        updateState({ avatar: uri });
+        updateState({ avatar: convertAvatarTimestamp(uri) });
         await setData(constants.USER_DATA, JSON.stringify({ ...userData, email: email, avatar_url: uri }));
         saveUserData({ ...userData, email: email, avatar_url: uri });
       }
@@ -152,8 +154,18 @@ const ProfileScreen = ({ navigation }) => {
               {avatar ? (
                 <>
                   <Image source={{ uri: avatar }} style={styles.avatarImage}
-                    onLoadStart={() => updateState({ imageLoading: true })}
-                    onLoadEnd={() => updateState({ imageLoading: false })}
+                    onLoad={() => {
+                      console.log('image loading true')
+                      updateState({ imageLoading: true })
+                    }}
+                    onLoadStart={() => {
+                      console.log('image loading true')
+                      updateState({ imageLoading: true })
+                    }}
+                    onLoadEnd={() => {
+                      console.log('image loading false')
+                      updateState({ imageLoading: false })
+                    }}
                   />
                   {imageLoading && (
                     <View style={styles.loaderOverlay}>

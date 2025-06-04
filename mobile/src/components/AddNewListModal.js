@@ -8,6 +8,7 @@ import {
   Image,
   FlatList,
   Dimensions,
+  KeyboardAvoidingView,
 } from 'react-native';
 import COLORS from '../constants/colors';
 import imagesPath from '../constants/images';
@@ -88,7 +89,10 @@ const AddNewListModal = ({ modalVisible, setModalVisible, selectedItem, onSave }
       visible={modalVisible}
       onRequestClose={() => setModalVisible(false)}
     >
-      <View style={styles.modalContainer}>
+      <KeyboardAvoidingView
+        style={styles.modalContainer}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={0}>
         <View style={styles.modalContent}>
           <View style={styles.headerIndicator} />
 
@@ -144,7 +148,7 @@ const AddNewListModal = ({ modalVisible, setModalVisible, selectedItem, onSave }
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };

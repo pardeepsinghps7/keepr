@@ -45,7 +45,7 @@ export default function ForgotPasswordScreen({ navigation }) {
     Keyboard.dismiss();
     const validation = validator.isValidData(
       {
-        email,
+        emailForgot:email,
       }
     );
     if (!validation.valid) {

@@ -229,7 +229,6 @@ export default ListsScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white
     },
     viewContainer: {
         flex: 1,

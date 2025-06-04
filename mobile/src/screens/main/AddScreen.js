@@ -135,6 +135,7 @@ const AddScreen = ({ navigation, route }) => {
       updateState({
         ...resetPayloads,
       });
+      setOpen(false);
     }, [])
   );
 
@@ -282,6 +283,8 @@ const AddScreen = ({ navigation, route }) => {
               ? await actions.getSearchTVShowsList(query)
               : selectedListLabel.toLowerCase() === MISC.restaurants
                 ? await actions.getSearchRestaurantsList(query)
+                : selectedListLabel.toLowerCase() === MISC.podcasts
+                  ? await actions.getSearchPodcastsList(query)
                 : await actions.getSearchMoviesList(query);
       console.log('getSearchBooksList response', response);
 
@@ -312,7 +315,8 @@ const AddScreen = ({ navigation, route }) => {
         || selectedListLabel.toLowerCase() === MISC.movies
         || selectedListLabel.toLowerCase() === MISC.beer
         || selectedListLabel.toLowerCase() === MISC.tvShows
-        || selectedListLabel.toLowerCase() === MISC.restaurants)) {
+        || selectedListLabel.toLowerCase() === MISC.restaurants
+        || selectedListLabel.toLowerCase() === MISC.podcasts)) {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
       // Debounce API call by 500ms
@@ -402,20 +406,20 @@ const AddScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Loader modalVisible={loading} />
       <KeyboardAvoidingView
         // style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
       >
 
-        <Loader modalVisible={loading} />
+        <Header title={MISC.addItem} />
         <ScrollView
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 0, flexGrow: 1 }}
+          contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
         >
-          <Header title={MISC.addItem} />
           <View style={styles.mainView}>
 
             <Text style={styles.label}>Select List Type</Text>
@@ -437,7 +441,8 @@ const AddScreen = ({ navigation, route }) => {
                     value: item.value,
 
                     ...resetPayloads,
-                  })
+                  });
+                  setOpen(false);
                 }}
                 placeholder="Select a category"
                 style={styles.dropdown}

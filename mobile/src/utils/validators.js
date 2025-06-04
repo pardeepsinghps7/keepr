@@ -8,6 +8,14 @@ const RULES_CONFIG = {
     rules: [is.email],
     messages: {
       required: 'Please enter your email',
+      invalid: 'Please enter a valid email',
+    },
+  },
+  emailForgot: {
+    required: true,
+    rules: [is.email],
+    messages: {
+      required: 'Please enter your email',
       invalid: 'Invalid email format, email not associated with an account',
     },
   },
@@ -34,6 +42,14 @@ const RULES_CONFIG = {
       required: 'Please enter your password',
       invalid:
         'Password must be at least 8 characters, with uppercase, lowercase, number, and symbol',
+    },
+  },
+  passwordLogin: {
+    required: true,
+    rules: [(val) => val.trim().length > 0],
+    messages: {
+      required: 'Please enter your password',
+      invalid: 'Incorrect credentials',
     },
   },
   confirmPassword: {

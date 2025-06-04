@@ -229,7 +229,9 @@ const EditItemScreen = ({ navigation, route }) => {
               ? await actions.getSearchTVShowsList(query)
               : selectedListLabel.toLowerCase() === MISC.restaurants
                 ? await actions.getSearchRestaurantsList(query)
-                : await actions.getSearchMoviesList(query);
+                : selectedListLabel.toLowerCase() === MISC.podcasts
+                  ? await actions.getSearchPodcastsList(query)
+                  : await actions.getSearchMoviesList(query);
       console.log('getSearchBooksList response', response);
 
       if (response && response.data.length > 0) {
@@ -259,7 +261,8 @@ const EditItemScreen = ({ navigation, route }) => {
         || selectedListLabel.toLowerCase() === MISC.movies
         || selectedListLabel.toLowerCase() === MISC.beer
         || selectedListLabel.toLowerCase() === MISC.tvShows
-        || selectedListLabel.toLowerCase() === MISC.restaurants)) {
+        || selectedListLabel.toLowerCase() === MISC.restaurants
+        || selectedListLabel.toLowerCase() === MISC.podcasts)) {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
       // Debounce API call by 500ms
@@ -356,10 +359,11 @@ const EditItemScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        // style={styles.container}
+        style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardShouldPersistTaps="handled"
       >
+        <Header title={MISC.editItem} isBack />
 
         <ScrollView
           nestedScrollEnabled
@@ -367,8 +371,6 @@ const EditItemScreen = ({ navigation, route }) => {
           contentContainerStyle={{ paddingBottom: 0, flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
         >
-          <Loader modalVisible={loading} />
-          <Header title={MISC.editItem} isBack />
           <View style={styles.mainView}>
             <View style={styles.searchBox}>
               {selectedListLabel?.toLowerCase() !== MISC.podcasts && <CustomInput
@@ -601,7 +603,7 @@ const EditItemScreen = ({ navigation, route }) => {
                   icon={'cloud-upload-outline'}
                   iconPress={() => updateState({ imageModalVisible: true })}
                 />
-              {imageUrl.length > 0 && (imageUrl.includes('http://') || imageUrl.includes('https://')) &&
+                {imageUrl.length > 0 && (imageUrl.includes('http://') || imageUrl.includes('https://')) &&
                   <View
                     style={{
                       borderWidth: 0.2, borderColor: COLORS.borderGray,
@@ -611,13 +613,13 @@ const EditItemScreen = ({ navigation, route }) => {
                       style={{
                       }}>
                       <Image source={{ uri: imageUrl }} style={styles.sampleImage}
-                        onLoadStart={() => updateState({ imageLoading: true })}
+                        // onLoadStart={() => updateState({ imageLoading: true })}
                         onLoadEnd={() => updateState({ imageLoading: false })} />
-                      {imageLoading && (
+                      {imageLoading ? (
                         <View style={styles.loaderOverlay}>
                           <ActivityIndicator size="small" color="#000" />
                         </View>
-                      )}
+                      ) : undefined}
                     </View>
                     <TouchableOpacity style={{ position: 'absolute', right: -8, top: -8 }}
                       onPress={() => updateState({ imageUrl: '' })}>

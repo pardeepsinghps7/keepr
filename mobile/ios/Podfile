@@ -19,7 +19,7 @@ target 'keepr' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    :hermes_enabled => true, # ✅ Ensure Hermes is enabled
+    # :hermes_enabled => false, # Hermes disabled
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
@@ -29,16 +29,5 @@ target 'keepr' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
-
-    # ✅ Force dSYM generation for Hermes
-    installer.pods_project.targets.each do |target|
-      if target.name == 'hermes'
-        target.build_configurations.each do |config|
-          config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
-          config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
-          config.build_settings['ENABLE_BITCODE'] = 'NO' # optional but avoids warnings
-        end
-      end
-    end
   end
 end

@@ -70,7 +70,7 @@ export default function LoginScreen({ navigation }) {
     const validation = validator.isValidData(
       {
         email,
-        password: password,
+        passwordLogin: password,
       }
     );
     if (!validation.valid) {

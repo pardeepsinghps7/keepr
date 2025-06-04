@@ -11,7 +11,7 @@ const { dispatch, getState } = store;
 
 export async function getHeaders() {
 	let token = await AsyncStorage.getItem(constants.TOKEN);
-	console.log('token is===> ', token)
+	// console.log('token is===> ', token)
 	if (token) {
 		token = JSON.parse(token);
 		// console.log(userData?.access_token, 'header')
@@ -40,11 +40,12 @@ export async function apiReq(endPoint, data, method, headers = {}, requestOption
 	}
 
 	try {
+		console.log('API CALL===> ', method, endPoint, headers)
 		const response = await axios({
 			method,
 			url: endPoint,
 			headers,
-			// timeout: 10000,
+			timeout: 20000,
 			...(method.toLowerCase() === 'get' ? { params: data } : { data }),
 			...requestOptions,
 		});
@@ -54,15 +55,15 @@ export async function apiReq(endPoint, data, method, headers = {}, requestOption
 		}
 		return response.data;
 	} catch (error) {
-		if (error?.response?.status === 401) {
+		if (error?.response?.status === 401 || error?.message?.includes('new row violates row-level security policy')) {
 			clearUserData();
 			dispatch({ type: types.CLEAR_REDUX_STATE, payload: {} });
 			dispatch({ type: types.NO_INTERNET, payload: { internetConnection: true } });
 			throw { message: "Token expired. Kindly login again.", msg: "Token expired. Kindly login again." };
 		}
-		// else if (error.code === 'ECONNABORTED') {
-		// 	throw { message: 'Request timed out. Please try again.', msg: 'Request timed out. Please try again.' };
-		// }
+		else if (error.code === 'ECONNABORTED') {
+			throw { message: 'Request timed out. Please try again.', msg: 'Request timed out. Please try again.' };
+		}
 		throw {
 			message: error?.response?.data?.message || error.message || "Network Error",
 			msg: error?.response?.data?.message || error.message || "Network Error",
@@ -150,3 +151,7 @@ export const toSingular = (word) => {
 	if (!word) return '';
 	return pluralize.singular(word);
 };
+
+export const convertAvatarTimestamp = (avatar) => {
+	return avatar ? `${avatar}?t=${Date.now()}` : null;
+}

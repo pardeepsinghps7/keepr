@@ -114,22 +114,21 @@ const ItemDetailsScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Loader modalVisible={loading} />
       <KeyboardAvoidingView
-        // style={styles.container}
+        style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardShouldPersistTaps="handled"
       >
 
+        <Header title={TITLES.itemDetails} isBack onMenuPress={onMenuPress} />
         <FlatList
           data={[]}
           renderItem={null}
-          style={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} // adjust as needed
+          contentContainerStyle={{ gap: 16, flexGrow: 1 }}
           ListHeaderComponent={
             <>
-              <Loader modalVisible={loading} />
-              <Header title={TITLES.itemDetails} isBack onMenuPress={onMenuPress} />
               <View style={styles.mainView}>
 
                 <Text style={styles.title}>{dataList?.title || dataList?.episode_title || dataList?.series_title}</Text>
@@ -250,7 +249,6 @@ export default ItemDetailsScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContainer: {},
   mainView: { padding: 16 },
   headerIndicator: {
     alignSelf: 'center',

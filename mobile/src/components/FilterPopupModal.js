@@ -22,22 +22,18 @@ const horizontalPadding = 48;
 const totalSpacing = 10 * 2;
 const avatarItemSize = (screenWidth - horizontalPadding - totalSpacing) / 3;
 
-const FilterPopupModal = ({ statusList, modalVisible, setModalVisible, selectedItem, onView, onSave }) => {
-  const { MISC, LABELS, BUTTONS } = STRINGS
+const FilterPopupModal = ({ statusList, modalVisible, setModalVisible, saveForLaterValue, onSave }) => {
+  const { MISC, BUTTONS } = STRINGS
 
   const [saveForLater, setSaveForLater] = useState(false);
   const [rating, setRating] = useState(0);
-  const [open, setOpen] = useState(false);
-  // const [statusList, setStatusList] = useState([
-  //   { key: 'watched', label: 'Watched' },
-  //   { key: 'to_watch', label: 'To Watch' }
-  // ]);
   const [status, setStatus] = useState(statusList[0] || {});
 
   useEffect(() => {
-    if (statusList?.length > 0) {
+    if (statusList?.length > 0 && Object.keys(status).length === 0) {
       setStatus(statusList[0]);
     }
+    setSaveForLater(saveForLaterValue || false);
   }, [statusList]);
 
   return (
@@ -110,9 +106,9 @@ const FilterPopupModal = ({ statusList, modalVisible, setModalVisible, selectedI
                 value,
                 saveForLater,
               });
-              setRating(0);
-              setSaveForLater(false);
-              setStatus(statusList[0]);
+              // setRating(0);
+              // setSaveForLater(false);
+              // setStatus(statusList[0]);
               setModalVisible(false);
             }}
           />

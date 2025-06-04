@@ -116,6 +116,7 @@ const QuickAddItemScreen = ({ navigation }) => {
       updateState({
         ...resetPayloads,
       });
+      setOpen(false);
       init();
     }, [])
   );
@@ -230,6 +231,8 @@ const QuickAddItemScreen = ({ navigation }) => {
               ? await actions.getSearchTVShowsList(query)
               : selectedListLabel.toLowerCase() === MISC.restaurants
                 ? await actions.getSearchRestaurantsList(query)
+                : selectedListLabel.toLowerCase() === MISC.podcasts
+                  ? await actions.getSearchPodcastsList(query)
                 : await actions.getSearchMoviesList(query);
       console.log('getSearchBooksList response', response);
 
@@ -260,7 +263,8 @@ const QuickAddItemScreen = ({ navigation }) => {
         || selectedListLabel.toLowerCase() === MISC.movies
         || selectedListLabel.toLowerCase() === MISC.beer
         || selectedListLabel.toLowerCase() === MISC.tvShows
-        || selectedListLabel.toLowerCase() === MISC.restaurants)) {
+        || selectedListLabel.toLowerCase() === MISC.restaurants
+        || selectedListLabel.toLowerCase() === MISC.podcasts)) {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
       // Debounce API call by 500ms
@@ -310,6 +314,7 @@ const QuickAddItemScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Loader modalVisible={loading} />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -321,7 +326,6 @@ const QuickAddItemScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 0, flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
         >
-          <Loader modalVisible={loading} />
           <View style={styles.headerIndicator} />
           <Text style={styles.header}>Add Quick Item</Text>
 
@@ -342,7 +346,10 @@ const QuickAddItemScreen = ({ navigation }) => {
                   statusList: list,
                   status: list[0],
                   value: item.value,
-                })
+
+                  ...resetPayloads,
+                });
+                setOpen(false);
               }}
               placeholder="Select a category"
               style={styles.dropdown}
@@ -623,11 +630,11 @@ const QuickAddItemScreen = ({ navigation }) => {
       </KeyboardAvoidingView>
 
       {/* Image Picker Modal */}
-      <ImageModal
+      {/* <ImageModal
         modalVisible={imageModalVisible}
         setModalVisible={(val) => updateState({ imageModalVisible: val })}
         onImageSelected={onImageSelectedHandler}
-      />
+      /> */}
     </SafeAreaView>
   );
 }
@@ -635,8 +642,8 @@ const QuickAddItemScreen = ({ navigation }) => {
 export default QuickAddItemScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scrollContainer: { padding: 20, paddingBottom: 100 },
+  container: { flex: 1, },
+  scrollContainer: {},
   headerIndicator: {
     alignSelf: 'center',
     width: 40,
@@ -681,7 +688,7 @@ const styles = StyleSheet.create({
   radioLabel: { marginLeft: 6, fontWeight: '400', fontSize: 16, color: COLORS.black },
   starContainer: { flexDirection: 'row', marginBottom: 16 },
   notesInput: { height: 80, textAlignVertical: 'top' },
-  cancelButton: { alignItems: 'center', marginBottom: 40 },
+  cancelButton: { alignItems: 'center', },
   cancelButtonText: { color: COLORS.accent, fontWeight: '400', fontSize: 16 },
   bottomNav: {
     flexDirection: 'row',

@@ -22,7 +22,7 @@ export function HomeStackNavigator() {
       <Stack.Screen
         name={ROUTES.quickAdd}
         component={QuickAddItemScreen}
-        options={{ presentation: 'modal' }} // Optional: for modal style
+        // options={{ presentation: 'modal' }} // Optional: for modal style
       />
     </Stack.Navigator>
   );

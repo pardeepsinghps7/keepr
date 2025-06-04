@@ -61,7 +61,7 @@ const HomeScreen = ({ navigation }) => {
                 email: userDetails[0]?.email,
                 avatar_url: userDetails[0]?.avatar_url
             });
-            updateState({ dataList: response, latestItem: latestItemResopnse[0] });
+            updateState({ dataList: response.slice(0,4), latestItem: latestItemResopnse[0] });
         } catch (error) {
             console.log('getUserListWithItemCount failed:', error.message);
             showCustomToast(LABELS.error, error.message);
@@ -90,11 +90,11 @@ const HomeScreen = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
             <Loader modalVisible={loading} />
             <Header title={ROUTES.home} onLeftIconTap={onLeftIconTap} />
-            <ScrollView
+            {/* <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 16, }}
                 keyboardShouldPersistTaps="handled"
-            >
+            > */}
                 <View style={styles.viewContainer}>
                     <Text style={styles.welcome}>Welcome <Text style={styles.wave}>👋</Text></Text>
                     <Text style={styles.subtext}>Your clever space to keep what you love.</Text>
@@ -142,7 +142,7 @@ const HomeScreen = ({ navigation }) => {
                         />
                     </View>
                 </View>
-            </ScrollView>
+            {/* </ScrollView> */}
         </SafeAreaView>
     );
 };
@@ -156,6 +156,7 @@ const styles = StyleSheet.create({
     },
     viewContainer: {
         flex: 1,
+        padding:16
     },
     welcome: {
         marginVertical: 8,
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 4,
+        // paddingHorizontal: 4,
     },
     plus: {
         color: COLORS.accent,
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         borderRadius: 12,
         width: '47%',
-        height: 137,
+        height: 150,
         padding: 16,
         elevation: 5,
         shadowColor: COLORS.accent,
@@ -242,6 +243,7 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         position: 'relative',
         shadowColor: '#000',
+        overflow:'visible'
     },
     iconImageStyle: {
         width: 36,

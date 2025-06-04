@@ -40,6 +40,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
     saveForLater: false,
     dataList: [],
     selectedSortItem: '',
+    selectedFilterItem: '',
     selectedActionItem: '',
     listActionModalVisible: false,
     sortModalVisible: false,
@@ -60,6 +61,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
     dataList,
     selectedActionItem,
     selectedSortItem,
+    selectedFilterItem,
     listActionModalVisible,
     sortModalVisible,
     filterModalVisible,
@@ -175,7 +177,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
       <View style={styles.emptyContainer}>
         <Image style={styles.iconImageStyle} source={{ uri: listIcon }} />
         <Text style={styles.cardTitle}>{MISC.noItemsTitle}</Text>
-        {selectedSortItem.length === 0 &&
+        {selectedSortItem.length === 0 && selectedFilterItem.length === 0 &&
           <>
             <Text style={styles.itemSubtitle}>Notes: {MISC.noItemsSubtitle}</Text>
             <CustomButton title={`+ ${BUTTONS.addYourFirst} ${toSingular(listTitle)}`}
@@ -301,6 +303,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
       />
       {/* List Popup Modal */}
       <FilterPopupModal
+        saveForLaterValue={saveForLater}
         statusList={statusList}
         selectedItem={selectedSortItem}
         modalVisible={filterModalVisible}
