@@ -3,6 +3,7 @@ from ..controllers.api.external.supabase_controller import test_supabase
 from ..controllers.api.external.movies_controller import get_all_movies
 from ..controllers.api.external.books_controller import get_all_books
 from ..controllers.api.external.tv_shows_controller import get_all_tv_shows
+from ..controllers.api.external.podcasts_controller import get_all_podcasts
 from ..controllers.api.external.restaurants_controller import get_all_restaurants
 from ..controllers.api.external.beer_controller import get_all_beers
 
@@ -27,6 +28,11 @@ def getBooks():
 @api.route('get-tv-shows', methods=["GET"])
 def getTvShows():
     return get_all_tv_shows()
+    
+
+@api.route('get-podcasts', methods=["GET"])
+def getPodcasts():
+    return get_all_podcasts()
 
 @api.route('get-restaurants', methods=["GET"])
 def getRestaurants():
