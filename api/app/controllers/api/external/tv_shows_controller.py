@@ -27,8 +27,10 @@ def get_all_tv_shows():
         for item in response_data:
             show = item.get('show')
             name = show.get("name", "Unknown Name")
+            client_id = show.get("id", "")
             shows.append({
-                "name" : name
+                "name" : name,
+                "client_id" : client_id
             })
         
         return jsonify({"status": True, "data": shows}), 200
