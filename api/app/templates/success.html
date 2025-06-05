@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Verified</title>
     <style>
         body {
@@ -16,7 +17,7 @@
             margin: 80px auto;
             background-color: #ffffff;
             border-radius: 10px;
-            padding: 40px;
+            padding: 40px 30px;
             text-align: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
@@ -29,15 +30,16 @@
         h1 {
             font-size: 28px;
             color: #333333;
+            margin-top: 20px;
         }
 
         p {
             font-size: 18px;
             color: #555555;
+            margin: 20px 0;
         }
 
         .button {
-            margin-top: 30px;
             display: inline-block;
             background-color: #4CAF50;
             color: white;
@@ -45,11 +47,33 @@
             border-radius: 5px;
             text-decoration: none;
             font-size: 16px;
+            margin-top: 20px;
             transition: background-color 0.3s ease;
         }
 
         .button:hover {
             background-color: #45a049;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                margin: 40px 20px;
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
+            .button {
+                font-size: 15px;
+                padding: 10px 20px;
+            }
         }
     </style>
 </head>
