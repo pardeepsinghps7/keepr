@@ -8,6 +8,7 @@ import {
   Image,
   FlatList,
   Dimensions,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import COLORS from '../constants/colors';
 import imagesPath from '../constants/images';
@@ -43,94 +44,96 @@ const FilterPopupModal = ({ statusList, modalVisible, setModalVisible, saveForLa
       visible={modalVisible}
       onRequestClose={() => setModalVisible(false)}
     >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <View style={styles.headerIndicator} />
-          <Text style={styles.cardTitle}>{MISC.filterBy}</Text>
+      <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.headerIndicator} />
+            <Text style={styles.cardTitle}>{MISC.filterBy}</Text>
 
-          {/* Conditional content */}
-          <TouchableOpacity onPress={() => setSaveForLater(!saveForLater)} style={styles.checkboxContainer}>
-            <Ionicons
-              name={saveForLater ? 'checkbox-outline' : 'square-outline'}
-              size={24}
-              color={saveForLater ? COLORS.black : COLORS.borderGray}
-            />
-            <Text style={styles.checkboxLabel}>Save for Later</Text>
-          </TouchableOpacity>
+            {/* Conditional content */}
+            <TouchableOpacity onPress={() => setSaveForLater(!saveForLater)} style={styles.checkboxContainer}>
+              <Ionicons
+                name={saveForLater ? 'checkbox-outline' : 'square-outline'}
+                size={24}
+                color={saveForLater ? COLORS.black : COLORS.borderGray}
+              />
+              <Text style={styles.checkboxLabel}>Save for Later</Text>
+            </TouchableOpacity>
 
-          {statusList?.length > 0 &&
-            <>
-              <Text style={styles.label}>Status</Text>
-              <View style={styles.radioGroup}>
-                {statusList
-                  .map((item) => (
-                    <TouchableOpacity
-                      key={item.key}
-                      onPress={() => setStatus(item)}
-                      style={styles.radioButton}
-                    >
-                      <View style={styles.radioCircle(status?.key === item?.key)} />
-                      <Text style={styles.radioLabel}>{item.label}</Text>
-                    </TouchableOpacity>
-                  )
-                  )}
+            {statusList?.length > 0 &&
+              <>
+                <Text style={styles.label}>Status</Text>
+                <View style={styles.radioGroup}>
+                  {statusList
+                    .map((item) => (
+                      <TouchableOpacity
+                        key={item.key}
+                        onPress={() => setStatus(item)}
+                        style={styles.radioButton}
+                      >
+                        <View style={styles.radioCircle(status?.key === item?.key)} />
+                        <Text style={styles.radioLabel}>{item.label}</Text>
+                      </TouchableOpacity>
+                    )
+                    )}
+                </View>
+              </>}
+
+            {statusList?.length > 0 && status?.key === statusList[0]?.key && <>
+              <Text style={styles.label}>Rating</Text>
+              <View style={styles.starContainer}>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <TouchableOpacity key={i} onPress={() => setRating(i)}>
+                    {i <= rating ? <Octicons
+                      name={'star-fill'}
+                      size={23}
+                      color={COLORS.black}
+                      style={{ marginRight: 8 }}
+                    /> : <SimpleLineIcons
+                      name={'star'}
+                      size={20}
+                      color={COLORS.black}
+                      style={{ marginRight: 8 }}
+                    />}
+                  </TouchableOpacity>
+                ))}
               </View>
             </>}
 
-          {statusList?.length > 0 && status?.key === statusList[0]?.key && <>
-            <Text style={styles.label}>Rating</Text>
-            <View style={styles.starContainer}>
-              {[1, 2, 3, 4, 5].map((i) => (
-                <TouchableOpacity key={i} onPress={() => setRating(i)}>
-                  {i <= rating ? <Octicons
-                    name={'star-fill'}
-                    size={23}
-                    color={COLORS.black}
-                    style={{ marginRight: 8 }}
-                  /> : <SimpleLineIcons
-                    name={'star'}
-                    size={20}
-                    color={COLORS.black}
-                    style={{ marginRight: 8 }}
-                  />}
-                </TouchableOpacity>
-              ))}
-            </View>
-          </>}
+            <CustomButton
+              title={BUTTONS.applyFilters}
+              onPress={() => {
+                const value = `&status=eq.${status.key}&rating=gte.${status.key === MISC.filterToWatch ? 0 : rating}`;
+                onSave({
+                  value,
+                  saveForLater,
+                });
+                // setRating(0);
+                // setSaveForLater(false);
+                // setStatus(statusList[0]);
+                setModalVisible(false);
+              }}
+            />
 
-          <CustomButton
-            title={BUTTONS.applyFilters}
-            onPress={() => {
-              const value = `&status=eq.${status.key}&rating=gte.${status.key === MISC.filterToWatch ? 0 : rating}`;
+            {/* Go Back */}
+            <TouchableOpacity style={styles.goBack} onPress={() => {
               onSave({
-                value,
-                saveForLater,
+                value: '',
+                saveForLater: false,
               });
-              // setRating(0);
-              // setSaveForLater(false);
-              // setStatus(statusList[0]);
+              setRating(0);
+              setSaveForLater(false);
+              setStatus(statusList[0]);
               setModalVisible(false);
-            }}
-          />
-
-          {/* Go Back */}
-          <TouchableOpacity style={styles.goBack} onPress={() => {
-            onSave({
-              value: '',
-              saveForLater: false,
-            });
-            setRating(0);
-            setSaveForLater(false);
-            setStatus(statusList[0]);
-            setModalVisible(false);
-          }}>
-            {/* <Icon name="arrow-back" size={16} color={COLORS.accent} /> */}
-            <Text style={[styles.modalButtonText, { color: COLORS.accent }]}>
-              {BUTTONS.clearFilters}
-            </Text>
-          </TouchableOpacity>
+            }}>
+              {/* <Icon name="arrow-back" size={16} color={COLORS.accent} /> */}
+              <Text style={[styles.modalButtonText, { color: COLORS.accent }]}>
+                {BUTTONS.clearFilters}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };

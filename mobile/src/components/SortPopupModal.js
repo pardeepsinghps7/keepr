@@ -8,6 +8,7 @@ import {
   Image,
   FlatList,
   Dimensions,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import COLORS from '../constants/colors';
 import imagesPath from '../constants/images';
@@ -30,59 +31,61 @@ const SortPopupModal = ({ statusList, modalVisible, setModalVisible, selectedIte
       visible={modalVisible}
       onRequestClose={() => setModalVisible(false)}
     >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <View style={styles.headerIndicator} />
-          <Text style={styles.cardTitle}>{MISC.sortBy}</Text>
+      <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.headerIndicator} />
+            <Text style={styles.cardTitle}>{MISC.sortBy}</Text>
 
-          {/* Conditional content */}
+            {/* Conditional content */}
 
-          <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortDate)}>
-            <View style={styles.cameraContainer}>
-              <Image source={imagesPath.calender} style={styles.cameraImage} />
-            </View>
-            <Text style={styles.modalButtonText}>{MISC.dateAdded}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortDate)}>
+              <View style={styles.cameraContainer}>
+                <Image source={imagesPath.calender} style={styles.cameraImage} />
+              </View>
+              <Text style={styles.modalButtonText}>{MISC.dateAdded}</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortRating)}>
-            <View style={styles.cameraContainer}>
-              <SimpleLineIcons name={'star'} size={20} color={COLORS.black} />
-            </View>
-            <Text style={styles.modalButtonText}>{MISC.ratingHighLow}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortRating)}>
+              <View style={styles.cameraContainer}>
+                <SimpleLineIcons name={'star'} size={20} color={COLORS.black} />
+              </View>
+              <Text style={styles.modalButtonText}>{MISC.ratingHighLow}</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortTitle)}>
-            <View style={styles.cameraContainer}>
-              <Icon name="filter" size={20} color={COLORS.black} />
-            </View>
-            <Text style={styles.modalButtonText}>{MISC.titleAtoZ}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortTitle)}>
+              <View style={styles.cameraContainer}>
+                <Icon name="filter" size={20} color={COLORS.black} />
+              </View>
+              <Text style={styles.modalButtonText}>{MISC.titleAtoZ}</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortStatus)}>
-            <View style={styles.cameraContainer}>
-              <Image source={imagesPath.sortStatus} style={styles.cameraImage} />
-            </View>
-            <Text style={styles.modalButtonText}>
-              {`${MISC.status}${statusList.length > 0 ? ` (${statusList[0]?.label} → ${statusList[1]?.label})` : ''}`}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortStatus)}>
+              <View style={styles.cameraContainer}>
+                <Image source={imagesPath.sortStatus} style={styles.cameraImage} />
+              </View>
+              <Text style={styles.modalButtonText}>
+                {`${MISC.status}${statusList.length > 0 ? ` (${statusList[0]?.label} → ${statusList[1]?.label})` : ''}`}</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortSaveForLater)}>
-            <View style={styles.cameraContainer}>
-              <Image source={imagesPath.sortFavorite} style={styles.cameraImage} />
-            </View>
-            <Text style={styles.modalButtonText}>{LABELS.savedForLater}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButton} onPress={() => onSelectItem(MISC.sortSaveForLater)}>
+              <View style={styles.cameraContainer}>
+                <Image source={imagesPath.sortFavorite} style={styles.cameraImage} />
+              </View>
+              <Text style={styles.modalButtonText}>{LABELS.savedForLater}</Text>
+            </TouchableOpacity>
 
 
-          {/* Go Back */}
-          <TouchableOpacity style={styles.goBack} onPress={() => setModalVisible(false)}>
-            {/* <Icon name="arrow-back" size={16} color={COLORS.accent} /> */}
-            <Text style={[styles.modalButtonText, { color: COLORS.accent }]}>
-              ✕  Cancel
-            </Text>
-          </TouchableOpacity>
+            {/* Go Back */}
+            <TouchableOpacity style={styles.goBack} onPress={() => setModalVisible(false)}>
+              {/* <Icon name="arrow-back" size={16} color={COLORS.accent} /> */}
+              <Text style={[styles.modalButtonText, { color: COLORS.accent }]}>
+                ✕  Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };

@@ -93,7 +93,7 @@ export default function LoginScreen({ navigation }) {
       showCustomToast(LABELS.success, "Login successful");
     } catch (error) {
       console.log('Login Failed: ' + JSON.stringify(error))
-      showCustomToast(LABELS.error, 'Login Failed: ' + error.message);
+      showCustomToast(LABELS.error, error.message);
     } finally {
       updateState({ loading: false });
     }

@@ -26,7 +26,7 @@ const Header = ({
     return (
         <View style={styles.header}>
 
-            <TouchableOpacity onPress={() => isBack ? navigation.goBack() : showCustomToast(LABELS.success, MISC.comingSoon)}>
+            <TouchableOpacity style={styles.button} onPress={() => isBack ? navigation.goBack() : showCustomToast(LABELS.success, MISC.comingSoon)}>
                 {
                     isBack
                         ? <Icon name={"chevron-back"} size={22} color={COLORS.black} style={styles.menuIcon} />
@@ -37,20 +37,20 @@ const Header = ({
             <Text style={styles.headerTitle}>{title}</Text>
 
             {!isBack && <View style={styles.headerRight}>
-                <TouchableOpacity onPress={() => showCustomToast(LABELS.success, MISC.comingSoon)}>
+                <TouchableOpacity style={styles.button} onPress={() => showCustomToast(LABELS.success, MISC.comingSoon)}>
                     <Image source={imagesPath.search} style={styles.search} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => showCustomToast(LABELS.success, MISC.comingSoon)}>
+                <TouchableOpacity style={styles.button} onPress={() => showCustomToast(LABELS.success, MISC.comingSoon)}>
                     <Icon name="notifications-outline" size={24} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate(ROUTES.profileScreen)}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(ROUTES.profileScreen)}>
                     {userData?.avatar_url
                         ? <Image source={{ uri: userData?.avatar_url }} style={styles.avatar} />
                         : <Image source={imagesPath.avatarSample} style={styles.avatar} />}
                 </TouchableOpacity>
             </View>}
             {onMenuPress &&
-                <TouchableOpacity onPress={onMenuPress}>
+                <TouchableOpacity style={styles.button} onPress={onMenuPress}>
                     <Icon name="ellipsis-vertical-sharp" size={20} color={COLORS.black} />
                 </TouchableOpacity>}
         </View>
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         position: 'relative',
         borderBottomWidth: 1,
         borderColor: COLORS.lighterGray,
-        padding: 16
+        padding: 8
     },
     menuIcon: {
         zIndex: 1,
@@ -89,9 +89,10 @@ const styles = StyleSheet.create({
     headerRight: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        gap: 4,
         zIndex: 1,
     },
+    button: { paddingHorizontal: 6, paddingVertical: 8 },
     search: {
         width: 24,
         height: 24,

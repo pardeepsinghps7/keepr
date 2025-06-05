@@ -145,11 +145,11 @@ const ListDetailsScreen = ({ navigation, route }) => {
             </View>
           </View>
           <View style={[styles.row, { gap: 8 }]}>
-            <TouchableOpacity style={styles.row} onPress={() => updateState({ sortModalVisible: true })}>
+            <TouchableOpacity style={[styles.row,{paddingVertical:8,}]} onPress={() => updateState({ sortModalVisible: true })}>
               <Icon name="filter" size={20} color={COLORS.black} />
               <Text style={styles.itemSubtitle}>{MISC.sortBy}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.row} onPress={() => updateState({ filterModalVisible: true })}>
+            <TouchableOpacity style={[styles.row,{paddingVertical:8,}]} onPress={() => updateState({ filterModalVisible: true })}>
               <Image source={imagesPath.filter} style={styles.watchImageStyle} />
               <Text style={styles.itemSubtitle}>{MISC.filterBy}</Text>
             </TouchableOpacity>

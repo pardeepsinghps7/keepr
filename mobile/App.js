@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import FlashMessage from 'react-native-flash-message';
 import 'react-native-url-polyfill/auto';
+import 'cross-fetch/polyfill';
 import { Provider } from 'react-redux';
 import store from './src/redux/store';
 import Routes from './src/Navigations/Route';

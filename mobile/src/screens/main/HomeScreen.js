@@ -7,6 +7,7 @@ import {
     FlatList,
     TouchableOpacity,
     ScrollView,
+    Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -24,6 +25,8 @@ import { saveUserData } from '../../redux/actions/auth.js';
 import { setData } from '../../utils/utils.js';
 import constants from '../../constants/constants.js';
 
+const SCREEN_WIDTH = Dimensions.get('screen').width;
+const SCREEN_HEIGHT = Dimensions.get('screen').height;
 const HomeScreen = ({ navigation }) => {
     const { LABELS, MISC } = STRINGS;
     const isFocused = useIsFocused();
@@ -50,7 +53,7 @@ const HomeScreen = ({ navigation }) => {
             const response = await actions.getUserListWithItemCount();
             const userDetails = await actions.getProfileDetail();
             const latestItemResopnse = await actions.getLatestAddedItem();
-            console.log('getUserListWithItemCount response', userDetails);
+            // console.log('latestItemResopnse response', latestItemResopnse);
             await setData(constants.USER_DATA, JSON.stringify({
                 ...userData,
                 email: userDetails[0]?.email,
@@ -61,7 +64,7 @@ const HomeScreen = ({ navigation }) => {
                 email: userDetails[0]?.email,
                 avatar_url: userDetails[0]?.avatar_url
             });
-            updateState({ dataList: response.slice(0,4), latestItem: latestItemResopnse[0] });
+            updateState({ dataList: response.slice(0, 4), latestItem: latestItemResopnse[0] });
         } catch (error) {
             console.log('getUserListWithItemCount failed:', error.message);
             showCustomToast(LABELS.error, error.message);
@@ -95,53 +98,53 @@ const HomeScreen = ({ navigation }) => {
                 contentContainerStyle={{ paddingHorizontal: 16, }}
                 keyboardShouldPersistTaps="handled"
             > */}
-                <View style={styles.viewContainer}>
-                    <Text style={styles.welcome}>Welcome <Text style={styles.wave}>👋</Text></Text>
-                    <Text style={styles.subtext}>Your clever space to keep what you love.</Text>
-                    <View style={styles.mainView} >
-                        <View style={styles.row}>
-                            <TouchableOpacity
-                                style={[styles.card, { alignItems: 'center', justifyContent: 'center' }]}
-                                onPress={() => navigation.navigate(ROUTES.quickAdd)}
-                            >
-                                <Icon name="add" size={20} color={COLORS.accent} style={styles.plus} />
-                                <Text style={styles.addLabel}>Quick Add</Text>
-                            </TouchableOpacity>
+            <View style={styles.viewContainer}>
+                <Text style={styles.welcome}>Welcome <Text style={styles.wave}>👋</Text></Text>
+                <Text style={styles.subtext}>Your clever space to keep what you love.</Text>
+                <View style={styles.mainView} >
+                    <View style={styles.row}>
+                        <TouchableOpacity
+                            style={[styles.card, { alignItems: 'center', justifyContent: 'center' }]}
+                            onPress={() => navigation.navigate(ROUTES.quickAdd)}
+                        >
+                            <Icon name="add" size={20} color={COLORS.accent} style={styles.plus} />
+                            <Text style={styles.addLabel}>Quick Add</Text>
+                        </TouchableOpacity>
 
 
-                            <TouchableOpacity style={styles.card} onPress={() =>
-                                (latestItem?.title || latestItem?.series_title || latestItem?.episode_title)
-                                    ? navigation.navigate(ROUTES.itemDetailsScreen, { item: latestItem })
-                                    : null}>
-                                <Text style={styles.latestTitle}>Latest Added</Text>
-                                {(latestItem?.title || latestItem?.series_title || latestItem?.episode_title) &&
-                                    <><View style={styles.latestRow}>
-                                        <Image source={{ uri: latestItem?.lists?.icon }} style={styles.latestMovieImageStyle} />
-                                        <Text style={styles.latestText} numberOfLines={1}>{latestItem?.title || latestItem?.series_title || latestItem?.episode_title}</Text>
+                        <TouchableOpacity style={[styles.card,{justifyContent:'flex-start'}]} onPress={() =>
+                            (latestItem?.title || latestItem?.series_title || latestItem?.episode_title)
+                                ? navigation.navigate(ROUTES.itemDetailsScreen, { item: latestItem })
+                                : null}>
+                            <Text style={styles.latestTitle}>Latest Added</Text>
+                            {(latestItem?.title || latestItem?.episode_title || latestItem?.series_title) &&
+                                <><View style={styles.latestRow}>
+                                    <Image source={{ uri: latestItem?.lists?.icon }} style={styles.latestMovieImageStyle} />
+                                    <Text style={styles.latestText} numberOfLines={1}>{latestItem?.title || latestItem?.episode_title || latestItem?.series_title}</Text>
+                                </View>
+                                    <View style={[styles.latestRow, { marginTop: 4 }]}>
+                                        <Image source={imagesPath.watch} style={styles.watchImageStyle} />
+                                        <Text style={styles.latestSub} numberOfLines={1}>{latestItem?.status?.replace(/_/g, ' ')}</Text>
                                     </View>
-                                        <View style={[styles.latestRow, { marginTop: 2 }]}>
-                                            <Image source={imagesPath.watch} style={styles.watchImageStyle} />
-                                            <Text style={styles.latestSub} numberOfLines={1}>{latestItem?.status?.replace(/_/g, ' ')}</Text>
-                                        </View>
-                                        <Text style={styles.latestSub} numberOfLines={1}>{moment(latestItem?.updated_at || latestItem?.created_at).fromNow()}</Text>
-                                    </>}
-                            </TouchableOpacity>
-                        </View>
-
-                        {/* FlatList Grid */}
-                        <FlatList
-                            data={dataList}
-                            renderItem={renderItem}
-                            keyExtractor={(item) => item.id}
-                            numColumns={2}
-                            columnWrapperStyle={styles.grid}
-                            contentContainerStyle={{ padding: 2 }}
-                            showsVerticalScrollIndicator={false}
-                            nestedScrollEnabled={true}
-                            scrollEnabled={false}
-                        />
+                                    <Text style={styles.latestSub} numberOfLines={1}>{moment(latestItem?.updated_at || latestItem?.created_at).fromNow()}</Text>
+                                </>}
+                        </TouchableOpacity>
                     </View>
+
+                    {/* FlatList Grid */}
+                    <FlatList
+                        data={dataList}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.id}
+                        numColumns={2}
+                        columnWrapperStyle={styles.grid}
+                        contentContainerStyle={{ padding: 2 }}
+                        showsVerticalScrollIndicator={false}
+                        nestedScrollEnabled={true}
+                        scrollEnabled={false}
+                    />
                 </View>
+            </View>
             {/* </ScrollView> */}
         </SafeAreaView>
     );
@@ -156,7 +159,7 @@ const styles = StyleSheet.create({
     },
     viewContainer: {
         flex: 1,
-        padding:16
+        padding: 16
     },
     welcome: {
         marginVertical: 8,
@@ -231,10 +234,11 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     card: {
+        justifyContent: 'center',
         backgroundColor: COLORS.white,
         borderRadius: 12,
         width: '47%',
-        height: 150,
+        height: SCREEN_HEIGHT / 5.5,
         padding: 16,
         elevation: 5,
         shadowColor: COLORS.accent,
@@ -243,7 +247,7 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         position: 'relative',
         shadowColor: '#000',
-        overflow:'visible'
+        overflow: 'visible'
     },
     iconImageStyle: {
         width: 36,
@@ -252,13 +256,14 @@ const styles = StyleSheet.create({
         tintColor: COLORS.accent,
     },
     cardTitle: {
-        marginTop: 8,
+        marginTop: 12,
         fontSize: 18,
         fontWeight: '400',
         color: COLORS.text_secondary,
     },
     itemCount: {
         fontSize: 12,
+        marginTop: 4,
         fontWeight: '400',
         color: COLORS.text_secondary,
     },

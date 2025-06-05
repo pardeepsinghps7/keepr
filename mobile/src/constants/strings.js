@@ -1,6 +1,6 @@
 export const STRINGS = {
   TITLES: {
-    appName: 'Keepr',
+    appName: 'listkeepr',
     itemDetails: 'Item Details',
   },
   LABELS: {
@@ -72,7 +72,7 @@ export const STRINGS = {
     sentResetLinkToast: 'We’ve sent a reset link to your inbox. Check your email to get started.',
   },
   UPDATE_PASSWORD: {
-    title: 'Secure Your Keepr',
+    title: 'Secure Your listkeepr',
     subTitle: 'A new password to protect what you love.',
   },
   CHANGE_PASSWORD: {
@@ -84,7 +84,7 @@ export const STRINGS = {
     passwordMatched: 'Password matched',
     signupLoaderText: 'Please wait...',
     loginLoaderText: 'Bringing back your memories...',
-    updatePasswordSuccess: 'All set! Your Keepr is now more secure.',
+    updatePasswordSuccess: 'All set! Your listkeepr is now more secure.',
     changePasswordSuccess: 'Congratulations! your password has been changed successfully',
   },
   BUTTONS: {
@@ -119,7 +119,7 @@ export const STRINGS = {
     termsConditions: 'Terms of Service',
     and: 'and',
     privacyPolicy: 'Privacy Policy',
-    alreadyAccount: 'Already have a Keepr account?',
+    alreadyAccount: 'Already have a listkeepr account?',
     newHere: 'New here?',
     quickAndFree: 'it’s quick and free.',
     notGetEmail: 'Didn’t get the email?',

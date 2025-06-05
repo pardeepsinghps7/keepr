@@ -99,5 +99,5 @@ export function getSearchRestaurantsList(searchText, page = 1) {
     return apiGet(`${RESTAURANTS}?name=${searchText}&page=${page}`)
 }
 export function getSearchPodcastsList(searchText, page = 1) {
-    return apiGet(`${PODCASTS}?name=${searchText}&page=${page}`)
+    return apiGet(`${PODCASTS}?title=${searchText}&page=${page}`)
 }

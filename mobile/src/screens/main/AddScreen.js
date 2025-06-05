@@ -13,6 +13,7 @@ import {
   Dimensions,
   Image,
   ActivityIndicator,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -285,7 +286,7 @@ const AddScreen = ({ navigation, route }) => {
                 ? await actions.getSearchRestaurantsList(query)
                 : selectedListLabel.toLowerCase() === MISC.podcasts
                   ? await actions.getSearchPodcastsList(query)
-                : await actions.getSearchMoviesList(query);
+                  : await actions.getSearchMoviesList(query);
       console.log('getSearchBooksList response', response);
 
       if (response && response.data.length > 0) {
@@ -309,7 +310,11 @@ const AddScreen = ({ navigation, route }) => {
 
   const onChangeText = (text) => {
     console.log('client id in change text', clientId);
-    updateState({ title: text.replace(/[^A-Za-z0-9 ]/g, ''), clientId: '' });
+    if (selectedListLabel.toLowerCase() === MISC.podcasts) {
+      updateState({ episodeTitle: text, clientId: '' });
+    } else {
+      updateState({ title: text, clientId: '' });
+    }
     if (text.length > 3
       && (selectedListLabel.toLowerCase() === MISC.books
         || selectedListLabel.toLowerCase() === MISC.movies
@@ -327,16 +332,25 @@ const AddScreen = ({ navigation, route }) => {
   };
 
   const handleSelectTitle = (item) => {
-    updateState({
-      title: item?.title || item?.name || '',
-      author: item?.author || '',
-      brewery: item?.brewery || '',
-      movieReleaseDate: item?.release_date || '',
-      location: item?.location?.formatted_address || '',
-      clientId: item?.client_id || '',
-      showDropdown: false,
-      searchList: []
-    });
+    if (selectedListLabel.toLowerCase() === MISC.podcasts) {
+      updateState({
+        episodeTitle: item?.title || '',
+        clientId: item?.client_id || '',
+        showDropdown: false,
+        searchList: []
+      });
+    } else {
+      updateState({
+        title: item?.title || item?.name || '',
+        author: item?.author || '',
+        brewery: item?.brewery || '',
+        movieReleaseDate: item?.release_date || '',
+        location: item?.location?.formatted_address || '',
+        clientId: item?.client_id || '',
+        showDropdown: false,
+        searchList: []
+      });
+    }
   }
 
   const renderItem = ({ item }) => (
@@ -408,101 +422,58 @@ const AddScreen = ({ navigation, route }) => {
     <SafeAreaView style={styles.container}>
       <Loader modalVisible={loading} />
       <KeyboardAvoidingView
-        // style={styles.container}
+        style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
+        keyboardShouldPersistTaps="handled"
       >
 
         <Header title={MISC.addItem} />
-        <ScrollView
-          nestedScrollEnabled
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.mainView}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{  flexGrow: 1 }}
+            // keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.mainView}>
 
-            <Text style={styles.label}>Select List Type</Text>
+              <Text style={styles.label}>Select List Type</Text>
 
-            {/* <DropdownContainer /> */}
-            {dataList.length > 0 && <View style={styles.dropdownContainer}>
-              <DropDownPicker
-                open={open}
-                value={value}
-                items={dataList}
-                setOpen={setOpen}
-                onSelectItem={(item) => {
-                  const list = getStatusList(item.label);
-                  updateState({
-                    selectedListId: item.key,
-                    selectedListLabel: item.label,
-                    statusList: list,
-                    status: list[0],
-                    value: item.value,
+              {/* <DropdownContainer /> */}
+              {dataList.length > 0 && <View style={styles.dropdownContainer}>
+                <DropDownPicker
+                  open={open}
+                  value={value}
+                  items={dataList}
+                  setOpen={setOpen}
+                  onSelectItem={(item) => {
+                    const list = getStatusList(item.label);
+                    updateState({
+                      selectedListId: item.key,
+                      selectedListLabel: item.label,
+                      statusList: list,
+                      status: list[0],
+                      value: item.value,
 
-                    ...resetPayloads,
-                  });
-                  setOpen(false);
-                }}
-                placeholder="Select a category"
-                style={styles.dropdown}
-                textStyle={{ fontSize: 16, color: COLORS.black }}
-                dropDownContainerStyle={styles.dropdownBox}
-                listMode="SCROLLVIEW"
-              />
-            </View>}
-
-            <TouchableOpacity onPress={handleAddPress} style={{ alignSelf: 'flex-end', paddingVertical: 8, paddingLeft: 8 }}>
-              <Text style={styles.addNewList}>+ Add New List</Text>
-            </TouchableOpacity>
-
-            {/* Title Input */}
-            <View style={styles.searchBox}>
-              {selectedListLabel.toLowerCase() !== MISC.podcasts && <CustomInput
-                placeholder={LABELS.typeSomethingHere}
-                value={title}
-                maxLength={100}
-                mainViewProps={{ marginVertical: 12 }}
-                onChangeText={onChangeText}
-                // onChangeText={(val) => updateState({ title: val.replace(/[^A-Za-z0-9@. ]/g, '') })}
-                label={(selectedListLabel.toLowerCase() === MISC.bourbon
-                  || selectedListLabel.toLowerCase() === MISC.wine
-                  || selectedListLabel.toLowerCase() === MISC.restaurants
-                  || selectedListLabel.toLowerCase() === MISC.beer) ? LABELS.name : LABELS.title}
-              />}
-              {showDropdown && dataList.length > 0 && title.length > 0 && (<View style={[styles.listAbsolute,]}>
-                <ScrollView horizontal
-                  contentContainerStyle={{
-                    maxHeight: 280, width: SCREEN_WIDTH,
-                    flex: 1, flexGrow: 1
+                      ...resetPayloads,
+                    });
+                    setOpen(false);
                   }}
-                  showsHorizontalScrollIndicator={false}
-                  scrollEnabled={false}>
-                  <FlatList
-                    data={searchList}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={renderItem}
-                    contentContainerStyle={{ padding: 8, gap: 8, flexGrow: 1 }}
-                    showsHorizontalScrollIndicator={false}
-                    nestedScrollEnabled={true}
-                  />
-                </ScrollView>
-              </View>
-              )}
-            </View>
+                  placeholder="Select a category"
+                  style={styles.dropdown}
+                  textStyle={{ fontSize: 16, color: COLORS.black }}
+                  dropDownContainerStyle={styles.dropdownBox}
+                  listMode="SCROLLVIEW"
+                />
+              </View>}
 
-            {selectedListLabel.toLowerCase() === MISC.movies &&
-              <CustomInput
-                placeholder={LABELS.typeSomethingHere}
-                value={movieReleaseDate}
-                mainViewProps={{ marginVertical: 12 }}
-                onChangeText={(val) => updateState({ movieReleaseDate: val.replace(/[^A-Za-z0-9 -]/g, '') })}
-                label={LABELS.releaseDate}
-                isOptional={true}
-              />}
+              <TouchableOpacity onPress={handleAddPress} style={{ alignSelf: 'flex-end', paddingVertical: 8, paddingLeft: 8 }}>
+                <Text style={styles.addNewList}>+ Add New List</Text>
+              </TouchableOpacity>
 
-            {selectedListLabel.toLowerCase() === MISC.podcasts &&
-              <>
+              {/* Title Input */}
+              {selectedListLabel.toLowerCase() === MISC.podcasts && <>
                 <Text style={styles.label}>Podcasts Type</Text>
                 <View style={styles.radioGroup}>
                   {podcastList
@@ -523,203 +494,254 @@ const AddScreen = ({ navigation, route }) => {
                   mainViewProps={{ marginVertical: 12 }}
                   onChangeText={(val) => updateState({ seriesTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
                   label={LABELS.seriesTitle}
-                  isOptional={true}
-                />
-                <CustomInput
-                  placeholder={LABELS.typeSomethingHere}
-                  value={episodeTitle}
-                  mainViewProps={{ marginVertical: 12 }}
-                  onChangeText={(val) => updateState({ episodeTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                  label={LABELS.episodeTitle}
-                  isOptional={podcastType.label === MISC.series}
+                  isOptional={podcastType.label === MISC.episode}
                 />
               </>}
 
-            {selectedListLabel.toLowerCase() === MISC.restaurants &&
-              <>
-                <CustomInput
-                  placeholder={LABELS.typeSomethingHere}
-                  value={location}
-                  mainViewProps={{ marginVertical: 12 }}
-                  onChangeText={(val) => updateState({ location: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                  label={LABELS.location}
-                  isOptional={true}
-                />
-              </>
-            }
-            {selectedListLabel.toLowerCase() === MISC.beer &&
-              <>
-                <CustomInput
-                  placeholder={LABELS.typeSomethingHere}
-                  value={brewery}
-                  mainViewProps={{ marginVertical: 12 }}
-                  onChangeText={(val) => updateState({ brewery: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                  label={LABELS.brewery}
-                  isOptional={true}
-                />
-              </>
-            }
+              {/* Title Input */}
+              <View style={styles.searchBox}>
+                {selectedListLabel.toLowerCase() === MISC.podcasts
+                  ? <CustomInput
+                    placeholder={LABELS.typeSomethingHere}
+                    value={episodeTitle}
+                    mainViewProps={{ marginVertical: 12 }}
+                    onChangeText={onChangeText}
+                    maxLength={100}
+                    label={LABELS.episodeTitle}
+                    isOptional={podcastType.label === MISC.series}
+                  />
+                  : <CustomInput
+                    placeholder={LABELS.typeSomethingHere}
+                    value={title}
+                    mainViewProps={{ marginVertical: 12 }}
+                    onChangeText={onChangeText}
+                    maxLength={100}
+                    label={(selectedListLabel.toLowerCase() === MISC.bourbon
+                      || selectedListLabel.toLowerCase() === MISC.wine
+                      || selectedListLabel.toLowerCase() === MISC.restaurants
+                      || selectedListLabel.toLowerCase() === MISC.beer) ? LABELS.name : LABELS.title}
+                  />}
+                {showDropdown && dataList.length > 0 && (title.length > 0 || episodeTitle.length > 0)
+                  && (
+                    <View style={[styles.listAbsolute,]}>
+                      <ScrollView horizontal
+                        contentContainerStyle={{
+                          maxHeight: 280, width: SCREEN_WIDTH,
+                          flexGrow: 1
+                        }}
+                        showsHorizontalScrollIndicator={false}
+                        scrollEnabled={false}>
+                        <FlatList
+                          data={searchList}
+                          keyExtractor={(item, index) => index.toString()}
+                          renderItem={renderItem}
+                          contentContainerStyle={{ padding: 8, gap: 8, flexGrow: 1 }}
+                          // keyboardShouldPersistTaps="handled"
+                          showsHorizontalScrollIndicator={false}
+                          nestedScrollEnabled={true}
+                          scrollEnabled={true}
+                        />
+                      </ScrollView>
+                    </View>
+                  )}
+              </View>
 
-            {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
-              <>
+              {selectedListLabel.toLowerCase() === MISC.movies &&
                 <CustomInput
                   placeholder={LABELS.typeSomethingHere}
-                  value={year}
+                  value={movieReleaseDate}
                   mainViewProps={{ marginVertical: 12 }}
-                  onChangeText={(val) => {
-                    // Allow only digits
-                    const filtered = val.replace(/[^0-9]/g, '');
-                    if (filtered.length <= 4) {
-                      updateState({ year: filtered });
-                      // Auto-validate when 4 digits are entered
-                      if (filtered.length === 4) {
-                        const yearNumber = parseInt(filtered);
-                        if (yearNumber < 1000 || yearNumber > currentYear) {
-                          Keyboard.dismiss(); // Hide keyboard
-                          showCustomToast(LABELS.error, `Year must be between 1000 and ${currentYear}`);
-                          updateState({ year: '' });
+                  onChangeText={(val) => updateState({ movieReleaseDate: val.replace(/[^A-Za-z0-9 -]/g, '') })}
+                  label={LABELS.releaseDate}
+                  isOptional={true}
+                />}
+
+              {selectedListLabel.toLowerCase() === MISC.restaurants &&
+                <>
+                  <CustomInput
+                    placeholder={LABELS.typeSomethingHere}
+                    value={location}
+                    mainViewProps={{ marginVertical: 12 }}
+                    onChangeText={(val) => updateState({ location: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                    label={LABELS.location}
+                    isOptional={true}
+                  />
+                </>
+              }
+              {selectedListLabel.toLowerCase() === MISC.beer &&
+                <>
+                  <CustomInput
+                    placeholder={LABELS.typeSomethingHere}
+                    value={brewery}
+                    mainViewProps={{ marginVertical: 12 }}
+                    onChangeText={(val) => updateState({ brewery: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                    label={LABELS.brewery}
+                    isOptional={true}
+                  />
+                </>
+              }
+
+              {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
+                <>
+                  <CustomInput
+                    placeholder={LABELS.typeSomethingHere}
+                    value={year}
+                    mainViewProps={{ marginVertical: 12 }}
+                    onChangeText={(val) => {
+                      // Allow only digits
+                      const filtered = val.replace(/[^0-9]/g, '');
+                      if (filtered.length <= 4) {
+                        updateState({ year: filtered });
+                        // Auto-validate when 4 digits are entered
+                        if (filtered.length === 4) {
+                          const yearNumber = parseInt(filtered);
+                          if (yearNumber < 1000 || yearNumber > currentYear) {
+                            Keyboard.dismiss(); // Hide keyboard
+                            showCustomToast(LABELS.error, `Year must be between 1000 and ${currentYear}`);
+                            updateState({ year: '' });
+                          }
                         }
                       }
-                    }
-                  }}
-                  label={LABELS.year}
-                  maxLength={10}
-                  keyboardType={'numeric'}
-                  isOptional={true}
-                />
-              </>
-            }
+                    }}
+                    label={LABELS.year}
+                    maxLength={10}
+                    keyboardType={'numeric'}
+                    isOptional={true}
+                  />
+                </>
+              }
 
-            <TouchableOpacity onPress={() => updateState({ saveForLater: !saveForLater })} style={styles.checkboxContainer}>
-              <Ionicons
-                name={saveForLater ? 'checkbox-outline' : 'square-outline'}
-                size={24}
-                color={saveForLater ? COLORS.black : COLORS.borderGray}
+              <TouchableOpacity onPress={() => updateState({ saveForLater: !saveForLater })} style={styles.checkboxContainer}>
+                <Ionicons
+                  name={saveForLater ? 'checkbox-outline' : 'square-outline'}
+                  size={24}
+                  color={saveForLater ? COLORS.black : COLORS.borderGray}
+                />
+                <Text style={styles.checkboxLabel}>Save for Later</Text>
+              </TouchableOpacity>
+
+              {/* Book Author Input */}
+              {selectedListLabel.toLowerCase() === MISC.books && <CustomInput
+                placeholder={LABELS.recommendedByPlaceholder}
+                value={author}
+                onChangeText={(val) => updateState({ author: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                label={LABELS.author}
+                mainViewProps={{ marginVertical: 12 }}
+                isOptional={true}
+              />}
+
+              <Text style={styles.label}>Status</Text>
+              <View style={styles.radioGroup}>
+                {statusList
+                  .map((item) => (
+                    <TouchableOpacity
+                      key={item.key}
+                      onPress={() => updateState({ status: item })}
+                      style={styles.radioButton}
+                    >
+                      <View style={styles.radioCircle(status.key === item.key)} />
+                      <Text style={styles.radioLabel}>{item.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+              </View>
+
+              {status.id === 0 && <>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.inputLabel}>Rating</Text>
+                  <Text style={styles.optional}>(Optional)</Text>
+                </View>
+                <View style={styles.starContainer}>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <TouchableOpacity key={i} onPress={() => updateState({ rating: i })}>
+                      {i <= rating ? <Octicons
+                        name={'star-fill'}
+                        size={23}
+                        color={COLORS.black}
+                        style={{ marginRight: 8 }}
+                      /> : <SimpleLineIcons
+                        name={'star'}
+                        size={20}
+                        color={COLORS.black}
+                        style={{ marginRight: 8 }}
+                      />}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>}
+
+
+              {/* Recommend Input */}
+              <CustomInput
+                placeholder={LABELS.recommendedByPlaceholder}
+                value={recommendedBy}
+                onChangeText={(val) => updateState({ recommendedBy: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                label={LABELS.recommendedBy}
+                mainViewProps={{ marginVertical: 12 }}
+                isOptional={true}
               />
-              <Text style={styles.checkboxLabel}>Save for Later</Text>
-            </TouchableOpacity>
 
-            {/* Book Author Input */}
-            {selectedListLabel.toLowerCase() === MISC.books && <CustomInput
-              placeholder={LABELS.recommendedByPlaceholder}
-              value={author}
-              onChangeText={(val) => updateState({ author: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-              label={LABELS.author}
-              mainViewProps={{ marginVertical: 12 }}
-              isOptional={true}
-            />}
-
-            <Text style={styles.label}>Status</Text>
-            <View style={styles.radioGroup}>
-              {statusList
-                .map((item) => (
-                  <TouchableOpacity
-                    key={item.key}
-                    onPress={() => updateState({ status: item })}
-                    style={styles.radioButton}
-                  >
-                    <View style={styles.radioCircle(status.key === item.key)} />
-                    <Text style={styles.radioLabel}>{item.label}</Text>
-                  </TouchableOpacity>
-                ))}
-            </View>
-
-            {status.id === 0 && <>
-              <View style={styles.labelContainer}>
-                <Text style={styles.inputLabel}>Rating</Text>
-                <Text style={styles.optional}>(Optional)</Text>
-              </View>
-              <View style={styles.starContainer}>
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <TouchableOpacity key={i} onPress={() => updateState({ rating: i })}>
-                    {i <= rating ? <Octicons
-                      name={'star-fill'}
-                      size={23}
-                      color={COLORS.black}
-                      style={{ marginRight: 8 }}
-                    /> : <SimpleLineIcons
-                      name={'star'}
-                      size={20}
-                      color={COLORS.black}
-                      style={{ marginRight: 8 }}
-                    />}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </>}
-
-
-            {/* Recommend Input */}
-            <CustomInput
-              placeholder={LABELS.recommendedByPlaceholder}
-              value={recommendedBy}
-              onChangeText={(val) => updateState({ recommendedBy: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-              label={LABELS.recommendedBy}
-              mainViewProps={{ marginVertical: 12 }}
-              isOptional={true}
-            />
-
-            {/* Recommend Input */}
-            <CustomInput
-              placeholder={LABELS.typeSomething}
-              value={notes}
-              isOptional={true}
-              mainViewProps={{ marginVertical: 12 }}
-              onChangeText={(val) => updateState({ notes: val.replace(/[^A-Za-z0-9@.%#$&*()-_+/ \n]/g, '') })}
-              label={LABELS.notes}
-              multiline={true}
-              textAlignVertical="top"
-              numberOfLines={5}
-              maxLength={200}
-              height={100}
-            />
-
-            {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
-              <>
-                <CustomInput
-                  placeholder={LABELS.enterImageUrl}
-                  value={imageUrl}
-                  mainViewProps={{ marginVertical: 12 }}
-                  onChangeText={(val) => updateState({ imageUrl: val })}
-                  label={LABELS.imageUrl}
-                  isOptional={true}
-                  maxLength={150}
-                  icon={'cloud-upload-outline'}
-                  iconPress={() => updateState({ imageModalVisible: true })}
-                />
-                {imageUrl.length > 0 && (imageUrl.includes('http://') || imageUrl.includes('https://')) &&
-                  <View
-                    style={{
-                      borderWidth: 0.2, borderColor: COLORS.borderGray,
-                      alignSelf: 'center', marginBottom: 16, padding: 8,
-                    }}>
+              {/* Recommend Input */}
+              <CustomInput
+                placeholder={LABELS.typeSomething}
+                value={notes}
+                isOptional={true}
+                mainViewProps={{ marginVertical: 12 }}
+                onChangeText={(val) => updateState({ notes: val.replace(/[^A-Za-z0-9@.%#$&*()-_+/ \n]/g, '') })}
+                label={LABELS.notes}
+                multiline={true}
+                textAlignVertical="top"
+                numberOfLines={5}
+                maxLength={200}
+                height={100}
+                keyboardType={undefined}
+              />
+              {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
+                <>
+                  <CustomInput
+                    placeholder={LABELS.enterImageUrl}
+                    value={imageUrl}
+                    mainViewProps={{ marginVertical: 12 }}
+                    onChangeText={(val) => updateState({ imageUrl: val })}
+                    label={LABELS.imageUrl}
+                    isOptional={true}
+                    maxLength={150}
+                    icon={'cloud-upload-outline'}
+                    iconPress={() => updateState({ imageModalVisible: true })}
+                  />
+                  {imageUrl.length > 0 && (imageUrl.includes('http://') || imageUrl.includes('https://')) &&
                     <View
                       style={{
+                        borderWidth: 0.2, borderColor: COLORS.borderGray,
+                        alignSelf: 'center', marginBottom: 16, padding: 8,
                       }}>
-                      <Image source={{ uri: imageUrl }} style={styles.sampleImage}
-                        onLoadStart={() => updateState({ imageLoading: true })}
-                        onLoadEnd={() => updateState({ imageLoading: false })} />
-                      {imageLoading && (
-                        <View style={styles.loaderOverlay}>
-                          <ActivityIndicator size="small" color="#000" />
-                        </View>
-                      )}
-                    </View>
-                    <TouchableOpacity style={{ position: 'absolute', right: -8, top: -8 }}
-                      onPress={() => updateState({ imageUrl: '' })}>
-                      <Ionicons name={'close-circle'} size={24} />
-                    </TouchableOpacity>
+                      <View
+                        style={{
+                        }}>
+                        <Image source={{ uri: imageUrl }} style={styles.sampleImage}
+                          onLoadStart={() => updateState({ imageLoading: true })}
+                          onLoadEnd={() => updateState({ imageLoading: false })} />
+                        {imageLoading && (
+                          <View style={styles.loaderOverlay}>
+                            <ActivityIndicator size="small" color="#000" />
+                          </View>
+                        )}
+                      </View>
+                      <TouchableOpacity style={{ position: 'absolute', right: -8, top: -8 }}
+                        onPress={() => updateState({ imageUrl: '' })}>
+                        <Ionicons name={'close-circle'} size={24} />
+                      </TouchableOpacity>
 
-                  </View>}
-              </>
-            }
+                    </View>}
+                </>
+              }
 
-            <CustomButton
-              title={BUTTONS.saveItemToTheList}
-              onPress={handleSavePress}
-            />
-          </View>
-        </ScrollView>
+              <CustomButton
+                title={BUTTONS.saveItemToTheList}
+                onPress={handleSavePress}
+              />
+            </View>
+          </ScrollView>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
 
       {/* Add New List Popup Modal */}
@@ -745,7 +767,7 @@ export default AddScreen;
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContainer: {},
-  mainView: { padding: 16 },
+  mainView: { padding: 16, },
   headerIndicator: {
     alignSelf: 'center',
     width: 40,
@@ -755,7 +777,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   header: { fontSize: 18, fontWeight: '400', color: COLORS.black, marginBottom: 32 },
-  label: { fontWeight: '400', marginBottom: 16, fontSize: 16, color: COLORS.black, },
+  label: { fontWeight: '400', fontSize: 16, color: COLORS.black, },
   addNewList: { fontWeight: '400', fontSize: 16, color: COLORS.accent, textDecorationLine: 'underline' },
   dropdownContainer: {
     marginTop: 4,
@@ -775,7 +797,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   checkboxLabel: { marginLeft: 8, fontSize: 16, fontWeight: '400', color: COLORS.black, },
-  radioGroup: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  radioGroup: { flexDirection: 'row', alignItems: 'center', marginVertical: 16 },
   radioCircle: (isSelected) => ({
     width: 20,
     height: 20,
