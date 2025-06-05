@@ -26,14 +26,14 @@ export default function AuthLayout({
                     width={231}
                     height={48}
                     className="dark:hidden"
-                    src="/images/logo/auth-logo.svg"
+                    src="/images/logo/listkeepr-logo.png"
                     alt="Logo"
                   />
                   <Image
                     width={231}
                     height={48}
                     className="hidden dark:block"
-                    src="/images/logo/logo-dark.svg"
+                    src="/images/logo/listkeepr-logo.png"
                     alt="Logo"
                   />
                 </Link>
