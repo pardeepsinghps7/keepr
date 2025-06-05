@@ -37,7 +37,8 @@ def get_all_restaurants():
         restaurants = [
             {
                 "name": item.get("name", "Unknown Name"),
-                "location": item.get("location", {})
+                "location": item.get("location", {}),
+                "client_id": item.get("fsq_id", "")
             }
             for item in results
         ]

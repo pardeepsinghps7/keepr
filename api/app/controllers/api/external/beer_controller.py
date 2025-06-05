@@ -38,7 +38,8 @@ def get_all_beers():
         beers = [
             {
                 "name": item.get("name", "Unknown Name"),
-                "brewery": item.get("brewery", "Unknown Brewery")
+                "brewery": item.get("brewery", "Unknown Brewery"),
+                "client_id": item.get("sku", ""),
             }
             for item in results
         ]
