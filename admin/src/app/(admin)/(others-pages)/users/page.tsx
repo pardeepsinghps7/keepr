@@ -7,7 +7,8 @@ import { useEffect, useState } from 'react'
 
 interface FormattedUser {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   email_confirmed: string;
   created_at: string;
