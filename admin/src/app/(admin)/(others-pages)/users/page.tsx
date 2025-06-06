@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 
 interface FormattedUser {
   id: string;
+  name: string;
   email: string;
   email_confirmed: string;
   created_at: string;
@@ -15,6 +16,14 @@ interface FormattedUser {
 }
 
 const userColumns = [
+    {
+        header: 'First Name',
+        accessorKey: 'first_name',
+    },
+    {
+        header: 'Last Name',
+        accessorKey: 'last_name',
+    },
     {
         header: 'Email',
         accessorKey: 'email',
@@ -68,6 +77,8 @@ export default function UsersPage() {
 
                 const formattedUser: FormattedUser[] = (data).map((user:any) => ({
                     id: user.id,
+                    first_name: user.first_name,
+                    last_name: user.last_name,
                     email: user.email,
                     email_confirmed: user.email_confirmed ? 'Yes' : 'No',
                     created_at: new Intl.DateTimeFormat('en-US', {
