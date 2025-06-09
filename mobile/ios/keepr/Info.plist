@@ -82,6 +82,8 @@
 		<array>
 		<string>keepr</string>
 		</array>
+		<key>CFBundleURLName</key>
+		<string>com.example.keepr</string>
 	</dict>
 	</array>
 </dict>

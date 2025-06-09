@@ -76,6 +76,22 @@ const RULES_CONFIG = {
       invalid: 'Invalid image',
     },
   },
+  firstname: {
+    required: true,
+    rules: [(val) => val.trim().length > 0],
+    messages: {
+      required: 'Please enter your first name',
+      invalid: 'First name cannot be empty',
+    },
+  },
+  lastname: {
+    required: true,
+    rules: [(val) => val.trim().length > 0],
+    messages: {
+      required: 'Please enter a last name',
+      invalid: 'Last name cannot be empty',
+    },
+  },
   title: {
     required: true,
     rules: [(val) => val.trim().length > 0],
@@ -96,7 +112,7 @@ const RULES_CONFIG = {
     required: true,
     rules: [(val) => val.trim().length > 0],
     messages: {
-      required: 'Please add episode title',
+      required: 'Please enter the episode title',
       invalid: 'Episode title cannot be empty',
     },
   },
@@ -104,7 +120,7 @@ const RULES_CONFIG = {
     required: true,
     rules: [(val) => val.trim().length > 0],
     messages: {
-      required: 'Please add series title',
+      required: 'Please enter the series title',
       invalid: 'Series title cannot be empty',
     },
   },

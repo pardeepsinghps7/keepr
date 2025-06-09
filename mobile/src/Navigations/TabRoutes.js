@@ -10,7 +10,7 @@ import HomeScreen from '../screens/main/HomeScreen';
 import COLORS from '../constants/colors';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import QuickAddItemScreen from '../screens/main/QuickAddItemScreen';
-import { AddScreen, ListsScreen, ProfileScreen } from '../index.js';
+import { AddScreen, ChangePasswordScreen, EditItemScreen, ItemDetailsScreen, ListDetailsScreen, ListsScreen, ProfileScreen } from '../index.js';
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -22,8 +22,41 @@ export function HomeStackNavigator() {
       <Stack.Screen
         name={ROUTES.quickAdd}
         component={QuickAddItemScreen}
-        // options={{ presentation: 'modal' }} // Optional: for modal style
+      // options={{ presentation: 'modal' }} // Optional: for modal style
       />
+
+      <Stack.Screen name={ROUTES.listDetailsScreen} component={ListDetailsScreen} />
+      <Stack.Screen name={ROUTES.itemDetailsScreen} component={ItemDetailsScreen} />
+      <Stack.Screen name={ROUTES.editItemScreen} component={EditItemScreen} />
+      <Stack.Screen name={ROUTES.profileScreen} component={ProfileScreen} />
+      <Stack.Screen name={ROUTES.changePasswordScreen} component={ChangePasswordScreen} />
+    </Stack.Navigator>
+  );
+}
+
+export function ListStackNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name={"MainLists"} component={ListsScreen} />
+
+      <Stack.Screen name={ROUTES.listDetailsScreen} component={ListDetailsScreen} />
+      <Stack.Screen name={ROUTES.itemDetailsScreen} component={ItemDetailsScreen} />
+      <Stack.Screen name={ROUTES.editItemScreen} component={EditItemScreen} />
+      <Stack.Screen name={ROUTES.profileScreen} component={ProfileScreen} />
+      <Stack.Screen name={ROUTES.changePasswordScreen} component={ChangePasswordScreen} />
+    </Stack.Navigator>
+  );
+}
+
+export function AddStackNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name={"MainAdd"} component={AddScreen} />
+      <Stack.Screen name={ROUTES.listDetailsScreen} component={ListDetailsScreen} />
+      <Stack.Screen name={ROUTES.itemDetailsScreen} component={ItemDetailsScreen} />
+      <Stack.Screen name={ROUTES.editItemScreen} component={EditItemScreen} />
+      <Stack.Screen name={ROUTES.profileScreen} component={ProfileScreen} />
+      <Stack.Screen name={ROUTES.changePasswordScreen} component={ChangePasswordScreen} />
     </Stack.Navigator>
   );
 }
@@ -75,7 +108,7 @@ const TabRoutes = () => {
       />
       <BottomTab.Screen
         name={ROUTES.lists}
-        component={ListsScreen}
+        component={ListStackNavigator}
         options={{
           tabBarLabel: ROUTES.lists,
           tabBarIcon: ({ color, size }) => (
@@ -86,7 +119,7 @@ const TabRoutes = () => {
       />
       <BottomTab.Screen
         name={ROUTES.add}
-        component={AddScreen}
+        component={AddStackNavigator}
         options={{
           tabBarLabel: ROUTES.add,
           tabBarIcon: ({ color, size }) => (

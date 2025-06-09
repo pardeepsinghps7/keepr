@@ -13,8 +13,10 @@ import { showCustomToast } from '../utils/helpers';
 const Header = ({
     title,
     isBack = false,
+    onRightPress,
     onMenuPress,
-    onLeftIconTap,
+    customeRightIcon,
+    rightText = '',
 }) => {
     const { LABELS, MISC } = STRINGS
     const navigation = useNavigation();
@@ -51,7 +53,11 @@ const Header = ({
             </View>}
             {onMenuPress &&
                 <TouchableOpacity style={styles.button} onPress={onMenuPress}>
-                    <Icon name="ellipsis-vertical-sharp" size={20} color={COLORS.black} />
+                    <Icon name={"ellipsis-vertical-sharp"} size={20} color={COLORS.black} />
+                </TouchableOpacity>}
+            {rightText &&
+                <TouchableOpacity style={styles.button} onPress={onRightPress}>
+                    <Text style={styles.rightText}>{rightText}</Text>
                 </TouchableOpacity>}
         </View>
     );
@@ -101,6 +107,10 @@ const styles = StyleSheet.create({
         width: 24,
         height: 24,
         borderRadius: 14,
+    },
+    rightText:{
+        fontSize:18,
+        color:COLORS.accent
     },
 });
 

@@ -9,6 +9,8 @@ export const STRINGS = {
     submit: 'Submit',
     success: 'success',
     error: 'error',
+    firstname: 'First Name',
+    lastname: 'Last Name',
     emailAddress: 'Email Address (Username)',
     emailPlaceholderText: 'ex: johndoe@email.com',
     currentPassword: 'Current Password',
@@ -85,7 +87,7 @@ export const STRINGS = {
     signupLoaderText: 'Please wait...',
     loginLoaderText: 'Bringing back your memories...',
     updatePasswordSuccess: 'All set! Your listkeepr is now more secure.',
-    changePasswordSuccess: 'Congratulations! your password has been changed successfully',
+    changePasswordSuccess: 'Congratulations! your password has been changed successfully. Kindly login again',
   },
   BUTTONS: {
     getStarted: 'Get Started',

@@ -88,8 +88,8 @@ export default function ChangePasswordScreen({ navigation }) {
     try {
       const data = await updateCurrentPassword(userData?.user?.email,
         currentPassword, password, userData?.access_token);//Admin@123
-      showCustomToast(LABELS.success, VALIDATIONS.changePasswordSuccess);
-      navigation.goBack();
+      // navigation.goBack();
+      handleLogout();
     } catch (error) {
       console.log('Failed: ' + error.message);
       showCustomToast(LABELS.error, error.message);
@@ -97,9 +97,23 @@ export default function ChangePasswordScreen({ navigation }) {
       updateState({ loading: false });
     }
   }
+  const handleLogout = async () => {
+    updateState({ isLoading: true })
+    try {
+      await logoutSupabase();
+      actions.logout();
+      showCustomToast(LABELS.success, VALIDATIONS.changePasswordSuccess);
+
+    } catch (error) {
+      console.log("error raised", error)
+      showCustomToast(LABELS.error, error?.message || error?.msg)
+    } finally {
+      updateState({ loading: false });
+    }
+  }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{ flex: 1 }}

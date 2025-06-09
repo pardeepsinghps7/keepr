@@ -113,7 +113,7 @@ const ItemDetailsScreen = ({ navigation, route }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <Loader modalVisible={loading} />
       <KeyboardAvoidingView
         style={styles.container}

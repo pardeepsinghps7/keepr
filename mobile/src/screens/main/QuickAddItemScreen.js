@@ -21,7 +21,7 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import COLORS from '../../constants/colors';
 import CustomInput from '../../components/CustomInput';
-import { STRINGS } from '../../constants/strings';
+import { ROUTES, STRINGS } from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import actions from '../../redux/actions';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -209,7 +209,8 @@ const QuickAddItemScreen = ({ navigation }) => {
       };
       const response = await actions.addItem(payload);
       console.log('addItem response:', response);
-      navigation.goBack();
+      // navigation.goBack();
+      navigation.navigate(ROUTES.listDetailsScreen, { item: { id: selectedListId, label: selectedListLabel } })
       showCustomToast(LABELS.success, MISC.itemAddedSuccessfully);
     } catch (error) {
       console.log('addItem failed:', error.message);
@@ -317,6 +318,9 @@ const QuickAddItemScreen = ({ navigation }) => {
       showCustomToast(LABELS.error, 'Image Upload Failed: ' + error.message);
     } finally {
       updateState({ loading: false });
+      setTimeout(() => {
+        Keyboard.dismiss();
+      }, 100);
     }
   }
 
@@ -327,7 +331,7 @@ const QuickAddItemScreen = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <Loader modalVisible={loading} />
       <KeyboardAvoidingView
         style={styles.container}
@@ -595,17 +599,17 @@ const QuickAddItemScreen = ({ navigation }) => {
               maxLength={200}
               height={100}
             />
-            {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
+            {
+            (selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
               <>
-
                 <CustomInput
                   placeholder={LABELS.enterImageUrl}
                   value={imageUrl}
                   mainViewProps={{ marginVertical: 12 }}
                   onChangeText={(val) => updateState({ imageUrl: val })}
                   label={LABELS.imageUrl}
-                  maxLength={150}
                   isOptional={true}
+                  maxLength={150}
                   icon={'cloud-upload-outline'}
                   iconPress={() => updateState({ imageModalVisible: true })}
                 />

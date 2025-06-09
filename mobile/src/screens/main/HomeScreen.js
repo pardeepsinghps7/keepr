@@ -56,11 +56,15 @@ const HomeScreen = ({ navigation }) => {
             // console.log('latestItemResopnse response', latestItemResopnse);
             await setData(constants.USER_DATA, JSON.stringify({
                 ...userData,
+                first_name: userDetails[0]?.first_name,
+                last_name: userDetails[0]?.last_name,
                 email: userDetails[0]?.email,
                 avatar_url: userDetails[0]?.avatar_url
             }));
             saveUserData({
                 ...userData,
+                first_name: userDetails[0]?.first_name,
+                last_name: userDetails[0]?.last_name,
                 email: userDetails[0]?.email,
                 avatar_url: userDetails[0]?.avatar_url
             });
@@ -90,7 +94,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['top']}>
             <Loader modalVisible={loading} />
             <Header title={ROUTES.home} onLeftIconTap={onLeftIconTap} />
             {/* <ScrollView
@@ -99,7 +103,7 @@ const HomeScreen = ({ navigation }) => {
                 keyboardShouldPersistTaps="handled"
             > */}
             <View style={styles.viewContainer}>
-                <Text style={styles.welcome}>Welcome <Text style={styles.wave}>👋</Text></Text>
+                <Text style={styles.welcome}>Welcome {userData?.first_name ? `${userData?.first_name} ` : ''}<Text style={styles.wave}>👋</Text></Text>
                 <Text style={styles.subtext}>Your clever space to keep what you love.</Text>
                 <View style={styles.mainView} >
                     <View style={styles.row}>
@@ -112,7 +116,7 @@ const HomeScreen = ({ navigation }) => {
                         </TouchableOpacity>
 
 
-                        <TouchableOpacity style={[styles.card,{justifyContent:'flex-start'}]} onPress={() =>
+                        <TouchableOpacity style={[styles.card, { justifyContent: 'flex-start' }]} onPress={() =>
                             (latestItem?.title || latestItem?.series_title || latestItem?.episode_title)
                                 ? navigation.navigate(ROUTES.itemDetailsScreen, { item: latestItem })
                                 : null}>

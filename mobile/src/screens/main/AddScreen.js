@@ -21,7 +21,7 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import COLORS from '../../constants/colors';
 import CustomInput from '../../components/CustomInput';
-import { STRINGS } from '../../constants/strings';
+import { ROUTES, STRINGS } from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import actions from '../../redux/actions';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -167,6 +167,7 @@ const AddScreen = ({ navigation, route }) => {
       const response = await actions.getUserListWithItemCount();
       console.log('getUserList response', response);
       const dropdownItems = response.map(item => ({
+        // icon:item.icon,
         label: item.label,
         value: item.id,
         key: item.id, // ensures unique key
@@ -259,7 +260,8 @@ const AddScreen = ({ navigation, route }) => {
       };
       const response = await actions.addItem(payload);
       console.log('addItem response:', response);
-      navigation.goBack();
+      // navigation.goBack();
+      navigation.navigate(ROUTES.listDetailsScreen, { item: { id: selectedListId, label: selectedListLabel } })
       showCustomToast(LABELS.success, MISC.itemAddedSuccessfully);
 
     } catch (error) {
@@ -380,6 +382,9 @@ const AddScreen = ({ navigation, route }) => {
       showCustomToast(LABELS.error, 'Image Upload Failed: ' + error.message);
     } finally {
       updateState({ loading: false });
+      setTimeout(() => {
+        Keyboard.dismiss();
+      }, 100);
     }
   }
 
@@ -419,7 +424,7 @@ const AddScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <Loader modalVisible={loading} />
       <KeyboardAvoidingView
         style={styles.container}
@@ -433,8 +438,8 @@ const AddScreen = ({ navigation, route }) => {
           <ScrollView
             nestedScrollEnabled
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{  flexGrow: 1 }}
-            // keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ flexGrow: 1 }}
+          // keyboardShouldPersistTaps="handled"
           >
             <View style={styles.mainView}>
 

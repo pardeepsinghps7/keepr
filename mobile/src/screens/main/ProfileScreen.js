@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
   ActivityIndicator,
+  Keyboard,
 } from 'react-native';
 import COLORS from '../../constants/colors'; // Assuming COLORS is defined elsewhere
 import { ROUTES, STRINGS } from '../../constants/strings'; // Assuming ROUTES is defined elsewhere
@@ -31,18 +32,24 @@ const ProfileScreen = ({ navigation }) => {
   // console.log('hey user', userData?.user?.email)
   const { LABELS, TITLES, SIGNUP, MISC, VALIDATIONS, BUTTONS } = STRINGS;
   const [state, setState] = useState({
+    firstname: '',
+    lastname: '',
     email: '',
     modalVisible: false,
     avatar: null,
     loading: false,
     imageLoading: false,
     isUpdateAvatar: false,
-    userDetails: {}
+    userDetails: {},
+    isAvatarImage: false,
+    avatar_url: null,
   });
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
 
   const {
+    firstname,
+    lastname,
     email,
     modalVisible,
     avatar,
@@ -50,6 +57,8 @@ const ProfileScreen = ({ navigation }) => {
     imageLoading,
     isUpdateAvatar,
     userDetails,
+    isAvatarImage,
+    avatar_url,
   } = state;
 
   useFocusEffect(
@@ -62,10 +71,13 @@ const ProfileScreen = ({ navigation }) => {
     updateState({ loading: true });
     try {
       const userDetails = await actions.getProfileDetail();
-      // console.log('getProfileDetail response', userDetails, userData);
+      console.log('getProfileDetail response', userDetails, userData);
       updateState({
         email: userDetails[0]?.email || userData?.user?.email,
         avatar: convertAvatarTimestamp(userDetails[0]?.avatar_url) || null,
+        firstname: userDetails[0]?.first_name,
+        lastname: userDetails[0]?.last_name,
+        avatar_url: userDetails[0]?.avatar_url,
         isUpdateAvatar: userDetails[0]?.avatar_url,
         userDetails: userDetails[0],
       });
@@ -108,23 +120,18 @@ const ProfileScreen = ({ navigation }) => {
           showCustomToast(LABELS.error, 'Failed to get public URL from Supabase');
           return;
         }
-        const payload = { email: email, avatar_url: avatarUrl.publicURL };
-        isUpdateAvatar
-          ? await actions.updateProfileDetail(userDetails?.id, payload)
-          : await actions.addProfileDetail(payload);
-        updateState({ avatar: convertAvatarTimestamp(avatarUrl.publicURL) });
-        await setData(constants.USER_DATA, JSON.stringify({ ...userData, email: email, avatar_url: avatarUrl.publicURL }));
-        saveUserData({ ...userData, email: email, avatar_url: avatarUrl.publicURL })
+        updateState({
+          avatar: convertAvatarTimestamp(avatarUrl.publicURL),
+          isAvatarImage: true,
+          avatar_url: avatarUrl.publicURL
+        });
       } else {
-        const payload = { email: email, avatar_url: uri };
-        isUpdateAvatar
-          ? await actions.updateProfileDetail(userDetails?.id, payload)
-          : await actions.addProfileDetail(payload);
-        updateState({ avatar: convertAvatarTimestamp(uri) });
-        await setData(constants.USER_DATA, JSON.stringify({ ...userData, email: email, avatar_url: uri }));
-        saveUserData({ ...userData, email: email, avatar_url: uri });
+        updateState({
+          avatar: convertAvatarTimestamp(uri),
+          isAvatarImage: false,
+          avatar_url: uri,
+        });
       }
-      showCustomToast(LABELS.success, 'Profile added successfully');
     } catch (error) {
       console.log('Profile Upload Failed: ' + error.message);
       showCustomToast(LABELS.error, 'Profile Upload Failed: ' + error.message);
@@ -138,15 +145,46 @@ const ProfileScreen = ({ navigation }) => {
     navigation.navigate(ROUTES.changePasswordScreen);
   };
 
+  const handleRightPress = async () => {
+    Keyboard.dismiss();
+    const validation = validator.isValidData(
+      {
+        avatar: avatar_url,
+        firstname: firstname,
+        lastname: lastname,
+      }
+    );
+    if (!validation.valid) {
+      showCustomToast(LABELS.error, validation.message);
+      return;
+    }
+    updateState({ loading: true });
+    try {
+      const payload = { email: email, avatar_url: avatar_url, first_name: firstname, last_name: lastname };
+      isUpdateAvatar
+        ? await actions.updateProfileDetail(userDetails?.id, payload)
+        : await actions.addProfileDetail(payload);
+      await setData(constants.USER_DATA, JSON.stringify({ ...userData, ...payload }));
+      saveUserData({ ...userData, ...payload });
+      updateState({ isUpdateAvatar: true });
+      showCustomToast(LABELS.success, 'Profile updated successfully');
+    } catch (error) {
+      console.log('Profile Upload Failed: ' + error.message);
+      showCustomToast(LABELS.error, 'Profile Upload Failed: ' + error.message);
+    } finally {
+      updateState({ loading: false });
+    }
+  }
+
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           {/* <Loader modalVisible={loading} /> */}
-          <Header title={ROUTES.profileScreen} isBack />
+          <Header title={ROUTES.profileScreen} isBack rightText={"Save"} onRightPress={handleRightPress} />
           <View style={styles.mainView}>
 
             {/* Profile Upload */}
@@ -194,6 +232,30 @@ const ProfileScreen = ({ navigation }) => {
               </Text>
               <Text style={styles.addPhotoText}>{SIGNUP.addImageSubTitle}</Text>
             </View>}
+
+            {/* First name */}
+            <CustomInput
+              label={LABELS.firstname}
+              value={firstname}
+              // editable={false}
+              // backgroundColor={COLORS.lighterGray}
+              onChangeText={(val) => updateState({ firstname: val.replace(/[^A-Za-z]/g, '') })}
+              placeholder={LABELS.firstname}
+              maxLength={15}
+              mainViewProps={{ marginTop: 24 }}
+            />
+
+            {/* Last name */}
+            <CustomInput
+              label={LABELS.lastname}
+              value={lastname}
+              // editable={false}
+              // backgroundColor={COLORS.lighterGray}
+              onChangeText={(val) => updateState({ lastname: val.replace(/[^A-Za-z]/g, '') })}
+              placeholder={LABELS.lastname}
+              maxLength={15}
+              mainViewProps={{ marginTop: 24 }}
+            />
 
             {/* Email */}
             <CustomInput

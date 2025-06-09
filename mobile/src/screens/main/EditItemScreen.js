@@ -371,12 +371,15 @@ const EditItemScreen = ({ navigation, route }) => {
       showCustomToast(LABELS.error, 'Image Upload Failed: ' + error.message);
     } finally {
       updateState({ loading: false });
+      setTimeout(() => {
+        Keyboard.dismiss();
+      }, 100);
     }
   }
 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

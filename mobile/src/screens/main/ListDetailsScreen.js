@@ -30,6 +30,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
   const userData = useSelector((state) => state.auth.userData);
   const { params } = route
   const { item: listItem } = params
+  console.log('list detail',listItem);
   const { LABELS, TITLES, SIGNUP, MISC, VALIDATIONS, BUTTONS } = STRINGS;
   const [rating, setRating] = useState(0);
   const [state, setState] = useState({
@@ -108,7 +109,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
   const renderItem = ({ index, item }) => (
     <TouchableOpacity style={styles.card} onPress={() => navigation.navigate(ROUTES.itemDetailsScreen, { item })}>
       <View style={styles.cardItems}>
-        <Image style={styles.iconImageStyle} source={{ uri: listItem.icon }} />
+        <Image style={styles.iconImageStyle} source={{ uri: item?.lists?.icon }} />
         <View style={styles.cardItemDetails}>
           <Text style={styles.cardTitle}>
             {capitalizeEachWord(item?.title || item?.episode_title || item?.series_title)}</Text>
@@ -265,7 +266,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{ flex: 1 }}>
