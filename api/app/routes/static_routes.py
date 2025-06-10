@@ -7,6 +7,10 @@ static_pages = Blueprint('static_pages', __name__)
 def success():
     return render_template('success.html')
 
+@static_pages.route('/open-app')
+def openapp():
+    return render_template('open-app.html')
+
 @static_pages.route('/.well-known/apple-app-site-association', methods=['GET'])
 def apple_app_site_association():
     # Adjust path to point directly to project-root/.well-known/apple-app-site-association
