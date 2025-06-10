@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+    <meta charset="UTF-8" />
+    <script>
+        function openApp() {
+            const fallbackUrl = "/success";
+            const appLink = "keepr://app/auth-callback?action=confirm_signup";
+
+            // Attempt to open the app
+            window.location = appLink;
+
+            // If app isn't installed, fallback after timeout
+            setTimeout(() => {
+                window.location = fallbackUrl;
+            }, 1500); // Adjust the timeout as needed
+        }
+    </script>
+</head>
+<body onload="openApp()">
+<p>Opening app... If it doesn't open, you'll be redirected shortly.</p>
+</body>
+</html>
