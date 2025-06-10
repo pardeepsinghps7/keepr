@@ -85,6 +85,7 @@ export default function LoginScreen({ navigation }) {
       // await setData(constants.REMEMBER_ME, rememberMe);
       await setData(constants.EMAIL, rememberMe ? email : '');
       await setData(constants.PASSWORD, rememberMe ? password : '');
+      await setData(constants.CURRENT_PASSWORD, password);
       // await setSession(userData?.access_token, userData?.refresh_token);
       const token = { access_token: userData?.access_token };
       console.log("token", token, userData?.access_token)

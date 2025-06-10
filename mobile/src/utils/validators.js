@@ -44,6 +44,21 @@ const RULES_CONFIG = {
         'Password must be at least 8 characters, with uppercase, lowercase, number, and symbol',
     },
   },
+  newPassword: {
+    required: true,
+    rules: [
+      (val) => val.length >= 8,
+      (val) => /[A-Z]/.test(val),
+      (val) => /[a-z]/.test(val),
+      (val) => /[0-9]/.test(val),
+      (val) => /[^A-Za-z0-9]/.test(val),
+    ],
+    messages: {
+      required: 'Please enter your new password',
+      invalid:
+        'Password must be at least 8 characters, with uppercase, lowercase, number, and symbol',
+    },
+  },
   passwordLogin: {
     required: true,
     rules: [(val) => val.trim().length > 0],

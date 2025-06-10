@@ -41,7 +41,7 @@ import moment from 'moment';
 const SCREEN_WIDTH = Dimensions.get('screen').width;
 const AddScreen = ({ navigation, route }) => {
   const { params } = route
-  console.log('Add screen', params?.item)
+  console.log('Add screen', route)
   const userData = useSelector((state) => state.auth.userData);
   const { LABELS, BUTTONS, MISC } = STRINGS
   const isFocused = useIsFocused();
@@ -50,6 +50,7 @@ const AddScreen = ({ navigation, route }) => {
     { key: MISC.filterSeries, label: MISC.series },
     { key: MISC.filterEpisode, label: MISC.episode }
   ]);
+  const scrollRef = useRef(null);
   // To debounce API calls:
   const debounceTimeout = useRef(null);
   // const [status, setStatus] = useState(statusList[0]);
@@ -140,14 +141,14 @@ const AddScreen = ({ navigation, route }) => {
     }, [])
   );
 
-  useEffect(() => {
-    if (params?.item) {
-      init(true);
+  // useEffect(() => {
+  //   if (params?.item) {
+  //     init(true);
 
-      // Clear the param after using
-      navigation.setParams({ item: undefined });
-    }
-  }, [params?.item]);
+  //     // Clear the param after using
+  //     navigation.setParams({ item: undefined });
+  //   }
+  // }, [params?.item]);
 
   useEffect(() => {
     let isActive = true;
@@ -261,7 +262,10 @@ const AddScreen = ({ navigation, route }) => {
       const response = await actions.addItem(payload);
       console.log('addItem response:', response);
       // navigation.goBack();
-      navigation.navigate(ROUTES.listDetailsScreen, { item: { id: selectedListId, label: selectedListLabel } })
+      navigation.navigate(ROUTES.mainHome, {
+        screen: ROUTES.listDetailsScreen,
+        params: { item: { id: selectedListId, label: selectedListLabel } }
+      })
       showCustomToast(LABELS.success, MISC.itemAddedSuccessfully);
 
     } catch (error) {
@@ -436,9 +440,12 @@ const AddScreen = ({ navigation, route }) => {
         <Header title={MISC.addItem} />
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView
+            ref={scrollRef}
             nestedScrollEnabled
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ flexGrow: 1 }}
+            contentContainerStyle={{
+              flexGrow: 1,
+            }}
           // keyboardShouldPersistTaps="handled"
           >
             <View style={styles.mainView}>
@@ -698,7 +705,12 @@ const AddScreen = ({ navigation, route }) => {
                 numberOfLines={5}
                 maxLength={200}
                 height={100}
-                keyboardType={undefined}
+                onFocus={() => {
+                  setTimeout(() => {
+                    scrollRef.current?.scrollToEnd({ animated: true });
+                  }, 100); // delay helps wait for keyboard to show
+                }}
+              keyboardType={undefined}
               />
               {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
                 <>
@@ -772,7 +784,7 @@ export default AddScreen;
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContainer: {},
-  mainView: { padding: 16, },
+  mainView: { padding: 16, flex: 1 },
   headerIndicator: {
     alignSelf: 'center',
     width: 40,

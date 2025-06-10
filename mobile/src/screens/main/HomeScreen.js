@@ -80,7 +80,7 @@ const HomeScreen = ({ navigation }) => {
     const renderItem = ({ item }) => (
         <TouchableOpacity style={styles.card} onPress={() => navigation.navigate(ROUTES.listDetailsScreen, { item })}>
             <Image style={styles.iconImageStyle} source={{ uri: item.icon }} />
-            <Text style={styles.cardTitle}>{item.label}</Text>
+            <Text style={styles.cardTitle} numberOfLines={2}>{item.label}</Text>
             <Text style={styles.itemCount}>{item.items_count} Items</Text>
             <View style={styles.arrow}>
                 <MaterialIcons name="chevron-right" size={20} color={COLORS.black} />

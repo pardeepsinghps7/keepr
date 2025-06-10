@@ -30,7 +30,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
   const userData = useSelector((state) => state.auth.userData);
   const { params } = route
   const { item: listItem } = params
-  console.log('list detail',listItem);
+  console.log('list detail', listItem);
   const { LABELS, TITLES, SIGNUP, MISC, VALIDATIONS, BUTTONS } = STRINGS;
   const [rating, setRating] = useState(0);
   const [state, setState] = useState({
@@ -98,9 +98,9 @@ const ListDetailsScreen = ({ navigation, route }) => {
   }
 
   const handleAddPress = () => {
-    console.log('Floating button pressed!');
+    console.log('Floating button pressed!', listItem);
     // Add your navigation or action here
-    navigation.navigate(ROUTES.main, {
+    navigation.navigate(ROUTES.mainAdd, {
       screen: ROUTES.add,
       params: { item: listItem }
     });
@@ -114,8 +114,8 @@ const ListDetailsScreen = ({ navigation, route }) => {
           <Text style={styles.cardTitle}>
             {capitalizeEachWord(item?.title || item?.episode_title || item?.series_title)}</Text>
           <RatingWatchDetail item={item} index={index} />
-          <Text style={styles.itemSubtitle}>Recommended by: <Text style={{ color: COLORS.accent }}>{capitalizeEachWord(item?.recommended_by)}</Text></Text>
-          <Text style={styles.itemSubtitle}>Notes: {capitalizeEachWord(item?.notes)}</Text>
+          <Text style={styles.itemSubtitle}>Recommended by: <Text style={{ color: COLORS.accent }}>{capitalizeEachWord(item?.recommended_by) || 'N/A'}</Text></Text>
+          <Text style={styles.itemSubtitle}>Notes: {capitalizeEachWord(item?.notes) || 'N/A'}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -146,11 +146,11 @@ const ListDetailsScreen = ({ navigation, route }) => {
             </View>
           </View>
           <View style={[styles.row, { gap: 8 }]}>
-            <TouchableOpacity style={[styles.row,{paddingVertical:8,}]} onPress={() => updateState({ sortModalVisible: true })}>
+            <TouchableOpacity style={[styles.row, { paddingVertical: 8, }]} onPress={() => updateState({ sortModalVisible: true })}>
               <Icon name="filter" size={20} color={COLORS.black} />
               <Text style={styles.itemSubtitle}>{MISC.sortBy}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.row,{paddingVertical:8,}]} onPress={() => updateState({ filterModalVisible: true })}>
+            <TouchableOpacity style={[styles.row, { paddingVertical: 8, }]} onPress={() => updateState({ filterModalVisible: true })}>
               <Image source={imagesPath.filter} style={styles.watchImageStyle} />
               <Text style={styles.itemSubtitle}>{MISC.filterBy}</Text>
             </TouchableOpacity>
@@ -181,8 +181,8 @@ const ListDetailsScreen = ({ navigation, route }) => {
         {selectedSortItem.length === 0 && selectedFilterItem.length === 0 &&
           <>
             <Text style={styles.itemSubtitle}>Notes: {MISC.noItemsSubtitle}</Text>
-            <CustomButton title={`+ ${BUTTONS.addYourFirst} ${toSingular(listTitle)}`}
-              onPress={() => navigation.navigate(ROUTES.main, {
+            <CustomButton style={{ width: '80%' }} title={`+ ${BUTTONS.addYourFirst} ${toSingular(listTitle)}`}
+              onPress={() => navigation.navigate(ROUTES.mainAdd, {
                 screen: ROUTES.add,
                 params: { item: listItem },
               })} />

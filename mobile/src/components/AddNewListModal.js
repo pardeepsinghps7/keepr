@@ -102,7 +102,7 @@ const AddNewListModal = ({ modalVisible, setModalVisible, selectedItem, onSave }
           <CustomInput
             placeholder={LABELS.listNamePlaceholder}
             value={listName}
-            onChangeText={(val) => updateState({ listName: val.replace(/[^A-Za-z0-9@. ]/g, ''), error: val.trim().length === 0 })}
+            onChangeText={(val) => updateState({ listName: val.replace(/[^A-Za-z0-9 ]/g, ''), error: val.trim().length === 0 })}
             label={LABELS.listName}
           />
           {error && <Text style={{ color: COLORS.red, fontSize: 12 }}>List name field is mandatory</Text>}

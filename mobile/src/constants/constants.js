@@ -5,6 +5,7 @@ const constants = {
     REMEMBER_ME:'rememberMe',
     EMAIL: 'email',
     PASSWORD: 'password',
+    CURRENT_PASSWORD: 'currentPassword',
 }
 
 export default constants

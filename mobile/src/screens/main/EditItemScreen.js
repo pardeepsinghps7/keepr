@@ -50,6 +50,7 @@ const EditItemScreen = ({ navigation, route }) => {
     { key: MISC.filterSeries, label: MISC.series },
     { key: MISC.filterEpisode, label: MISC.episode }
   ]);
+  const scrollRef = useRef(null);
   // To debounce API calls:
   const debounceTimeout = useRef(null);
   // const [status, setStatus] = useState(statusList[0]);
@@ -389,6 +390,7 @@ const EditItemScreen = ({ navigation, route }) => {
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView
+            ref={scrollRef}
             nestedScrollEnabled
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 0, flexGrow: 1 }}
@@ -613,6 +615,12 @@ const EditItemScreen = ({ navigation, route }) => {
                 numberOfLines={5}
                 maxLength={200}
                 height={100}
+                onFocus={() => {
+                  setTimeout(() => {
+                    scrollRef.current?.scrollToEnd({ animated: true });
+                  }, 100); // delay helps wait for keyboard to show
+                }}
+                keyboardType={undefined}
               />
 
               {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&

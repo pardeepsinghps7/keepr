@@ -47,6 +47,7 @@ const QuickAddItemScreen = ({ navigation }) => {
     { key: MISC.filterSeries, label: MISC.series },
     { key: MISC.filterEpisode, label: MISC.episode }
   ]);
+    const scrollRef = useRef(null);
   // To debounce API calls:
   const debounceTimeout = useRef(null);
   // const [statusList, setStatusList] = useState(movieStatusList);
@@ -335,11 +336,12 @@ const QuickAddItemScreen = ({ navigation }) => {
       <Loader modalVisible={loading} />
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'position' : 'height'}
         keyboardVerticalOffset={0}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView
+            ref={scrollRef}
             nestedScrollEnabled
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 0, flexGrow: 1 }}
@@ -598,6 +600,12 @@ const QuickAddItemScreen = ({ navigation }) => {
               numberOfLines={5}
               maxLength={200}
               height={100}
+              onFocus={() => {
+                setTimeout(() => {
+                  scrollRef.current?.scrollToEnd({ animated: true });
+                }, 100); // delay helps wait for keyboard to show
+              }}
+              keyboardType={undefined}
             />
             {
             (selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&

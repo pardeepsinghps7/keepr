@@ -15,43 +15,13 @@ import { AddScreen, ChangePasswordScreen, EditItemScreen, ItemDetailsScreen, Lis
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
 
-export function HomeStackNavigator() {
+
+// --- Reusable Shared Stack (for Home, Lists, Add)
+function SharedStack({ initialRouteName, component: MainComponent }) {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="MainHome" component={HomeScreen} />
-      <Stack.Screen
-        name={ROUTES.quickAdd}
-        component={QuickAddItemScreen}
-      // options={{ presentation: 'modal' }} // Optional: for modal style
-      />
-
-      <Stack.Screen name={ROUTES.listDetailsScreen} component={ListDetailsScreen} />
-      <Stack.Screen name={ROUTES.itemDetailsScreen} component={ItemDetailsScreen} />
-      <Stack.Screen name={ROUTES.editItemScreen} component={EditItemScreen} />
-      <Stack.Screen name={ROUTES.profileScreen} component={ProfileScreen} />
-      <Stack.Screen name={ROUTES.changePasswordScreen} component={ChangePasswordScreen} />
-    </Stack.Navigator>
-  );
-}
-
-export function ListStackNavigator() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name={"MainLists"} component={ListsScreen} />
-
-      <Stack.Screen name={ROUTES.listDetailsScreen} component={ListDetailsScreen} />
-      <Stack.Screen name={ROUTES.itemDetailsScreen} component={ItemDetailsScreen} />
-      <Stack.Screen name={ROUTES.editItemScreen} component={EditItemScreen} />
-      <Stack.Screen name={ROUTES.profileScreen} component={ProfileScreen} />
-      <Stack.Screen name={ROUTES.changePasswordScreen} component={ChangePasswordScreen} />
-    </Stack.Navigator>
-  );
-}
-
-export function AddStackNavigator() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name={"MainAdd"} component={AddScreen} />
+    <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ headerShown: false }}>
+      <Stack.Screen name={initialRouteName} component={MainComponent} />
+      <Stack.Screen name={ROUTES.quickAdd} component={QuickAddItemScreen} />
       <Stack.Screen name={ROUTES.listDetailsScreen} component={ListDetailsScreen} />
       <Stack.Screen name={ROUTES.itemDetailsScreen} component={ItemDetailsScreen} />
       <Stack.Screen name={ROUTES.editItemScreen} component={EditItemScreen} />
@@ -81,7 +51,7 @@ const TabRoutes = () => {
 
   return (
     <BottomTab.Navigator
-      initialRouteName={ROUTES.home}
+      initialRouteName={ROUTES.mainHome}
       screenOptions={{
         tabBarInactiveTintColor: COLORS.text_secondary,
         tabBarActiveTintColor: COLORS.accent,
@@ -97,8 +67,9 @@ const TabRoutes = () => {
       }}
     >
       <BottomTab.Screen
-        name={ROUTES.home}
-        component={HomeStackNavigator}
+        name={ROUTES.mainHome}
+        // component={HomeStackNavigator}
+        children={() => <SharedStack initialRouteName={ROUTES.home} component={HomeScreen} />}
         options={{
           tabBarLabel: ROUTES.home,
           tabBarIcon: ({ color, size }) => (
@@ -107,8 +78,9 @@ const TabRoutes = () => {
         }}
       />
       <BottomTab.Screen
-        name={ROUTES.lists}
-        component={ListStackNavigator}
+        name={ROUTES.mainLists}
+        // component={ListStackNavigator}
+        children={() => <SharedStack initialRouteName={ROUTES.lists} component={ListsScreen} />}
         options={{
           tabBarLabel: ROUTES.lists,
           tabBarIcon: ({ color, size }) => (
@@ -118,8 +90,9 @@ const TabRoutes = () => {
         }}
       />
       <BottomTab.Screen
-        name={ROUTES.add}
-        component={AddStackNavigator}
+        name={ROUTES.mainAdd}
+        // component={AddStackNavigator}
+        children={() => <SharedStack initialRouteName={ROUTES.add} component={AddScreen} />}
         options={{
           tabBarLabel: ROUTES.add,
           tabBarIcon: ({ color, size }) => (

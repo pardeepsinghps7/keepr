@@ -168,6 +168,7 @@ const ProfileScreen = ({ navigation }) => {
       saveUserData({ ...userData, ...payload });
       updateState({ isUpdateAvatar: true });
       showCustomToast(LABELS.success, 'Profile updated successfully');
+      navigation.goBack();
     } catch (error) {
       console.log('Profile Upload Failed: ' + error.message);
       showCustomToast(LABELS.error, 'Profile Upload Failed: ' + error.message);
@@ -183,7 +184,7 @@ const ProfileScreen = ({ navigation }) => {
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          {/* <Loader modalVisible={loading} /> */}
+          <Loader modalVisible={loading} />
           <Header title={ROUTES.profileScreen} isBack rightText={"Save"} onRightPress={handleRightPress} />
           <View style={styles.mainView}>
 

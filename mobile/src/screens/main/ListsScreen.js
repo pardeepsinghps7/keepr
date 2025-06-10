@@ -91,17 +91,12 @@ const ListsScreen = ({ navigation }) => {
 
     const renderItem = ({ item }) => (
         <TouchableOpacity style={styles.card} onPress={() => navigation.navigate(ROUTES.listDetailsScreen, { item })}>
+            <Image style={styles.iconImageStyle} source={{ uri: item.icon }} />
             <View style={styles.cardItems}>
-                <Image style={styles.iconImageStyle} source={{ uri: item.icon }} />
-                <View style={{gap:2}}>
-                    <Text style={styles.cardTitle}>{item.label}</Text>
-                    <Text style={styles.itemCount}>{item.items_count || 0} Items</Text>
-                </View>
+                <Text style={styles.cardTitle}>{item.label} dsfdsfs</Text>
+                <Text style={styles.itemCount}>{item.items_count || 0} Items</Text>
             </View>
-            {/* <TouchableOpacity onPress={() => updateState({ selectedItem: item, itemModalVisible: true })}> */}
-                {/* <Icon name="ellipsis-vertical-sharp" size={20} color={COLORS.black} /> */}
-                <MaterialIcons name="chevron-right" size={28} color={COLORS.black} />
-            {/* </TouchableOpacity> */}
+            <MaterialIcons name="chevron-right" size={28} color={COLORS.black} />
         </TouchableOpacity>
     );
 
@@ -241,7 +236,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         borderRadius: 12,
         // width: '47%',
-        height: 70,
+        minHeight: 70,
         paddingVertical: 16,
         paddingLeft: 16,
         paddingRight: 8,
@@ -251,12 +246,13 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 0 },
         shadowRadius: 8,
         position: 'relative',
-
+        gap:16,
     },
     cardItems: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 16,
+        // flexDirection: 'row',
+        // alignItems: 'center',
+        // gap: 16,
+        flex: 1
     },
     iconImageStyle: {
         width: 28,
@@ -267,6 +263,9 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '400',
         color: COLORS.text_secondary,
+        flexWrap: 'wrap',
+        flexShrink: 1,
+        flexGrow: 1,
     },
     itemCount: {
         fontSize: 12,

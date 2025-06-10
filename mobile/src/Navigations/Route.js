@@ -76,6 +76,7 @@ export default function Routes() {
         const subscription = Linking.addEventListener('url', onLink);
 
         Linking.getInitialURL().then((url) => {
+            console.log('huddsdsusfsf')
             if (url) handleResetLink(url);
             setInitialUrlHandled(true);
         });

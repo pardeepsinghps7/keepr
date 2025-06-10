@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Buffer } from 'buffer';
 import RNFS from 'react-native-fs';
+import NetInfo from '@react-native-community/netinfo';
 
 global.Buffer = global.Buffer || Buffer;
 // ✅ Custom AsyncStorage adapter for React Native
@@ -40,15 +41,39 @@ const supabase = createClient(
 //   });
 // }
 
+// Tries 3 times with short delay before throwing
+export const checkInternetConnection = async (retries = 3, delay = 500) => {
+  for (let i = 0; i < retries; i++) {
+    const netState = await NetInfo.fetch();
+
+    if (netState.isConnected) {
+      return true; // ✅ Connected
+    }
+
+    // Wait before retrying
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+
+  // ❌ After retries, still offline
+  throw {
+    code: 506,
+    message: 'Please check your connection and try again.',
+    msg: 'Please check your connection and try again.',
+  };
+};
+
 // Authentication functions
 export const login = async (email, password) => {
+  await checkInternetConnection();
   const { data, error } = await supabase.auth.signIn({ email, password });
   if (error) throw error;
   return data;
 };
 
 export const signUp = async (email, password) => {
-  const redirectTo = 'keepr://app/auth-callback?action=confirm_signup';
+  await checkInternetConnection();
+  const redirectTo = 'https://keeprapi.trigma.in/open-app';
+  // const redirectTo = 'keepr://app/auth-callback?action=confirm_signup';
   const { user, error } = await supabase.auth.signUp({ email, password }, {
     redirectTo,
   });
@@ -61,6 +86,7 @@ export const signUp = async (email, password) => {
 };
 
 export const forgotPassword = async (email) => {
+  await checkInternetConnection();
   const redirectTo = 'keepr://app/auth-callback?action=reset';
   const { data, error } = await supabase.auth.api.resetPasswordForEmail(email, {
     redirectTo,
@@ -71,6 +97,7 @@ export const forgotPassword = async (email) => {
 };
 
 export const setSession = async (access_token, refresh_token) => {
+  await checkInternetConnection();
   try {
     console.log('recoverSession');
     console.log('Access Token:', access_token);
@@ -97,6 +124,7 @@ export const setSession = async (access_token, refresh_token) => {
 };
 
 export const updatePassword = async (newPassword) => {
+  await checkInternetConnection();
   const session = supabase.auth.session(); // Get the current session
   if (!session) {
     throw new Error('User is not authenticated');
@@ -119,6 +147,7 @@ export const updatePassword = async (newPassword) => {
 };
 
 export const updateCurrentPassword = async (email, currentPassword, newPassword, access_token) => {
+  await checkInternetConnection();
   // const session = supabase.auth.session(); // Get the current session
   // if (!session) {
   //   throw new Error('User is not authenticated');
@@ -129,6 +158,7 @@ export const updateCurrentPassword = async (email, currentPassword, newPassword,
   //   throw new Error('Access token is not available');
   // }
   const { data: userData, error: loginError } = await supabase.auth.signIn({ email, currentPassword });
+  console.log('current password', userData, loginError)
   if (loginError) {
     console.log('current password', loginError.message)
     if (loginError?.message?.includes('authenticate'))
@@ -136,19 +166,20 @@ export const updateCurrentPassword = async (email, currentPassword, newPassword,
     else
       throw loginError;
   }
-  const { data, error } = await supabase.auth.api.updateUser(
-    access_token, // Provide the Bearer token
-    {
-      password: newPassword,
-    }
-  );
+  // const { data, error } = await supabase.auth.api.updateUser(
+  //   access_token, // Provide the Bearer token
+  //   {
+  //     password: newPassword,
+  //   }
+  // );
 
-  if (error) throw error; //Failed to update password
-  return data;
+  // if (error) throw error; //Failed to update password
+  // return data;
 };
 
 // Image upload function
 export const uploadAvatarToSupabase = async (uri) => {
+  await checkInternetConnection();
   try {
     const fileName = `avatars/${Date.now()}.jpg`;
     let filePath = uri;
@@ -202,6 +233,7 @@ export const uploadAvatarToSupabase = async (uri) => {
 };
 
 export const insertAvatarToProfile = async ({ id, email, avatar_url }) => {
+  await checkInternetConnection();
   console.log('Insert Params:', id, email, avatar_url);
 
   const { data, error } = await supabase
@@ -217,6 +249,7 @@ export const insertAvatarToProfile = async ({ id, email, avatar_url }) => {
 };
 
 export const logoutSupabase = async () => {
+  await checkInternetConnection();
   let { error } = await supabase.auth.signOut()
   if (error) throw error;
 }

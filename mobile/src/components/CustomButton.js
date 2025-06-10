@@ -21,12 +21,13 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     justifyContent:'center',
     gap:8,
-    marginVertical:16
+    marginVertical:16,
   },
   buttonText: {
     color: COLORS.black,
     fontSize: 16,
-    fontWeight: '400'
+    fontWeight: '400',
+    textAlign:'center'
   },
 });
 

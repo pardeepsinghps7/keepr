@@ -45,7 +45,7 @@ export async function apiReq(endPoint, data, method, headers = {}, requestOption
 			method,
 			url: endPoint,
 			headers,
-			timeout: 20000,
+			timeout: 10000,
 			...(method.toLowerCase() === 'get' ? { params: data } : { data }),
 			...requestOptions,
 		});
@@ -55,7 +55,9 @@ export async function apiReq(endPoint, data, method, headers = {}, requestOption
 		}
 		return response.data;
 	} catch (error) {
-		if (error?.response?.status === 401 || error?.message?.includes('new row violates row-level security policy')) {
+		if (error?.response?.status === 401
+			|| (error?.response?.data?.message || error?.message)?.
+				includes('new row violates row-level security policy')) {
 			clearUserData();
 			dispatch({ type: types.CLEAR_REDUX_STATE, payload: {} });
 			dispatch({ type: types.NO_INTERNET, payload: { internetConnection: true } });

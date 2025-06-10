@@ -87,6 +87,7 @@ export const STRINGS = {
     signupLoaderText: 'Please wait...',
     loginLoaderText: 'Bringing back your memories...',
     updatePasswordSuccess: 'All set! Your listkeepr is now more secure.',
+    currentPasswordWrong:'Current password is wrong',
     changePasswordSuccess: 'Congratulations! your password has been changed successfully. Kindly login again',
   },
   BUTTONS: {
@@ -218,6 +219,9 @@ export const ROUTES = {
 
   //main
   main: "Main",
+  mainHome: "MainHome",
+  mainLists: "MainLists",
+  mainAdd: "MainAdd",
   home: "Home",
   lists: "Lists",
   add: "Add",

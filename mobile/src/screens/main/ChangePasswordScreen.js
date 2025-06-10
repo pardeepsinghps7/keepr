@@ -18,10 +18,13 @@ import COLORS from '../../constants/colors'; // Assuming COLORS is defined elsew
 import { ROUTES, STRINGS } from '../../constants/strings'; // Assuming ROUTES is defined elsewhere
 import { CustomButton, CustomInput, Header, showCustomToast, showSuccess, } from '../..';
 import imagesPath from '../../constants/images';
-import { updateCurrentPassword, updatePassword } from '../../lib/supabase';
+import { logoutSupabase, updateCurrentPassword, updatePassword } from '../../lib/supabase';
 import validator from '../../utils/validators';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
+import actions from '../../redux/actions';
+import { getData } from '../../utils/utils';
+import constants from '../../constants/constants';
 
 export default function ChangePasswordScreen({ navigation }) {
   const { LABELS, TITLES, CHANGE_PASSWORD, MISC, VALIDATIONS, BUTTONS } = STRINGS;
@@ -72,15 +75,20 @@ export default function ChangePasswordScreen({ navigation }) {
 
   const handleUpdatePassword = async () => {
     Keyboard.dismiss();
+    const oldPassword = await getData(constants.CURRENT_PASSWORD);
     const validation = validator.isValidData(
       {
         currentPassword: currentPassword,
-        password: password,
+        newPassword: password,
         confirmPassword,
       }
     );
     if (!validation.valid) {
       showCustomToast(LABELS.error, validation.message);
+      return;
+    }
+    if(oldPassword!==currentPassword){
+      showCustomToast(LABELS.error, VALIDATIONS.currentPasswordWrong);
       return;
     }
 

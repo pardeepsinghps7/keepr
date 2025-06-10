@@ -36,8 +36,9 @@ const Header = ({
                 }
             </TouchableOpacity>
 
-            <Text style={styles.headerTitle}>{title}</Text>
-
+            <View style={styles.headerTitleView}>
+                <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
+            </View>
             {!isBack && <View style={styles.headerRight}>
                 <TouchableOpacity style={styles.button} onPress={() => showCustomToast(LABELS.success, MISC.comingSoon)}>
                     <Image source={imagesPath.search} style={styles.search} />
@@ -83,14 +84,18 @@ const styles = StyleSheet.create({
     menuIcon: {
         zIndex: 1,
     },
-    headerTitle: {
+    headerTitleView: {
         position: 'absolute',
         left: 0,
         right: 0,
-        textAlign: 'center',
+        zIndex: -1,
+        alignItems:'center'
+    },
+    headerTitle: {
         fontSize: 18,
         fontWeight: '400',
-        zIndex: -1,
+        textAlign: 'center',
+        width:'50%',
     },
     headerRight: {
         flexDirection: 'row',
@@ -108,9 +113,9 @@ const styles = StyleSheet.create({
         height: 24,
         borderRadius: 14,
     },
-    rightText:{
-        fontSize:18,
-        color:COLORS.accent
+    rightText: {
+        fontSize: 18,
+        color: COLORS.accent
     },
 });
 
