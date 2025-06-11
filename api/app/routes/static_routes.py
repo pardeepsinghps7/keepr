@@ -10,7 +10,13 @@ def error():
 
 @static_pages.route('/success')
 def success():
-    return render_template('success.html')
+    access_token = request.args.get('access_token', 'unknown_error')
+    refresh_token = request.args.get('refresh_token', 'unknown_error')
+    return render_template(
+        'success.html',
+        access_token=access_token,
+        refresh_token=refresh_token
+    )
 
 @static_pages.route('/open-app')
 def openapp():

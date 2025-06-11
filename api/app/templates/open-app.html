@@ -6,6 +6,8 @@
     <script>
         function openApp() {
             const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const access_token = hashParams.get('access_token');
+            const refresh_token = hashParams.get('refresh_token');
             const error = hashParams.get('error');
             const errorCode = hashParams.get('error_code');
             const errorDescription = hashParams.get('error_description');
@@ -17,7 +19,7 @@
             }
 
             const fallbackUrl = "/success";
-            const appLink = "keepr://app/auth-callback?action=confirm_signup&error="+error+"&error_code="+errorCode+"&error_description="+errorDescription;
+            const appLink = "keepr://app/auth-callback?action=confirm_signup&error="+error+"&error_code="+errorCode+"&error_description="+errorDescription+"&access_token="+access_token+"&refresh_token="+refresh_token;
 
             // Try opening the app
             window.location = appLink;
