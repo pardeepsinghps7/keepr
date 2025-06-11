@@ -1,7 +1,12 @@
-from flask import Blueprint, render_template, send_file, abort
+from flask import Blueprint, render_template, send_file, abort, request
 import os
 
 static_pages = Blueprint('static_pages', __name__)
+
+@static_pages.route('/error')
+def error():
+    description = request.args.get('error_description', 'unknown_error')
+    return render_template('error.html', error_description=description)
 
 @static_pages.route('/success')
 def success():
