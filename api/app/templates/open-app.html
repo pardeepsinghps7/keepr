@@ -17,7 +17,7 @@
             }
 
             const fallbackUrl = "/success";
-            const appLink = "keepr://app/auth-callback?action=confirm_signup&error"+error+"&error_code="+errorCode+"&error_description="+errorDescription;
+            const appLink = "keepr://app/auth-callback?action=confirm_signup&error="+error+"&error_code="+errorCode+"&error_description="+errorDescription;
 
             // Try opening the app
             window.location = appLink;
