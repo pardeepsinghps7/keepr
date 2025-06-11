@@ -5,16 +5,27 @@
     <meta charset="UTF-8" />
     <script>
         function openApp() {
-            const fallbackUrl = "/success";
-            const appLink = "keepr://app/auth-callback?action=confirm_signup";
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const error = hashParams.get('error');
+            const errorCode = hashParams.get('error_code');
+            const errorDescription = hashParams.get('error_description');
 
-            // Attempt to open the app
+            if (errorCode) {
+                // Redirect to error page with query param
+                window.location.href = `/error?error_code=${errorCode}&error_description=${errorDescription}`;
+                return;
+            }
+
+            const fallbackUrl = "/success";
+            const appLink = "keepr://app/auth-callback?action=confirm_signup&error"+error+"&error_code="+errorCode+"&error_description="+errorDescription;
+
+            // Try opening the app
             window.location = appLink;
 
-            // If app isn't installed, fallback after timeout
+            // Fallback if app doesn't open
             setTimeout(() => {
                 window.location = fallbackUrl;
-            }, 1500); // Adjust the timeout as needed
+            }, 1500);
         }
     </script>
 </head>
