@@ -93,7 +93,7 @@ const ListsScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.card} onPress={() => navigation.navigate(ROUTES.listDetailsScreen, { item })}>
             <Image style={styles.iconImageStyle} source={{ uri: item.icon }} />
             <View style={styles.cardItems}>
-                <Text style={styles.cardTitle}>{item.label} dsfdsfs</Text>
+                <Text style={styles.cardTitle}>{item.label}</Text>
                 <Text style={styles.itemCount}>{item.items_count || 0} Items</Text>
             </View>
             <MaterialIcons name="chevron-right" size={28} color={COLORS.black} />

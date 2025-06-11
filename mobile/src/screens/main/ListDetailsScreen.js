@@ -12,6 +12,7 @@ import {
   FlatList,
   Switch,
   Keyboard,
+  Alert,
 } from 'react-native';
 import COLORS from '../../constants/colors';
 import { ROUTES, STRINGS } from '../../constants/strings';
@@ -242,14 +243,23 @@ const ListDetailsScreen = ({ navigation, route }) => {
       updateState({ loading: false });
     }
   };
+  
+    const onDeletePress = () => {
+      Alert.alert(
+        MISC.deleteList,
+        VALIDATIONS.areYouSureWantToDelete,
+        [{ text: BUTTONS.yes, onPress: deleteSelectedItem }, { text: BUTTONS.no, }],
+        { cancelable: true }
+      )
+    }
 
   const deleteSelectedItem = async () => {
-    updateState({ loading: true });
+    updateState({ loading: true,listActionModalVisible: false  });
     try {
       const response = await actions.deleteList(listItem?.id);
       console.log('deleteList response:', response);
       // const updatedList = dataList.filter((cat) => cat.id !== listItem.id);
-      updateState({ listActionModalVisible: false });
+      // updateState({ listActionModalVisible: false });
       showCustomToast(LABELS.success, MISC.listDeletedSuccessfully);
       navigation.goBack();
     } catch (error) {
@@ -317,7 +327,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
         modalVisible={listActionModalVisible}
         setModalVisible={(val) => updateState({ listActionModalVisible: val })}
         onEdit={handleEdit}
-        onDelete={deleteSelectedItem}
+        onDelete={onDeletePress}
       />
 
       {/* Edit List Popup Modal */}

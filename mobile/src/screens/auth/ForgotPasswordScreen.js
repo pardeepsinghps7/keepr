@@ -45,7 +45,7 @@ export default function ForgotPasswordScreen({ navigation }) {
     Keyboard.dismiss();
     const validation = validator.isValidData(
       {
-        emailForgot:email,
+        emailForgot: email,
       }
     );
     if (!validation.valid) {
@@ -72,7 +72,7 @@ export default function ForgotPasswordScreen({ navigation }) {
         // error: 'Something went wrong. Try again.',
       });
       console.log('forgot', error.message)
-      showCustomToast(LABELS.error, error.message || MISC.somethingWentWrong)
+      showCustomToast(LABELS.error, error?.message || MISC.somethingWentWrong)
     }
   };
 
@@ -90,12 +90,13 @@ export default function ForgotPasswordScreen({ navigation }) {
           toastVisible: false,
         });
       }, 3000);
-    } catch (e) {
+    } catch (error) {
       updateState({
-        status: 'idle',
+        toastVisible: false,
+        status: 'sent',
         error: 'Unable to resend. Try again.',
       });
-      showCustomToast(LABELS.error, MISC.unableToResend)
+      showCustomToast(LABELS.error, error?.message || MISC.unableToResend)
     }
   };
 
@@ -191,10 +192,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   content: {
-    flexGrow:1,
+    flexGrow: 1,
   },
-  mainView:{
-    flexGrow:1,
+  mainView: {
+    flexGrow: 1,
     padding: 16
   },
   logoContainer: {

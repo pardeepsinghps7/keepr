@@ -18,6 +18,7 @@ global.Buffer = global.Buffer || Buffer;
 //     await AsyncStorage.removeItem(key);
 //   },
 // };
+
 const supabase = createClient(
   supabaseUrl,
   supabaseKey,
@@ -42,6 +43,7 @@ const supabase = createClient(
 // }
 
 // Tries 3 times with short delay before throwing
+
 export const checkInternetConnection = async (retries = 3, delay = 500) => {
   for (let i = 0; i < retries; i++) {
     const netState = await NetInfo.fetch();
@@ -166,15 +168,15 @@ export const updateCurrentPassword = async (email, currentPassword, newPassword,
     else
       throw loginError;
   }
-  // const { data, error } = await supabase.auth.api.updateUser(
-  //   access_token, // Provide the Bearer token
-  //   {
-  //     password: newPassword,
-  //   }
-  // );
+  const { data, error } = await supabase.auth.api.updateUser(
+    access_token, // Provide the Bearer token
+    {
+      password: newPassword,
+    }
+  );
 
-  // if (error) throw error; //Failed to update password
-  // return data;
+  if (error) throw error; //Failed to update password
+  return data;
 };
 
 // Image upload function

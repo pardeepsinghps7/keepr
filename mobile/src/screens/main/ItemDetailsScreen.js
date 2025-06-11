@@ -11,6 +11,7 @@ import {
   FlatList,
   Keyboard,
   Image,
+  Alert,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -38,7 +39,7 @@ const ItemDetailsScreen = ({ navigation, route }) => {
   const { params } = route
   const { item: routeItemData } = params
   console.log('item dertail', routeItemData)
-  const { TITLES, LABELS, BUTTONS, MISC } = STRINGS
+  const { TITLES, LABELS, BUTTONS, VALIDATIONS, MISC } = STRINGS
   const isFocused = useIsFocused();
   const [state, setState] = useState({
     dataList: {},
@@ -90,13 +91,22 @@ const ItemDetailsScreen = ({ navigation, route }) => {
     updateState({ listActionModalVisible: true })
   }
 
+  const onDeletePress = () => {
+    Alert.alert(
+      MISC.deleteItem,
+      VALIDATIONS.areYouSureWantToDelete,
+      [{ text: BUTTONS.yes, onPress: deleteSelectedItem }, { text: BUTTONS.no, }],
+      { cancelable: true }
+    )
+  }
+
   const deleteSelectedItem = async () => {
-    updateState({ loading: true });
+    updateState({ loading: true, listActionModalVisible: false });
     try {
       const response = await actions.deleteItem(dataList?.id);
       console.log('deleteList response:', response);
       // const updatedList = dataList.filter((cat) => cat.id !== dataList.id);
-      updateState({ listActionModalVisible: false });
+      // updateState({ listActionModalVisible: false });
       showCustomToast(LABELS.success, MISC.itemDeletedSuccessfully);
       navigation.goBack();
     } catch (error) {
@@ -229,7 +239,7 @@ const ItemDetailsScreen = ({ navigation, route }) => {
         modalVisible={listActionModalVisible}
         setModalVisible={(val) => updateState({ listActionModalVisible: val })}
         onEdit={handleEdit}
-        onDelete={deleteSelectedItem}
+        onDelete={onDeletePress}
         editText={MISC.editItem}
         deleteText={MISC.deleteItem}
       />

@@ -89,6 +89,7 @@ export const STRINGS = {
     updatePasswordSuccess: 'All set! Your listkeepr is now more secure.',
     currentPasswordWrong:'Current password is wrong',
     changePasswordSuccess: 'Congratulations! your password has been changed successfully. Kindly login again',
+    areYouSureWantToDelete:'Are you sure want to delete?',
   },
   BUTTONS: {
     getStarted: 'Get Started',
@@ -110,6 +111,8 @@ export const STRINGS = {
     updateItemToTheList: 'Update Item to the list',
     applyFilters: 'Apply Filters',
     clearFilters: 'Clear Filters',
+    yes:'Yes',
+    no: 'No',
   },
   MISC: {
     passwordContainsText: 'Your password must contain:',
