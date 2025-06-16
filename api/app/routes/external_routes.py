@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify
 from ..controllers.api.external.supabase_controller import test_supabase
 from ..controllers.api.external.movies_controller import get_all_movies
+from ..controllers.api.external.bourbons_controller import get_all_bourbons
+from ..controllers.api.external.wines_controller import get_all_wines
 from ..controllers.api.external.books_controller import get_all_books
 from ..controllers.api.external.tv_shows_controller import get_all_tv_shows
 from ..controllers.api.external.podcasts_controller import get_all_podcasts
@@ -20,6 +22,14 @@ def testSupabase():
 @api.route('/get-movies', methods=["GET"])
 def getMovies():
     return get_all_movies()
+
+@api.route('/get-bourbons', methods=["GET"])
+def getBourbons():
+    return get_all_bourbons()
+
+@api.route('/get-wines', methods=["GET"])
+def getWines():
+    return get_all_wines()
 
 @api.route('get-books', methods=["GET"])
 def getBooks():
