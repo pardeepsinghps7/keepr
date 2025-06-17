@@ -22,9 +22,18 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
+        .logo {
+            width: 200px;
+            height: auto;
+            object-fit: contain;
+            margin: 0 auto;
+            display: block;
+        }
+
         .checkmark {
-            font-size: 40px;
+            font-size: 30px;
             color: red;
+            margin-top: 20px;
         }
 
         h1 {
@@ -79,7 +88,8 @@
 </head>
 <body>
     <div class="container">
-        <div class="checkmark">x</div>
+        <img src="{{ url_for('static', filename='listkeepr-logo.png') }}" alt="logo" class="logo" />
+        <div class="checkmark">❌</div>
         <h1>Access Denied</h1>
         <p>{{ error_description }}</p>
     </div>
