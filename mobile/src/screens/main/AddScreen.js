@@ -41,7 +41,7 @@ import moment from 'moment';
 const SCREEN_WIDTH = Dimensions.get('screen').width;
 const AddScreen = ({ navigation, route }) => {
   const { params } = route
-  console.log('Add screen', route)
+  // console.log('Add screen', route)
   const userData = useSelector((state) => state.auth.userData);
   const { LABELS, BUTTONS, MISC } = STRINGS
   const isFocused = useIsFocused();
@@ -133,6 +133,9 @@ const AddScreen = ({ navigation, route }) => {
 
   useFocusEffect(
     useCallback(() => {
+      // Scroll to top every time screen comes back into focus
+      scrollRef.current?.scrollTo({ y: 0, animated: false });
+
       // ✅ Reset form state when screen is focused
       updateState({
         ...resetPayloads,
@@ -267,7 +270,6 @@ const AddScreen = ({ navigation, route }) => {
         params: { item: { id: selectedListId, label: selectedListLabel } }
       })
       showCustomToast(LABELS.success, MISC.itemAddedSuccessfully);
-
     } catch (error) {
       console.log('addItem failed:', error.message);
       showCustomToast(LABELS.error, error.message);
@@ -292,7 +294,9 @@ const AddScreen = ({ navigation, route }) => {
                 ? await actions.getSearchRestaurantsList(query)
                 : selectedListLabel.toLowerCase() === MISC.podcasts
                   ? await actions.getSearchPodcastsList(query)
-                  : await actions.getSearchMoviesList(query);
+                  : selectedListLabel.toLowerCase() === MISC.bourbon
+                    ? await actions.getSearchBourbonsList(query)
+                    : await actions.getSearchWinesList(query);
       console.log('getSearchBooksList response', response);
 
       if (response && response.data.length > 0) {
@@ -321,13 +325,14 @@ const AddScreen = ({ navigation, route }) => {
     } else {
       updateState({ title: text, clientId: '' });
     }
-    if (text.length > 3
-      && (selectedListLabel.toLowerCase() === MISC.books
-        || selectedListLabel.toLowerCase() === MISC.movies
-        || selectedListLabel.toLowerCase() === MISC.beer
-        || selectedListLabel.toLowerCase() === MISC.tvShows
-        || selectedListLabel.toLowerCase() === MISC.restaurants
-        || selectedListLabel.toLowerCase() === MISC.podcasts)) {
+    if (text.length > 2
+      // && (selectedListLabel.toLowerCase() === MISC.books
+      //   || selectedListLabel.toLowerCase() === MISC.movies
+      //   || selectedListLabel.toLowerCase() === MISC.beer
+      //   || selectedListLabel.toLowerCase() === MISC.tvShows
+      //   || selectedListLabel.toLowerCase() === MISC.restaurants
+      //   || selectedListLabel.toLowerCase() === MISC.podcasts)
+    ) {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
       // Debounce API call by 500ms
@@ -710,7 +715,7 @@ const AddScreen = ({ navigation, route }) => {
                     scrollRef.current?.scrollToEnd({ animated: true });
                   }, 100); // delay helps wait for keyboard to show
                 }}
-              keyboardType={undefined}
+                keyboardType={undefined}
               />
               {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
                 <>

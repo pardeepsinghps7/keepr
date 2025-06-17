@@ -80,14 +80,14 @@ export default function ChangePasswordScreen({ navigation }) {
       {
         currentPassword: currentPassword,
         newPassword: password,
-        confirmPassword,
+        confirmPassword: confirmPassword,
       }
     );
     if (!validation.valid) {
       showCustomToast(LABELS.error, validation.message);
       return;
     }
-    if(oldPassword!==currentPassword){
+    if (oldPassword !== currentPassword) {
       showCustomToast(LABELS.error, VALIDATIONS.currentPasswordWrong);
       return;
     }

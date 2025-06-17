@@ -23,6 +23,7 @@ export const STRINGS = {
     seriesTitle: 'Series Title',
     episodeTitle: 'Episode Title',
     year: 'Year',
+    image: 'Image',
     imageUrl: 'Image URL',
     location: 'Location',
     brewery: 'Brewery',
@@ -87,7 +88,7 @@ export const STRINGS = {
     signupLoaderText: 'Please wait...',
     loginLoaderText: 'Bringing back your memories...',
     updatePasswordSuccess: 'All set! Your listkeepr is now more secure.',
-    currentPasswordWrong:'Current password is wrong',
+    currentPasswordWrong:'The current password you entered is incorrect. Please enter the correct password',
     changePasswordSuccess: 'Congratulations! your password has been changed successfully. Kindly login again',
     areYouSureWantToDelete:'Are you sure want to delete?',
   },
@@ -219,6 +220,7 @@ export const ROUTES = {
   login: "Login",
   forgotPassword: "ForgotPassword",
   updatePassword: "updatePassword",
+  listkeeprHome: "ListKeepr Home",
 
   //main
   main: "Main",

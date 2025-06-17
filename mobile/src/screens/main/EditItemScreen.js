@@ -238,7 +238,9 @@ const EditItemScreen = ({ navigation, route }) => {
                 ? await actions.getSearchRestaurantsList(query)
                 : selectedListLabel.toLowerCase() === MISC.podcasts
                   ? await actions.getSearchPodcastsList(query)
-                  : await actions.getSearchMoviesList(query);
+                  : selectedListLabel.toLowerCase() === MISC.bourbon
+                    ? await actions.getSearchBourbonsList(query)
+                    : await actions.getSearchWinesList(query);
       console.log('getSearchBooksList response', response);
 
       if (response && response.data.length > 0) {
@@ -267,13 +269,14 @@ const EditItemScreen = ({ navigation, route }) => {
     } else {
       updateState({ title: text, clientId: '' });
     }
-    if (text.length > 3
-      && (selectedListLabel.toLowerCase() === MISC.books
-        || selectedListLabel.toLowerCase() === MISC.movies
-        || selectedListLabel.toLowerCase() === MISC.beer
-        || selectedListLabel.toLowerCase() === MISC.tvShows
-        || selectedListLabel.toLowerCase() === MISC.restaurants
-        || selectedListLabel.toLowerCase() === MISC.podcasts)) {
+    if (text.length > 2
+      // && (selectedListLabel.toLowerCase() === MISC.books
+      //   || selectedListLabel.toLowerCase() === MISC.movies
+      //   || selectedListLabel.toLowerCase() === MISC.beer
+      //   || selectedListLabel.toLowerCase() === MISC.tvShows
+      //   || selectedListLabel.toLowerCase() === MISC.restaurants
+      //   || selectedListLabel.toLowerCase() === MISC.podcasts)
+    ) {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
       // Debounce API call by 500ms

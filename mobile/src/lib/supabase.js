@@ -4,6 +4,10 @@ import { createClient } from '@supabase/supabase-js';
 import { Buffer } from 'buffer';
 import RNFS from 'react-native-fs';
 import NetInfo from '@react-native-community/netinfo';
+import { clearUserData } from '../utils/utils';
+import store from '../redux/store';
+import types from '../redux/types';
+const { dispatch, getState } = store;
 
 global.Buffer = global.Buffer || Buffer;
 // ✅ Custom AsyncStorage adapter for React Native
@@ -230,7 +234,13 @@ export const uploadAvatarToSupabase = async (uri) => {
     return { path: data?.path, publicURL };
   } catch (err) {
     // console.error('Upload failed:', err.message);
-    throw err;
+    if (err?.message?.includes('violates')) {
+      clearUserData();
+      dispatch({ type: types.CLEAR_REDUX_STATE, payload: {} });
+      dispatch({ type: types.NO_INTERNET, payload: { internetConnection: true } });
+      throw { message: "Token expired. Kindly login again.", msg: "Token expired. Kindly login again." };
+    } else
+      throw err;
   }
 };
 

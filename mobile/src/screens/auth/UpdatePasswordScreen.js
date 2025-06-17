@@ -68,7 +68,7 @@ export default function UpdatePasswordScreen({ navigation }) {
     Keyboard.dismiss();
     const validation = validator.isValidData(
       {
-        password: password,
+        newPassword: password,
         confirmPassword,
       }
     );

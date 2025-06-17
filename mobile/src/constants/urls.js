@@ -32,4 +32,6 @@ export const BEERS = getExternalApiUrl('/get-beers');
 export const TV_SHOWS = getExternalApiUrl('/get-tv-shows');
 export const RESTAURANTS = getExternalApiUrl('/get-restaurants');
 export const PODCASTS = getExternalApiUrl('/get-podcasts');
+export const BOURBONS = getExternalApiUrl('/get-bourbons');
+export const WINES = getExternalApiUrl('/get-wines');
 // console.log('BOOKS',BOOKS)

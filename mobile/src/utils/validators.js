@@ -69,9 +69,9 @@ const RULES_CONFIG = {
   },
   confirmPassword: {
     required: true,
-    rules: [(val, data) => is.equal(val, data?.password)],
+    rules: [(val, data) => is.equal(val, data?.newPassword)],
     messages: {
-      required: 'Please confirm your password',
+      required: 'Please enter your confirm password',
       invalid: 'Passwords do not match',
     },
   },

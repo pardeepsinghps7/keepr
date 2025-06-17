@@ -100,10 +100,10 @@ const styles = StyleSheet.create({
     headerRight: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
+        // gap: 4,
         zIndex: 1,
     },
-    button: { paddingHorizontal: 6, paddingVertical: 8 },
+    button: { paddingHorizontal: 4, paddingVertical: 8 },
     search: {
         width: 24,
         height: 24,

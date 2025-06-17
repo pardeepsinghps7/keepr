@@ -33,6 +33,7 @@ import imagesPath from '../../constants/images';
 import ListPopupModal from '../../components/ListPopupModal';
 import EditListModal from '../../components/EditListModal';
 import CustomRatings from '../../components/CustomRatings';
+import PreviewDocument from '../../components/PreviewDocument';
 // import { FontAwesome } from '@expo/vector-icons';
 
 const ItemDetailsScreen = ({ navigation, route }) => {
@@ -47,11 +48,14 @@ const ItemDetailsScreen = ({ navigation, route }) => {
     selectedActionItem: '',
     listActionModalVisible: false,
     editListModalVisible: false,
+    imageLoading: false,
+    modalVisible: false,
     // saveForLater:routeItemData?.save_for_later || false,
   });
 
   const {
-    dataList, loading, selectedActionItem, listActionModalVisible, editListModalVisible,
+    dataList, loading, selectedActionItem, listActionModalVisible, editListModalVisible, imageLoading,
+    modalVisible,
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -121,6 +125,18 @@ const ItemDetailsScreen = ({ navigation, route }) => {
     updateState({ listActionModalVisible: false });
     navigation.navigate(ROUTES.editItemScreen, { item: dataList });
   }
+
+  // const showDocumentPreviewModal = () => {
+  //   return (
+  //     !!modalVisible && <View>
+  //       <PreviewDocument
+  //         modalVisible={modalVisible}
+  //         item={dataList?.image_url}
+  //         onClose={() => updateState({ modalVisible: false })}
+  //       />
+  //     </View>
+  //   )
+  // }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -218,14 +234,41 @@ const ItemDetailsScreen = ({ navigation, route }) => {
                 </View>
                 {(dataList?.lists?.label?.toLowerCase() === MISC.bourbon
                   || dataList?.lists?.label?.toLowerCase() === MISC.wine) &&
-                  <View style={[styles.card,]}>
-                    <Text style={styles.cardTitle}>{LABELS.imageUrl}</Text>
-                    <Text style={[styles.cardSubTitle, {
-                      fontSize: 16, lineHeight: 28,
-                      textTransform: dataList?.image_url?.length > 0 ? 'lowercase' : 'uppercase'
-                    }]}>
-                      {dataList?.image_url || 'N/A'}</Text>
-                  </View>}
+                  <>
+                    <View style={[styles.card,]}>
+                      <Text style={styles.cardTitle}>{LABELS.imageUrl}</Text>
+                      <Text style={[styles.cardSubTitle, {
+                        fontSize: 16, lineHeight: 28,
+                        textTransform: dataList?.image_url?.length > 0 ? 'lowercase' : 'uppercase'
+                      }]}>
+                        {dataList?.image_url || 'N/A'}</Text>
+                    </View>
+                    {dataList?.image_url?.length > 0 &&
+                      (dataList?.image_url?.includes('http://') || dataList?.image_url?.includes('https://')) &&
+
+                      <View style={[styles.card,]}>
+                        <Text style={styles.cardTitle}>{LABELS.image}</Text>
+                        <View
+                          style={{
+                            // borderWidth: 0.2, borderColor: COLORS.borderGray,
+                            alignSelf: 'center', marginBottom: 16, padding: 8,
+                          }}>
+                          <TouchableOpacity onPress={() => updateState({ modalVisible: true })}
+                            style={{
+                            }}>
+                            <Image source={{ uri: dataList?.image_url }} style={styles.sampleImage}
+                              // onLoadStart={() => updateState({ imageLoading: true })}
+                              onLoadEnd={() => updateState({ imageLoading: false })} />
+                            {imageLoading ? (
+                              <View style={styles.loaderOverlay}>
+                                <ActivityIndicator size="small" color="#000" />
+                              </View>
+                            ) : undefined}
+                          </TouchableOpacity>
+                        </View>
+                      </View>}
+                  </>
+                }
                 {/* {dataList?.image_url?.length > 0 && <Image source={{ uri: dataList?.image_url }} style={styles.sampleImage} />} */}
 
               </View>
@@ -251,6 +294,12 @@ const ItemDetailsScreen = ({ navigation, route }) => {
         setModalVisible={(val) => updateState({ editListModalVisible: val })}
       // onSave={handleUpdateList}
       />
+      <PreviewDocument
+        modalVisible={modalVisible}
+        item={dataList?.image_url}
+        onClose={() => updateState({ modalVisible: false })}
+      />
+      {/* {showDocumentPreviewModal()} */}
     </SafeAreaView>
   );
 }
@@ -356,6 +405,6 @@ const styles = StyleSheet.create({
   sampleImage: {
     width: 150,
     height: 150,
-    resizeMode: 'contain'
+    resizeMode: 'cover'
   },
 });

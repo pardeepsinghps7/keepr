@@ -17,6 +17,9 @@ export default function SplashScreen({ navigation, route }) {
       // ✅ Skip splash logic if deep link navigation already occurred
       if (deepLinkHandledRef?.current === true) {
         console.log('🔗 Skipping splash navigation due to deep link');
+
+        // Clear deepLinkHandledRef after use
+        navigation.setParams({ deepLinkHandledRef: undefined });
         return;
       }
 
@@ -28,7 +31,7 @@ export default function SplashScreen({ navigation, route }) {
         navigation.replace(ROUTES.Onboarding);
       }
 
-    // navigation.replace(ROUTES.Onboarding)
+      // navigation.replace(ROUTES.Onboarding)
     }, 2000); // 2 seconds delay
     return () => clearTimeout(timer);
   }, [navigation, route?.params]);

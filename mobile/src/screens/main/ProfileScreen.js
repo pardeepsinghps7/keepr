@@ -10,6 +10,7 @@ import {
   Image,
   ActivityIndicator,
   Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import COLORS from '../../constants/colors'; // Assuming COLORS is defined elsewhere
 import { ROUTES, STRINGS } from '../../constants/strings'; // Assuming ROUTES is defined elsewhere
@@ -137,6 +138,9 @@ const ProfileScreen = ({ navigation }) => {
       showCustomToast(LABELS.error, 'Profile Upload Failed: ' + error.message);
     } finally {
       updateState({ loading: false });
+      setTimeout(() => {
+        Keyboard.dismiss();
+      }, 100);
     }
   }
   const handleChangePassword = () => {
@@ -179,117 +183,123 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <Loader modalVisible={loading} />
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={0}
         style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <Loader modalVisible={loading} />
-          <Header title={ROUTES.profileScreen} isBack rightText={"Save"} onRightPress={handleRightPress} />
-          <View style={styles.mainView}>
+        <Header title={ROUTES.profileScreen} isBack rightText={"Save"} onRightPress={handleRightPress} />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled">
+            <View style={styles.mainView}>
 
-            {/* Profile Upload */}
-            <View style={styles.profileCircle}>
-              {avatar ? (
-                <>
-                  <Image source={{ uri: avatar }} style={styles.avatarImage}
-                    onLoad={() => {
-                      console.log('image loading true')
-                      updateState({ imageLoading: true })
-                    }}
-                    onLoadStart={() => {
-                      console.log('image loading true')
-                      updateState({ imageLoading: true })
-                    }}
-                    onLoadEnd={() => {
-                      console.log('image loading false')
-                      updateState({ imageLoading: false })
-                    }}
+              {/* Profile Upload */}
+              <View style={styles.profileCircle}>
+                {avatar ? (
+                  <>
+                    <Image source={{ uri: avatar }} style={styles.avatarImage}
+                      onLoad={() => {
+                        console.log('image loading true')
+                        updateState({ imageLoading: true })
+                      }}
+                      onLoadStart={() => {
+                        console.log('image loading true')
+                        updateState({ imageLoading: true })
+                      }}
+                      onLoadEnd={() => {
+                        console.log('image loading false')
+                        updateState({ imageLoading: false })
+                      }}
+                    />
+                    {imageLoading && (
+                      <View style={styles.loaderOverlay}>
+                        <ActivityIndicator size="small" color="#000" />
+                      </View>
+                    )}
+                  </>
+
+                ) : (
+                  <Image source={imagesPath.addImage} style={styles.sampleImage} />
+                )}
+                <TouchableOpacity
+                  style={styles.cameraIcon}
+                  onPress={() => updateState({ modalVisible: true })}
+                >
+                  <Image
+                    source={avatar ? imagesPath.edit : imagesPath.camera}
+                    style={styles.cameraImage}
                   />
-                  {imageLoading && (
-                    <View style={styles.loaderOverlay}>
-                      <ActivityIndicator size="small" color="#000" />
-                    </View>
-                  )}
-                </>
-
-              ) : (
-                <Image source={imagesPath.addImage} style={styles.sampleImage} />
-              )}
-              <TouchableOpacity
-                style={styles.cameraIcon}
-                onPress={() => updateState({ modalVisible: true })}
-              >
-                <Image
-                  source={avatar ? imagesPath.edit : imagesPath.camera}
-                  style={styles.cameraImage}
-                />
-              </TouchableOpacity>
-            </View>
-
-            {!avatar && <View style={styles.addPhotoView}>
-              <Text style={[styles.addPhotoText, { fontSize: 14 }]}>
-                {SIGNUP.addImageTitle}
-              </Text>
-              <Text style={styles.addPhotoText}>{SIGNUP.addImageSubTitle}</Text>
-            </View>}
-
-            {/* First name */}
-            <CustomInput
-              label={LABELS.firstname}
-              value={firstname}
-              // editable={false}
-              // backgroundColor={COLORS.lighterGray}
-              onChangeText={(val) => updateState({ firstname: val.replace(/[^A-Za-z]/g, '') })}
-              placeholder={LABELS.firstname}
-              maxLength={15}
-              mainViewProps={{ marginTop: 24 }}
-            />
-
-            {/* Last name */}
-            <CustomInput
-              label={LABELS.lastname}
-              value={lastname}
-              // editable={false}
-              // backgroundColor={COLORS.lighterGray}
-              onChangeText={(val) => updateState({ lastname: val.replace(/[^A-Za-z]/g, '') })}
-              placeholder={LABELS.lastname}
-              maxLength={15}
-              mainViewProps={{ marginTop: 24 }}
-            />
-
-            {/* Email */}
-            <CustomInput
-              label={LABELS.emailAddress}
-              value={email}
-              editable={false}
-              backgroundColor={COLORS.lighterGray}
-              onChangeText={(val) => updateState({ email: val.replace(/[^A-Za-z0-9@.]/g, '') })}
-              placeholder={LABELS.emailPlaceholderText}
-              mainViewProps={{ marginTop: 24 }}
-            />
-
-            <TouchableOpacity onPress={handleChangePassword} style={{ alignSelf: 'flex-end', paddingVertical: 8, paddingLeft: 8 }}>
-              <Text style={styles.changePassword}>Change Password?</Text>
-            </TouchableOpacity>
-
-            {/* Sign Up Button */}
-            <CustomButton
-              title={BUTTONS.logout}
-              onPress={handleLogout}
-              style={styles.logout}
-              textStyle={styles.logoutText}
-            />
-
-            {loading && (
-              <View style={styles.loadingRow}>
-                <ActivityIndicator size="small" color={COLORS.accent} />
-                <Text style={styles.loadingText}>{VALIDATIONS.signupLoaderText}</Text>
+                </TouchableOpacity>
               </View>
-            )}
-          </View>
-        </ScrollView>
 
+              {!avatar && <View style={styles.addPhotoView}>
+                <Text style={[styles.addPhotoText, { fontSize: 14 }]}>
+                  {SIGNUP.addImageTitle}
+                </Text>
+                <Text style={styles.addPhotoText}>{SIGNUP.addImageSubTitle}</Text>
+              </View>}
+
+              {/* First name */}
+              <CustomInput
+                label={LABELS.firstname}
+                value={firstname}
+                // editable={false}
+                // backgroundColor={COLORS.lighterGray}
+                onChangeText={(val) => updateState({ firstname: val.replace(/[^A-Za-z]/g, '') })}
+                placeholder={LABELS.firstname}
+                maxLength={15}
+                mainViewProps={{ marginTop: 24 }}
+              />
+
+              {/* Last name */}
+              <CustomInput
+                label={LABELS.lastname}
+                value={lastname}
+                // editable={false}
+                // backgroundColor={COLORS.lighterGray}
+                onChangeText={(val) => updateState({ lastname: val.replace(/[^A-Za-z]/g, '') })}
+                placeholder={LABELS.lastname}
+                maxLength={15}
+                mainViewProps={{ marginTop: 24 }}
+              />
+
+              {/* Email */}
+              <CustomInput
+                label={LABELS.emailAddress}
+                value={email}
+                editable={false}
+                backgroundColor={COLORS.lighterGray}
+                onChangeText={(val) => updateState({ email: val.replace(/[^A-Za-z0-9@.]/g, '') })}
+                placeholder={LABELS.emailPlaceholderText}
+                mainViewProps={{ marginTop: 24 }}
+              />
+
+              <TouchableOpacity onPress={handleChangePassword} style={{ alignSelf: 'flex-end', paddingVertical: 8, paddingLeft: 8 }}>
+                <Text style={styles.changePassword}>Change Password?</Text>
+              </TouchableOpacity>
+
+              {/* Sign Up Button */}
+              <CustomButton
+                title={BUTTONS.logout}
+                onPress={handleLogout}
+                style={styles.logout}
+                textStyle={styles.logoutText}
+              />
+
+              {loading && (
+                <View style={styles.loadingRow}>
+                  <ActivityIndicator size="small" color={COLORS.accent} />
+                  <Text style={styles.loadingText}>{VALIDATIONS.signupLoaderText}</Text>
+                </View>
+              )}
+            </View>
+          </ScrollView>
+        </TouchableWithoutFeedback>
         {/* Image Picker Modal */}
         <ImageSelectionModal
           modalVisible={modalVisible}
@@ -313,6 +323,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mainView: {
+    flex: 1,
     padding: 16
   },
   logoContainer: {

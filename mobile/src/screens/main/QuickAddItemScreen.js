@@ -41,13 +41,13 @@ const QuickAddItemScreen = ({ navigation }) => {
   const userData = useSelector((state) => state.auth.userData);
   const isFocused = useIsFocused();
   const [saveForLater, setSaveForLater] = useState(false);
-  const [rating, setRating] = useState(0);
+  // const [rating, setRating] = useState(0);
   const [open, setOpen] = useState(false);
   const [podcastList, setPodcastList] = useState([
     { key: MISC.filterSeries, label: MISC.series },
     { key: MISC.filterEpisode, label: MISC.episode }
   ]);
-    const scrollRef = useRef(null);
+  const scrollRef = useRef(null);
   // To debounce API calls:
   const debounceTimeout = useRef(null);
   // const [statusList, setStatusList] = useState(movieStatusList);
@@ -80,6 +80,7 @@ const QuickAddItemScreen = ({ navigation }) => {
     imageLoading: false,
     clientId: '',
     movieReleaseDate: '',
+    rating:0,
   });
 
   const {
@@ -87,6 +88,7 @@ const QuickAddItemScreen = ({ navigation }) => {
     loading, selectedListId, selectedListLabel, location, brewery,
     author, statusList, status, value, year, imageUrl, podcastType,
     searchList, showDropdown, imageModalVisible, imageLoading, clientId, movieReleaseDate,
+    rating,
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -236,7 +238,9 @@ const QuickAddItemScreen = ({ navigation }) => {
                 ? await actions.getSearchRestaurantsList(query)
                 : selectedListLabel.toLowerCase() === MISC.podcasts
                   ? await actions.getSearchPodcastsList(query)
-                  : await actions.getSearchMoviesList(query);
+                  : selectedListLabel.toLowerCase() === MISC.bourbon
+                    ? await actions.getSearchBourbonsList(query)
+                    : await actions.getSearchWinesList(query);
       console.log('getSearchBooksList response', response);
 
       if (response && response.data.length > 0) {
@@ -265,13 +269,14 @@ const QuickAddItemScreen = ({ navigation }) => {
     } else {
       updateState({ title: text, clientId: '' });
     }
-    if (text.length > 3
-      && (selectedListLabel.toLowerCase() === MISC.books
-        || selectedListLabel.toLowerCase() === MISC.movies
-        || selectedListLabel.toLowerCase() === MISC.beer
-        || selectedListLabel.toLowerCase() === MISC.tvShows
-        || selectedListLabel.toLowerCase() === MISC.restaurants
-        || selectedListLabel.toLowerCase() === MISC.podcasts)) {
+    if (text.length > 2
+      // && (selectedListLabel.toLowerCase() === MISC.books
+      //   || selectedListLabel.toLowerCase() === MISC.movies
+      //   || selectedListLabel.toLowerCase() === MISC.beer
+      //   || selectedListLabel.toLowerCase() === MISC.tvShows
+      //   || selectedListLabel.toLowerCase() === MISC.restaurants
+      //   || selectedListLabel.toLowerCase() === MISC.podcasts)
+    ) {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
       // Debounce API call by 500ms
@@ -336,7 +341,7 @@ const QuickAddItemScreen = ({ navigation }) => {
       <Loader modalVisible={loading} />
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'position' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -432,6 +437,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                 && (
                   <View style={[styles.listAbsolute,]}>
                     <ScrollView horizontal
+                      nestedScrollEnabled={true}
                       contentContainerStyle={{
                         maxHeight: 280, width: SCREEN_WIDTH,
                         flex: 1, flexGrow: 1
@@ -560,7 +566,7 @@ const QuickAddItemScreen = ({ navigation }) => {
               </View>
               <View style={styles.starContainer}>
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <TouchableOpacity key={i} onPress={() => setRating(i)}>
+                  <TouchableOpacity key={i} onPress={() => updateState({ rating: i })}>
                     {i <= rating ? <Octicons
                       name={'star-fill'}
                       size={23}
@@ -608,7 +614,7 @@ const QuickAddItemScreen = ({ navigation }) => {
               keyboardType={undefined}
             />
             {
-            (selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
+              (selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
               <>
                 <CustomInput
                   placeholder={LABELS.enterImageUrl}

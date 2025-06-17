@@ -40,7 +40,7 @@ export async function apiReq(endPoint, data, method, headers = {}, requestOption
 	}
 
 	try {
-		console.log('API CALL===> ', method, endPoint, headers)
+		console.log('API CALL===> ', method,data, endPoint, headers)
 		const response = await axios({
 			method,
 			url: endPoint,
@@ -56,8 +56,8 @@ export async function apiReq(endPoint, data, method, headers = {}, requestOption
 		return response.data;
 	} catch (error) {
 		if (error?.response?.status === 401
-			|| (error?.response?.data?.message || error?.message)?.
-				includes('new row violates row-level security policy')) {
+			// || (error?.response?.data?.message || error?.message)?.includes('violate')
+		) {
 			clearUserData();
 			dispatch({ type: types.CLEAR_REDUX_STATE, payload: {} });
 			dispatch({ type: types.NO_INTERNET, payload: { internetConnection: true } });

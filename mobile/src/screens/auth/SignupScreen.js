@@ -70,7 +70,7 @@ export default function SignupScreen({ navigation }) {
       {
         // avatar: avatar,
         email,
-        password: password,
+        newPassword: password,
         confirmPassword,
         agree: agree,
       }
@@ -96,7 +96,10 @@ export default function SignupScreen({ navigation }) {
       // }
       // await insertAvatarToProfile({ id: userId, email: email, avatar_url: avatarUrl.publicURL });
 
-      showCustomToast(LABELS.success, 'Account created! Please confirm your email');
+      showCustomToast(LABELS.success, 'Thank you for signing up with ListKeepr. ' +
+        `A verification email has been sent to ${email}. ` +
+        'Click the link in the email to activate the account and start using ListKeepr. ' +
+        'If the email is not received, check the spam folder or contact us for assistance.', { duration: 10000 });
       updateState({
         email: '',
         password: '',

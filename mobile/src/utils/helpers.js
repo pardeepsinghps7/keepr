@@ -22,14 +22,14 @@ const showSuccess = (message) => {
         message
     })
 }
-
-const showCustomToast = (type, message) => {
+const showCustomToast = (type, message, options = {}) => {
+    const { duration = 3000 } = options;
     const isSuccess = type === 'success';
 
     showMessage({
         message: '',
         type,
-        duration: 3000,
+        duration: duration,
         backgroundColor: COLORS.transparent,
         renderCustomContent: () => (
             <View
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     toastContainer: {
         flex: 1,
         // position: 'absolute',
-        bottom: Platform.select({android:60,ios:30}),
+        bottom: Platform.select({ android: 60, ios: 30 }),
         // left: 20,
         // right: 20,
         padding: 14,

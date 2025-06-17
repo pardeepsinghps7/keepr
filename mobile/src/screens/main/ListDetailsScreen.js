@@ -83,7 +83,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
     updateState({ loading: true });
     try {
       const statusList = getStatusList(listItem?.label);
-      const response = await actions.getItemListByListId(listItem.id + selectedSortItem + (isInitial ? '' : `&save_for_later=eq.${saveForLater}`));
+      const response = await actions.getItemListByListId(listItem.id + selectedSortItem + (!saveForLater ? '' : `&save_for_later=eq.${saveForLater}`));
       console.log('getItemListByListId response', response);
       updateState({ dataList: response, statusList: statusList, loading: false, });
     } catch (error) {
@@ -110,7 +110,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
   const renderItem = ({ index, item }) => (
     <TouchableOpacity style={styles.card} onPress={() => navigation.navigate(ROUTES.itemDetailsScreen, { item })}>
       <View style={styles.cardItems}>
-        <Image style={styles.iconImageStyle} source={{ uri: item?.lists?.icon }} />
+        {item?.lists?.icon && <Image style={styles.iconImageStyle} source={{ uri: item?.lists?.icon }} />}
         <View style={styles.cardItemDetails}>
           <Text style={styles.cardTitle}>
             {capitalizeEachWord(item?.title || item?.episode_title || item?.series_title)}</Text>
