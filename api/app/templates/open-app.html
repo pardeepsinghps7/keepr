@@ -18,7 +18,7 @@
                 return;
             }
 
-            const fallbackUrl = "/success";
+            const fallbackUrl = "/success#"+window.location.hash.substring(1);
             const appLink = "keepr://app/auth-callback?action=confirm_signup&error="+error+"&error_code="+errorCode+"&error_description="+errorDescription+"&access_token="+access_token+"&refresh_token="+refresh_token;
 
             // Try opening the app
