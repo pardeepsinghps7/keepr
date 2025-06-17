@@ -22,6 +22,14 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
+        .logo {
+            width: 200px;
+            height: auto;
+            object-fit: contain;
+            margin: 0 auto;
+            display: block;
+        }
+
         .checkmark {
             font-size: 60px;
             color: #4CAF50;
@@ -30,7 +38,7 @@
         h1 {
             font-size: 28px;
             color: #333333;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         p {
@@ -76,9 +84,29 @@
             }
         }
     </style>
+
+    <script>
+        function openApp() {
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const access_token = hashParams.get('access_token');
+            const refresh_token = hashParams.get('refresh_token');
+            const error = hashParams.get('error');
+            const errorCode = hashParams.get('error_code');
+            const errorDescription = hashParams.get('error_description');
+
+            const appLink = "keepr://app/auth-callback?action=confirm_signup&error="+error+"&error_code="+errorCode+"&error_description="+errorDescription+"&access_token="+access_token+"&refresh_token="+refresh_token;
+
+            // Fallback if app doesn't open
+            setTimeout(() => {
+                // Try opening the app
+                window.location = appLink;
+            }, 3000);
+        }
+    </script>
 </head>
-<body>
+<body onload="openApp()">
     <div class="container">
+        <img src="{{ url_for('static', filename='listkeepr-logo.png') }}" alt="logo" class="logo" />
         <div class="checkmark">✔</div>
         <h1>Email Verified</h1>
         <p>Thank you! Your email address has been successfully verified.</p>
