@@ -498,7 +498,19 @@ const EditItemScreen = ({ navigation, route }) => {
                     placeholder={LABELS.typeSomethingHere}
                     value={brewery}
                     mainViewProps={{ marginVertical: 12 }}
-                    keyboardType={'numeric'}
+                    onChangeText={(val) => updateState({ brewery: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                    label={LABELS.brewery}
+                    isOptional={true}
+                  />
+                </>
+              }
+
+              {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
+                <>
+                  <CustomInput
+                    placeholder={LABELS.typeSomethingHere}
+                    value={year}
+                    mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => {
                       // Allow only digits
                       const filtered = val.replace(/[^0-9]/g, '');
@@ -515,19 +527,6 @@ const EditItemScreen = ({ navigation, route }) => {
                         }
                       }
                     }}
-                    label={LABELS.brewery}
-                    isOptional={true}
-                  />
-                </>
-              }
-
-              {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
-                <>
-                  <CustomInput
-                    placeholder={LABELS.typeSomethingHere}
-                    value={year}
-                    mainViewProps={{ marginVertical: 12 }}
-                    onChangeText={(val) => updateState({ year: val.replace(/[^0-9 \-]/g, '') })}
                     label={LABELS.year}
                     keyboardType={'numeric'}
                     maxLength={10}

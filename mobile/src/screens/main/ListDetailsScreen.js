@@ -31,7 +31,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
   const userData = useSelector((state) => state.auth.userData);
   const { params } = route
   const { item: listItem } = params
-  console.log('list detail', listItem);
+  console.log('list detail', listItem, listItem?.id);
   const { LABELS, TITLES, SIGNUP, MISC, VALIDATIONS, BUTTONS } = STRINGS;
   const [rating, setRating] = useState(0);
   const [state, setState] = useState({
@@ -75,16 +75,17 @@ const ListDetailsScreen = ({ navigation, route }) => {
   useFocusEffect(
     useCallback(() => {
       init();
-    }, [saveForLater, selectedSortItem])
+    }, [listItem, saveForLater, selectedSortItem])
   );
 
 
   const init = async () => {
     updateState({ loading: true });
     try {
+      const listId = listItem?.id;
       const statusList = getStatusList(listItem?.label);
-      const response = await actions.getItemListByListId(listItem.id + selectedSortItem + (!saveForLater ? '' : `&save_for_later=eq.${saveForLater}`));
-      console.log('getItemListByListId response', response);
+      const response = await actions.getItemListByListId(listId + selectedSortItem + (!saveForLater ? '' : `&save_for_later=eq.${saveForLater}`));
+      console.log('getItemListByListId response', listId, response);
       updateState({ dataList: response, statusList: statusList, loading: false, });
     } catch (error) {
       console.log('getItemListByListId failed:', error.message);
@@ -175,9 +176,10 @@ const ListDetailsScreen = ({ navigation, route }) => {
   }
 
   const ListEmptyComponent = () => {
+    console.log('listicon:', listIcon);
     return (
       <View style={styles.emptyContainer}>
-        <Image style={styles.iconImageStyle} source={{ uri: listIcon }} />
+        {listIcon?.length > 0 && <Image style={styles.iconImageStyle} source={{ uri: listIcon }} />}
         <Text style={styles.cardTitle}>{MISC.noItemsTitle}</Text>
         {selectedSortItem.length === 0 && selectedFilterItem.length === 0 &&
           <>
@@ -243,18 +245,18 @@ const ListDetailsScreen = ({ navigation, route }) => {
       updateState({ loading: false });
     }
   };
-  
-    const onDeletePress = () => {
-      Alert.alert(
-        MISC.deleteList,
-        VALIDATIONS.areYouSureWantToDelete,
-        [{ text: BUTTONS.yes, onPress: deleteSelectedItem }, { text: BUTTONS.no, }],
-        { cancelable: true }
-      )
-    }
+
+  const onDeletePress = () => {
+    Alert.alert(
+      MISC.deleteList,
+      VALIDATIONS.areYouSureWantToDelete,
+      [{ text: BUTTONS.yes, onPress: deleteSelectedItem }, { text: BUTTONS.no, }],
+      { cancelable: true }
+    )
+  }
 
   const deleteSelectedItem = async () => {
-    updateState({ loading: true,listActionModalVisible: false  });
+    updateState({ loading: true, listActionModalVisible: false });
     try {
       const response = await actions.deleteList(listItem?.id);
       console.log('deleteList response:', response);
@@ -281,7 +283,7 @@ const ListDetailsScreen = ({ navigation, route }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{ flex: 1 }}>
         <Loader modalVisible={loading} />
-        <Header title={listTitle} isBack onMenuPress={listItem?.is_default ? undefined : onMenuPress} />
+        <Header title={listItem?.label} isBack onMenuPress={listItem?.is_default ? undefined : onMenuPress} />
         <FlatList
           data={dataList}
           renderItem={renderItem}
