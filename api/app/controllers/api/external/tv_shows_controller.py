@@ -25,11 +25,15 @@ def get_all_tv_shows():
         shows = []
 
         for item in response_data:
-            show = item.get('show')
-            name = show.get("name", "Unknown Name")
+            show = item.get('show',"")
+            name = show.get("name", "")
+            genres = show.get("genres",[])
+            type = show.get("type", "")
             client_id = show.get("id", "")
             shows.append({
                 "name" : name,
+                "genres" : genres,
+                "type" : type,
                 "client_id" : client_id
             })
         

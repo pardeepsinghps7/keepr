@@ -36,7 +36,7 @@ def get_all_restaurants():
         # Extract restaurant names and locations
         restaurants = [
             {
-                "name": item.get("name", "Unknown Name"),
+                "name": item.get("name", ""),
                 "location": item.get("location", {}),
                 "client_id": item.get("fsq_id", "")
             }
