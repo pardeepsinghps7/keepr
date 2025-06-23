@@ -28,8 +28,8 @@ def format_books(data, source="open_library"):
         for item in data.get("items", []):
             volume_info = item.get("volumeInfo", {})
             client_id = item.get("id", "")
-            title = volume_info.get("title", "Unknown Title")
-            author = volume_info.get("authors", ["Unknown Author"])
+            title = volume_info.get("title", "")
+            author = volume_info.get("authors", [])
             books.append({
                 "client_id": client_id,
                 "title": title,

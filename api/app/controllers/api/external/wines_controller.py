@@ -48,7 +48,7 @@ def get_all_wines():
         response_data = response.json()
 
         # Extract item titles
-        data = [{"client_id" : item.get('id'), "title": item.get("title", "Unknown Title")} for item in response_data]
+        data = [{"client_id" : item.get('id'), "title": item.get("title", "Unknown Title"), "country": item.get("country"), "province": item.get("province"), "variety": item.get("variety"), "winery": item.get("winery")} for item in response_data]
 
         return jsonify({"status": True, "data": data}), 200
 

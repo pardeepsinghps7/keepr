@@ -37,8 +37,8 @@ def get_all_beers():
         # Extract restaurant names and locations
         beers = [
             {
-                "name": item.get("name", "Unknown Name"),
-                "brewery": item.get("brewery", "Unknown Brewery"),
+                "name": item.get("name", ""),
+                "brewery": item.get("brewery", ""),
                 "client_id": item.get("sku", ""),
             }
             for item in results

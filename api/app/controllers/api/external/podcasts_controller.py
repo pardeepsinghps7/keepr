@@ -56,9 +56,11 @@ def get_all_podcasts():
         # Extract podcast titles
         data = []
         for result in response_data.get("results", []):
+            publisher = result.get("podcast", {})
             data.append({
                 "client_id": result.get("id"),
-                "title": result.get("title_original", "Unknown Title")
+                "title": result.get("title_original", ""),
+                "publisher": publisher.get("publisher_original", "")
             })
 
         return jsonify({"status": True, "data": data}), 200

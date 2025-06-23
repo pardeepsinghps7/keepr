@@ -48,7 +48,7 @@ def get_all_bourbons():
         response_data = response.json()
 
         # Extract item titles
-        data = [{"client_id" : item.get('id'), "title": item.get("name", "Unknown Title")} for item in response_data]
+        data = [{"client_id" : item.get('id'), "title": item.get("name", "")} for item in response_data]
 
         return jsonify({"status": True, "data": data}), 200
 
