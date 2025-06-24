@@ -27,12 +27,14 @@ def get_all_tv_shows():
         for item in response_data:
             show = item.get('show',"")
             name = show.get("name", "")
+            language = show.get("language", "")
             genres = show.get("genres",[])
             type = show.get("type", "")
             client_id = show.get("id", "")
             shows.append({
+                "language" : language,
                 "name" : name,
-                "genres" : genres,
+                "genres" : ", ".join(genres),
                 "type" : type,
                 "client_id" : client_id
             })
