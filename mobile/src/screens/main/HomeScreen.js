@@ -68,7 +68,7 @@ const HomeScreen = ({ navigation }) => {
                 email: userDetails[0]?.email,
                 avatar_url: userDetails[0]?.avatar_url
             });
-            updateState({ dataList: response.slice(0, 4), latestItem: latestItemResopnse[0] });
+            updateState({ dataList: response.slice(0, 20), latestItem: latestItemResopnse[0] });
         } catch (error) {
             console.log('getUserListWithItemCount failed:', error.message);
             showCustomToast(LABELS.error, error.message);
@@ -97,11 +97,11 @@ const HomeScreen = ({ navigation }) => {
         <SafeAreaView style={styles.container} edges={['top']}>
             <Loader modalVisible={loading} />
             <Header title={ROUTES.listkeeprHome} onLeftIconTap={onLeftIconTap} />
-            {/* <ScrollView
+            <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 16, }}
+                contentContainerStyle={{ paddingHorizontal: 0, }}
                 keyboardShouldPersistTaps="handled"
-            > */}
+            >
             <View style={styles.viewContainer}>
                 <Text style={styles.welcome}>Welcome {userData?.first_name ? `${userData?.first_name} ` : ''}<Text style={styles.wave}>👋</Text></Text>
                 <Text style={styles.subtext}>Your clever space to keep what you love.</Text>
@@ -149,7 +149,7 @@ const HomeScreen = ({ navigation }) => {
                     />
                 </View>
             </View>
-            {/* </ScrollView> */}
+            </ScrollView>
         </SafeAreaView>
     );
 };

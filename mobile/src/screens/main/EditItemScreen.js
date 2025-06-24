@@ -270,12 +270,14 @@ const EditItemScreen = ({ navigation, route }) => {
       updateState({ title: text, clientId: '' });
     }
     if (text.length > 2
-      // && (selectedListLabel.toLowerCase() === MISC.books
-      //   || selectedListLabel.toLowerCase() === MISC.movies
-      //   || selectedListLabel.toLowerCase() === MISC.beer
-      //   || selectedListLabel.toLowerCase() === MISC.tvShows
-      //   || selectedListLabel.toLowerCase() === MISC.restaurants
-      //   || selectedListLabel.toLowerCase() === MISC.podcasts)
+      && (selectedListLabel.toLowerCase() === MISC.books
+        || selectedListLabel.toLowerCase() === MISC.movies
+        || selectedListLabel.toLowerCase() === MISC.beer
+        || selectedListLabel.toLowerCase() === MISC.tvShows
+        || selectedListLabel.toLowerCase() === MISC.restaurants
+        || selectedListLabel.toLowerCase() === MISC.podcasts
+        || selectedListLabel.toLowerCase() === MISC.bourbon
+        || selectedListLabel.toLowerCase() === MISC.wine)
     ) {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
@@ -310,7 +312,9 @@ const EditItemScreen = ({ navigation, route }) => {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleSelectTitle(item)}>
-      <Text style={styles.label}>{item.title || item.name || item.series_title || item.episode_title}</Text>
+      {(selectedListLabel.toLowerCase() === MISC.restaurants)
+        ? <Text style={styles.label}>{item.name} ({item?.location?.formatted_address})</Text>
+        : <Text style={styles.label}>{item.title || item.name || item.series_title || item.episode_title}</Text>}
     </TouchableOpacity>
   );
 
