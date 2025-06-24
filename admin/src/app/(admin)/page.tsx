@@ -10,7 +10,7 @@ import RecentUsersTable from "@/components/tables/RecentUsersTable";
 
 export const metadata: Metadata = {
   title:
-    "Keepr | Dashboard",
+    "ListKeepr | Dashboard",
   description: "Dashboard",
 };
 
