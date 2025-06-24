@@ -213,6 +213,7 @@ const ItemModal = ({
                             <Detail label="Podcast Type" value={item.podcast_type} />
                             <Detail label="Series Title" value={item.series_title} />
                             <Detail label="Episode Title" value={item.episode_title} />
+                            <Detail label="Publisher" value={item.raw_json.publisher ? item.raw_json.publisher : "N/A"} />
                         </>
                     )}
                     {listId !== LIST_IDS.Podcasts && <Detail label="Title/Name" value={item.title} />}
@@ -229,6 +230,21 @@ const ItemModal = ({
                     <Detail label="Status" value={item.status ? item.status : "N/A"} />
                     <Rating label="Rating" value={item.rating ? item.rating : "N/A"} />
                     <Detail label="Recommended by" value={item.recommended_by ? item.recommended_by : "N/A"} />
+                    {listId === LIST_IDS.Wine && (
+                        <>
+                            <Detail label="Winery" value={item.raw_json.winery ? item.raw_json.winery : "N/A"} />
+                            <Detail label="Variety" value={item.raw_json.variety ? item.raw_json.variety : "N/A"} />
+                            <Detail label="Province" value={item.raw_json.province ? item.raw_json.province : "N/A"} />
+                        </>
+                    )}
+                    {listId === LIST_IDS.TVShows && (
+                        <>
+                            <Detail label="Type" value={item.raw_json.type ? item.raw_json.type : "N/A"} />
+                            <Detail label="Language" value={item.raw_json.language ? item.raw_json.language : "N/A"} />
+                            <Detail label="Genres" value={item.raw_json.genres ? item.raw_json.genres : "N/A"} />
+                            <Detail label="Year of release" value={item.year ? item.year : "N/A"} />
+                        </>
+                    )}
                     {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(listId) && (
                         <div>
                             <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Image</p>
