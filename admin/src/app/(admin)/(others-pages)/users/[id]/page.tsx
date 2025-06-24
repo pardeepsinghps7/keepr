@@ -175,6 +175,7 @@ const ItemModal = ({ item, onClose }: { item: FormattedItem; onClose: () => void
                             <Detail label="Podcast Type" value={item.podcast_type} />
                             <Detail label="Series Title" value={item.series_title} />
                             <Detail label="Episode Title" value={item.episode_title} />
+                            <Detail label="Publisher" value={item.raw_json.publisher ? item.raw_json.publisher : "N/A"} />
                         </>
                     )}
                     {item.list_id !== LIST_IDS.Podcasts && <Detail label="Title/Name" value={item.title} />}
@@ -190,11 +191,26 @@ const ItemModal = ({ item, onClose }: { item: FormattedItem; onClose: () => void
                     <Detail label="Status" value={item.status} />
                     <Rating label="Rating" value={item?.rating ?? "N/A"} />
                     <Detail label="Recommended by" value={item.recommended_by ? item.recommended_by : "N/A"} />
+                    {item.list_id === LIST_IDS.Wine && (
+                        <>
+                            <Detail label="Winery" value={item.raw_json.winery ? item.raw_json.winery : "N/A"} />
+                            <Detail label="Variety" value={item.raw_json.variety ? item.raw_json.variety : "N/A"} />
+                            <Detail label="Province" value={item.raw_json.province ? item.raw_json.province : "N/A"} />
+                        </>
+                    )}
+                    {item.list_id === LIST_IDS.TVShows && (
+                        <>
+                            <Detail label="Type" value={item.raw_json.type ? item.raw_json.type : "N/A"} />
+                            <Detail label="Language" value={item.raw_json.language ? item.raw_json.language : "N/A"} />
+                            <Detail label="Genres" value={item.raw_json.genres ? item.raw_json.genres : "N/A"} />
+                            <Detail label="Year of release" value={item.year ? item.year : "N/A"} />
+                        </>
+                    )}
                     {[LIST_IDS.Bourbon, LIST_IDS.Wine].includes(item.list_id) && (
                         <div>
                             <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Image</p>
                             {item.image_url && (
-                                <Image src={item.image_url} alt="" className="overflow-hidden w-full max-w-25"/>
+                                <Image src={item.image_url} alt="" className="overflow-hidden w-full max-w-25" width="100" height="100"/>
                             )}
                         </div>
                     )}
