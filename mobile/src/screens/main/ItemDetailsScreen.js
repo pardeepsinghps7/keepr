@@ -153,6 +153,7 @@ const ItemDetailsScreen = ({ navigation, route }) => {
           renderItem={null}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ gap: 16, flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
           ListHeaderComponent={
             <>
               <View style={styles.mainView}>
@@ -169,10 +170,17 @@ const ItemDetailsScreen = ({ navigation, route }) => {
                   <Text style={styles.checkboxLabel}>Save for Later</Text>
                 </View>
 
-                {dataList?.lists?.label?.toLowerCase() === MISC.podcasts && <View style={[styles.card,]}>
-                  <Text style={styles.cardTitle}>{LABELS.podcastsType}</Text>
-                  <Text style={styles.cardSubTitle}>{dataList?.podcast_type}</Text>
-                </View>}
+                {dataList?.lists?.label?.toLowerCase() === MISC.podcasts &&
+                  <>
+                    <View style={[styles.card,]}>
+                      <Text style={styles.cardTitle}>{LABELS.podcastsType}</Text>
+                      <Text style={styles.cardSubTitle}>{dataList?.podcast_type}</Text>
+                    </View>
+                    <View style={[styles.card,]}>
+                      <Text style={styles.cardTitle}>{LABELS.publisher}</Text>
+                      <Text style={styles.cardSubTitle}>{dataList?.raw_json?.publisher}</Text>
+                    </View>
+                  </>}
 
                 {dataList?.lists?.label?.toLowerCase() === MISC.restaurants && dataList?.location &&
                   <View style={[styles.card,]}>
@@ -180,7 +188,8 @@ const ItemDetailsScreen = ({ navigation, route }) => {
                     <Text style={styles.cardSubTitle}>{dataList?.location || 'N/A'}</Text>
                   </View>}
                 {(dataList?.lists?.label?.toLowerCase() === MISC.bourbon
-                  || dataList?.lists?.label?.toLowerCase() === MISC.wine) &&
+                  || dataList?.lists?.label?.toLowerCase() === MISC.wine
+                  || dataList?.lists?.label?.toLowerCase() === MISC.tvShows) &&
                   <View style={[styles.card,]}>
                     <Text style={styles.cardTitle}>{LABELS.year}</Text>
                     <Text style={styles.cardSubTitle}>{dataList?.year || 'N/A'}</Text>
@@ -194,6 +203,40 @@ const ItemDetailsScreen = ({ navigation, route }) => {
                   <Text style={styles.cardTitle}>{LABELS.author}</Text>
                   <Text style={styles.cardSubTitle}>{dataList?.author || 'N/A'}</Text>
                 </View>}
+
+                {/* tvshows type */}
+                {dataList?.lists?.label?.toLowerCase() === MISC.tvShows &&
+                  <>
+                    <View style={[styles.card,]}>
+                      <Text style={styles.cardTitle}>{LABELS.type}</Text>
+                      <Text style={styles.cardSubTitle}>{dataList?.raw_json?.type || 'N/A'}</Text>
+                    </View>
+                    <View style={[styles.card,]}>
+                      <Text style={styles.cardTitle}>{LABELS.language}</Text>
+                      <Text style={styles.cardSubTitle}>{dataList?.raw_json?.language || 'N/A'}</Text>
+                    </View>
+                    <View style={[styles.card,]}>
+                      <Text style={styles.cardTitle}>{LABELS.genres}</Text>
+                      <Text style={styles.cardSubTitle}>{dataList?.raw_json?.genres || 'N/A'}</Text>
+                    </View>
+                  </>}
+
+                {/* wine type */}
+                {dataList?.lists?.label?.toLowerCase() === MISC.wine &&
+                  <>
+                    <View style={[styles.card,]}>
+                      <Text style={styles.cardTitle}>{LABELS.variety}</Text>
+                      <Text style={styles.cardSubTitle}>{dataList?.raw_json?.variety || 'N/A'}</Text>
+                    </View>
+                    <View style={[styles.card,]}>
+                      <Text style={styles.cardTitle}>{LABELS.winery}</Text>
+                      <Text style={styles.cardSubTitle}>{dataList?.raw_json?.winery || 'N/A'}</Text>
+                    </View>
+                    <View style={[styles.card,]}>
+                      <Text style={styles.cardTitle}>{LABELS.province}</Text>
+                      <Text style={styles.cardSubTitle}>{dataList?.raw_json?.province || 'N/A'}</Text>
+                    </View>
+                  </>}
 
                 <View style={styles.row}>
                   <View style={[styles.rowCard,]}>

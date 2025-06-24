@@ -100,7 +100,7 @@ const TabRoutes = () => {
           // tabBarBadge: 3,
         }}
       />
-      {/* <BottomTab.Screen
+      <BottomTab.Screen
         name={ROUTES.share}
         options={{
           tabBarLabel: ({ focused }) => (
@@ -134,7 +134,7 @@ const TabRoutes = () => {
         }}
       >
         {() => null}
-      </BottomTab.Screen> */}
+      </BottomTab.Screen>
     </BottomTab.Navigator>
   );
 }

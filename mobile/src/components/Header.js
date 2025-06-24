@@ -28,12 +28,12 @@ const Header = ({
     return (
         <View style={styles.header}>
 
-            <TouchableOpacity style={styles.button} onPress={() => isBack ? navigation.goBack() : null}>
+            <TouchableOpacity style={styles.button} onPress={() => isBack ? navigation.goBack() : showCustomToast(LABELS.success, MISC.comingSoon)}>
                 {
                     isBack
                         ? <Icon name={"chevron-back"} size={22} color={COLORS.black} style={styles.menuIcon} />
-                        : <Text></Text>
-                        // : <Icon name={"menu"} size={24} color={COLORS.black} style={styles.menuIcon} />
+                        // : <Text></Text>
+                        : <Icon name={"menu"} size={24} color={COLORS.black} style={styles.menuIcon} />
                 }
             </TouchableOpacity>
 
@@ -44,9 +44,9 @@ const Header = ({
                 <TouchableOpacity style={styles.button} onPress={() => showCustomToast(LABELS.success, MISC.comingSoon)}>
                     <Image source={imagesPath.search} style={styles.search} />
                 </TouchableOpacity>
-                {/* <TouchableOpacity style={styles.button} onPress={() => showCustomToast(LABELS.success, MISC.comingSoon)}>
+                <TouchableOpacity style={styles.button} onPress={() => showCustomToast(LABELS.success, MISC.comingSoon)}>
                     <Icon name="notifications-outline" size={24} />
-                </TouchableOpacity> */}
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(ROUTES.profileScreen)}>
                     {userData?.avatar_url
                         ? <Image source={{ uri: userData?.avatar_url }} style={styles.avatar} />

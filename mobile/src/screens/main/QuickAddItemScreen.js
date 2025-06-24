@@ -80,7 +80,14 @@ const QuickAddItemScreen = ({ navigation }) => {
     imageLoading: false,
     clientId: '',
     movieReleaseDate: '',
-    rating:0,
+    rating: 0,
+    variety: '',
+    winery: '',
+    province: '',
+    tvShowsType: '',
+    language: '',
+    genres: '',
+    publisher: '',
   });
 
   const {
@@ -88,7 +95,8 @@ const QuickAddItemScreen = ({ navigation }) => {
     loading, selectedListId, selectedListLabel, location, brewery,
     author, statusList, status, value, year, imageUrl, podcastType,
     searchList, showDropdown, imageModalVisible, imageLoading, clientId, movieReleaseDate,
-    rating,
+    rating, variety, winery, province,
+    tvShowsType, language, genres, publisher,
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -112,6 +120,13 @@ const QuickAddItemScreen = ({ navigation }) => {
     imageLoading: false,
     clientId: '',
     movieReleaseDate: '',
+    variety: '',
+    winery: '',
+    province: '',
+    tvShowsType: '',
+    language: '',
+    genres: '',
+    publisher: '',
   }
 
   useFocusEffect(
@@ -165,13 +180,13 @@ const QuickAddItemScreen = ({ navigation }) => {
           name: title,
         }
       )
-      : selectedListLabel.toLowerCase() === MISC.podcasts && podcastType.label.toLowerCase() === MISC.episode
+      : selectedListLabel.toLowerCase() === MISC.podcasts && podcastType.label.toLowerCase() === MISC.episode.toLowerCase()
         ? validator.isValidData(
           {
             episodeTitle: episodeTitle,
           }
         )
-        : selectedListLabel.toLowerCase() === MISC.podcasts && podcastType.label === MISC.series
+        : selectedListLabel.toLowerCase() === MISC.podcasts && podcastType.label.toLowerCase() === MISC.series.toLowerCase()
           ? validator.isValidData(
             {
               seriesTitle: seriesTitle,
@@ -190,6 +205,13 @@ const QuickAddItemScreen = ({ navigation }) => {
     try {
       const rawJson = {
         release_date: movieReleaseDate,
+        variety,
+        winery,
+        province,
+        type: tvShowsType,
+        language,
+        genres,
+        publisher,
       };
       const payload = {
         list_id: selectedListId,
@@ -294,7 +316,8 @@ const QuickAddItemScreen = ({ navigation }) => {
         episodeTitle: item?.title || '',
         clientId: item?.client_id || '',
         showDropdown: false,
-        searchList: []
+        searchList: [],
+        publisher: item?.publisher || '',
       });
     } else {
       updateState({
@@ -305,7 +328,13 @@ const QuickAddItemScreen = ({ navigation }) => {
         location: item?.location?.formatted_address || '',
         clientId: item?.client_id || '',
         showDropdown: false,
-        searchList: []
+        searchList: [],
+        variety: item?.variety || '',
+        winery: item?.winery || '',
+        province: item?.province || '',
+        tvShowsType: item?.type || '',
+        language: item?.language || '',
+        genres: item?.genres || '',
       });
     }
   }
@@ -331,7 +360,7 @@ const QuickAddItemScreen = ({ navigation }) => {
       }, 100);
     }
   }
-  
+
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleSelectTitle(item)}>
       {(selectedListLabel.toLowerCase() === MISC.restaurants)
@@ -417,7 +446,7 @@ const QuickAddItemScreen = ({ navigation }) => {
             {/* Title Input */}
             <View style={styles.searchBox}>
               {selectedListLabel.toLowerCase() === MISC.podcasts
-                ? <CustomInput
+                ? <><CustomInput
                   placeholder={LABELS.typeSomethingHere}
                   value={episodeTitle}
                   mainViewProps={{ marginVertical: 12 }}
@@ -426,6 +455,17 @@ const QuickAddItemScreen = ({ navigation }) => {
                   label={LABELS.episodeTitle}
                   isOptional={podcastType.label === MISC.series}
                 />
+                  <CustomInput
+                    placeholder={LABELS.publisher}
+                    value={publisher}
+                    onChangeText={(val) => updateState({ publisher: val })}
+                    label={LABELS.publisher}
+                    mainViewProps={{ marginVertical: 12 }}
+                    editable={false}
+                    maxLength={100}
+                    isOptional={true}
+                  />
+                </>
                 : <CustomInput
                   placeholder={LABELS.typeSomethingHere}
                   value={title}
@@ -497,8 +537,80 @@ const QuickAddItemScreen = ({ navigation }) => {
                 />
               </>
             }
+            {/* tv shows */}
+            {selectedListLabel.toLowerCase() === MISC.tvShows &&
+              <>
+                <CustomInput
+                  placeholder={LABELS.type}
+                  value={tvShowsType}
+                  onChangeText={(val) => updateState({ tvShowsType: val })}
+                  label={LABELS.type}
+                  mainViewProps={{ marginVertical: 12 }}
+                  editable={false}
+                  maxLength={100}
+                  isOptional={true}
+                />
+                <CustomInput
+                  placeholder={LABELS.language}
+                  value={language}
+                  onChangeText={(val) => updateState({ language: val })}
+                  label={LABELS.language}
+                  mainViewProps={{ marginVertical: 12 }}
+                  editable={false}
+                  maxLength={100}
+                  isOptional={true}
+                />
+                <CustomInput
+                  placeholder={LABELS.genres}
+                  value={genres}
+                  onChangeText={(val) => updateState({ genres: val })}
+                  label={LABELS.genres}
+                  mainViewProps={{ marginVertical: 12 }}
+                  editable={false}
+                  maxLength={100}
+                  isOptional={true}
+                />
+              </>
+            }
 
-            {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine) &&
+            {/* wine type */}
+            {selectedListLabel.toLowerCase() === MISC.wine &&
+              <>
+                <CustomInput
+                  placeholder={LABELS.variety}
+                  value={variety}
+                  onChangeText={(val) => updateState({ variety: val })}
+                  label={LABELS.variety}
+                  mainViewProps={{ marginVertical: 12 }}
+                  editable={false}
+                  maxLength={100}
+                  isOptional={true}
+                />
+                <CustomInput
+                  placeholder={LABELS.winery}
+                  value={winery}
+                  onChangeText={(val) => updateState({ winery: val })}
+                  label={LABELS.winery}
+                  mainViewProps={{ marginVertical: 12 }}
+                  editable={false}
+                  maxLength={100}
+                  isOptional={true}
+                />
+                <CustomInput
+                  placeholder={LABELS.province}
+                  value={province}
+                  onChangeText={(val) => updateState({ province: val })}
+                  label={LABELS.province}
+                  mainViewProps={{ marginVertical: 12 }}
+                  editable={false}
+                  maxLength={100}
+                  isOptional={true}
+                />
+              </>
+            }
+
+            {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine
+              || selectedListLabel.toLowerCase() === MISC.tvShows) &&
               <>
                 <CustomInput
                   placeholder={LABELS.typeSomethingHere}
