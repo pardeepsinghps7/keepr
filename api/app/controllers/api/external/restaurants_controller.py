@@ -19,6 +19,8 @@ def get_all_restaurants():
     }
     if latitude and longitude:
         params["ll"] = f"{latitude},{longitude}"
+        params["radius"] = 100000
+        params["limit"] = 50
 
     FOUR_SQUARE_API_KEY = os.environ.get("FOUR_SQUARE_API_KEY")
     if not FOUR_SQUARE_API_KEY:
