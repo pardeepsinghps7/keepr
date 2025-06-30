@@ -7,7 +7,6 @@ from ..controllers.api.external.books_controller import get_all_books
 from ..controllers.api.external.tv_shows_controller import get_all_tv_shows
 from ..controllers.api.external.podcasts_controller import get_all_podcasts
 from ..controllers.api.external.podcasts_controller import get_all_episodes
-from ..controllers.api.external.podcasts_controller import get_podcast_episodes
 from ..controllers.api.external.restaurants_controller import get_all_restaurants
 from ..controllers.api.external.beer_controller import get_all_beers
 
@@ -49,10 +48,6 @@ def getPodcasts():
 @api.route('get-episodes', methods=["GET"])
 def getEpisodes():
     return get_all_episodes()
-
-@api.route('get-podcast-episodes', methods=["GET"])
-def getPodcastEpisodes():
-    return get_podcast_episodes()
 
 @api.route('get-restaurants', methods=["GET"])
 def getRestaurants():
