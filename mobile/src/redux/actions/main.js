@@ -34,7 +34,7 @@ export function addProfileDetail(data) {
     return apiPost(PROFILE_DETAILS, data)
 }
 
-export function updateProfileDetail(id,data) {
+export function updateProfileDetail(id, data) {
     return apiPatch(`${PROFILE_BY_ID}.${id}`, data)
 }
 
@@ -95,8 +95,8 @@ export function getSearchBeerList(searchText, page = 1) {
 export function getSearchTVShowsList(searchText, page = 1) {
     return apiGet(`${TV_SHOWS}?name=${searchText}&page=${page}`)
 }
-export function getSearchRestaurantsList(searchText, page = 1) {
-    return apiGet(`${RESTAURANTS}?name=${searchText}&page=${page}`)
+export function getSearchRestaurantsList(searchText, latitude, longitude, page = 1) {
+    return apiGet(`${RESTAURANTS}?name=${searchText}&latitude=${latitude || ''}&longitude=${longitude || ''}&page=${page}`)
 }
 export function getSearchPodcastsList(searchText, page = 1) {
     return apiGet(`${PODCASTS}?title=${searchText}&page=${page}`)

@@ -18,6 +18,7 @@ import {
     UpdatePasswordScreen,
     setSession,
     showCustomToast,
+    getCurrentLocation,
 } from '../index.js';
 import COLORS from '../constants/colors.js';
 
@@ -71,6 +72,7 @@ export default function Routes() {
     };
 
     useEffect(() => {
+        // getCurrentLocation();
         const onLink = ({ url }) => handleResetLink(url);
 
         const subscription = Linking.addEventListener('url', onLink);

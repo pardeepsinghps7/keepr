@@ -27,7 +27,7 @@ import actions from '../../redux/actions';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Loader from '../../components/Loader';
 import validator from '../../utils/validators';
-import { getStatusList, showCustomToast } from '../../utils/helpers';
+import { getCurrentLocation, getStatusList, showCustomToast } from '../../utils/helpers';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ImageModal from '../../components/ImageModal';
 import { uploadAvatarToSupabase } from '../../lib/supabase';
@@ -88,6 +88,7 @@ const QuickAddItemScreen = ({ navigation }) => {
     language: '',
     genres: '',
     publisher: '',
+    currentLocation: {},
   });
 
   const {
@@ -96,7 +97,7 @@ const QuickAddItemScreen = ({ navigation }) => {
     author, statusList, status, value, year, imageUrl, podcastType,
     searchList, showDropdown, imageModalVisible, imageLoading, clientId, movieReleaseDate,
     rating, variety, winery, province,
-    tvShowsType, language, genres, publisher,
+    tvShowsType, language, genres, publisher, currentLocation
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -140,9 +141,25 @@ const QuickAddItemScreen = ({ navigation }) => {
     }, [])
   );
 
+  useEffect(()=>{
+    getLocation();
+  },[]);
+
+  const getLocation = async () => {
+    try {
+      const currentLocationValue = await getCurrentLocation();
+      console.log('currentLocation response', currentLocationValue || {});
+      updateState({
+        currentLocation: currentLocationValue,
+      });
+    } catch (error) {
+      console.log('getUserList failed:', error.message);
+      showCustomToast(LABELS.error, 'Enable location permissions in settings to continue.');
+    }
+  }
 
   const init = async () => {
-    updateState({ loading: true });
+    updateState({ loading: true, });
     try {
       const response = await actions.getUserList();
       console.log('getUserList response', response);
@@ -257,7 +274,7 @@ const QuickAddItemScreen = ({ navigation }) => {
             : selectedListLabel.toLowerCase() === MISC.tvShows
               ? await actions.getSearchTVShowsList(query)
               : selectedListLabel.toLowerCase() === MISC.restaurants
-                ? await actions.getSearchRestaurantsList(query)
+                ? await actions.getSearchRestaurantsList(query, currentLocation?.latitude, currentLocation?.longitude, 1)
                 : selectedListLabel.toLowerCase() === MISC.podcasts
                   ? await actions.getSearchPodcastsList(query)
                   : selectedListLabel.toLowerCase() === MISC.bourbon
@@ -364,8 +381,16 @@ const QuickAddItemScreen = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleSelectTitle(item)}>
       {(selectedListLabel.toLowerCase() === MISC.restaurants)
-        ? <Text style={styles.label}>{item.name} ({item?.location?.formatted_address})</Text>
-        : <Text style={styles.label}>{item.title || item.name || item.series_title || item.episode_title}</Text>}
+        ? <Text style={styles.label}>{item.name} - ({item?.location?.formatted_address})</Text>
+        : <Text style={styles.label}>
+          {item.title || item.name || item.series_title || item.episode_title}
+          {item?.release_date ? ` (${moment(item?.release_date, 'YYYY-MM-DD').year()})`
+            : item?.author ? ` - (${item?.author})`
+              : item?.publisher ? ` - (${item?.publisher})`
+                : item?.type ? ` - (${item?.type})`
+                  : item?.brewery ? ` - (${item?.brewery})`
+                    : item?.variety ? ` - (${item?.variety})` : ''}
+        </Text>}
     </TouchableOpacity>
   );
 

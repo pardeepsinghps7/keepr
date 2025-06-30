@@ -27,7 +27,7 @@ import actions from '../../redux/actions';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Loader from '../../components/Loader';
 import validator from '../../utils/validators';
-import { getStatusList, showCustomToast } from '../../utils/helpers';
+import { getCurrentLocation, getStatusList, showCustomToast } from '../../utils/helpers';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../components/Header';
 import AddNewListModal from '../../components/AddNewListModal';
@@ -103,6 +103,7 @@ const AddScreen = ({ navigation, route }) => {
     language: '',
     genres: '',
     publisher: '',
+    currentLocation: {},
   });
 
   const {
@@ -112,7 +113,7 @@ const AddScreen = ({ navigation, route }) => {
     author, statusList, status, value, year, imageUrl, podcastType,
     searchList, showDropdown, saveForLater, imageModalVisible, imageLoading,
     clientId, newelyAddedList, movieReleaseDate, variety, winery, province,
-    tvShowsType, language, genres, publisher,
+    tvShowsType, language, genres, publisher, currentLocation
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -159,6 +160,10 @@ const AddScreen = ({ navigation, route }) => {
     }, [])
   );
 
+  useEffect(() => {
+    getLocation();
+  }, []);
+
   // useEffect(() => {
   //   if (params?.item) {
   //     init(true);
@@ -180,8 +185,21 @@ const AddScreen = ({ navigation, route }) => {
   }, [isFocused, needListTypeApiCall]);
 
 
+  const getLocation = async () => {
+    try {
+      const currentLocationValue = await getCurrentLocation();
+      console.log('currentLocation response', currentLocationValue || {});
+      updateState({
+        currentLocation: currentLocationValue,
+      });
+    } catch (error) {
+      console.log('getUserList failed:', error.message);
+      showCustomToast(LABELS.error, 'Enable location permissions in settings to continue.');
+    }
+  }
+
   const init = async (isActive) => {
-    updateState({ loading: true });
+    updateState({ loading: true, });
     try {
       const response = await actions.getUserListWithItemCount();
       console.log('getUserList response', response);
@@ -213,6 +231,7 @@ const AddScreen = ({ navigation, route }) => {
 
         });
       }
+      navigation.setParams({ item: undefined });
     } catch (error) {
       console.log('getUserList failed:', error.message);
       showCustomToast(LABELS.error, error.message);
@@ -302,6 +321,7 @@ const AddScreen = ({ navigation, route }) => {
 
 
   const fetchResults = async (query) => {
+    console.log('fdfsfs', currentLocation?.latitude, currentLocation?.longitude)
     // updateState({ loading: true });
     try {
       const response = selectedListLabel.toLowerCase() === MISC.books
@@ -313,7 +333,7 @@ const AddScreen = ({ navigation, route }) => {
             : selectedListLabel.toLowerCase() === MISC.tvShows
               ? await actions.getSearchTVShowsList(query)
               : selectedListLabel.toLowerCase() === MISC.restaurants
-                ? await actions.getSearchRestaurantsList(query)
+                ? await actions.getSearchRestaurantsList(query, currentLocation?.latitude, currentLocation?.longitude, 1)
                 : selectedListLabel.toLowerCase() === MISC.podcasts
                   ? await actions.getSearchPodcastsList(query)
                   : selectedListLabel.toLowerCase() === MISC.bourbon
@@ -398,8 +418,16 @@ const AddScreen = ({ navigation, route }) => {
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleSelectTitle(item)}>
       {(selectedListLabel.toLowerCase() === MISC.restaurants)
-        ? <Text style={styles.label}>{item.name} ({item?.location?.formatted_address})</Text>
-        : <Text style={styles.label}>{item.title || item.name || item.series_title || item.episode_title}</Text>}
+        ? <Text style={styles.label}>{item.name} - ({item?.location?.formatted_address})</Text>
+        : <Text style={styles.label}>
+          {item.title || item.name || item.series_title || item.episode_title}
+          {item?.release_date ? ` (${moment(item?.release_date, 'YYYY-MM-DD').year()})`
+            : item?.author ? ` - (${item?.author})`
+              : item?.publisher ? ` - (${item?.publisher})`
+                : item?.type ? ` - (${item?.type})`
+                  : item?.brewery ? ` - (${item?.brewery})`
+                    : item?.variety ? ` - (${item?.variety})` : ''}
+        </Text>}
     </TouchableOpacity>
   );
 
@@ -455,6 +483,7 @@ const AddScreen = ({ navigation, route }) => {
         addItemModalVisible: false,
         needListTypeApiCall: true,
         newelyAddedList: payload,
+        ...resetPayloads
       });
       showCustomToast(LABELS.success, MISC.listAddedSuccessfully)
     } catch (error) {
@@ -588,7 +617,7 @@ const AddScreen = ({ navigation, route }) => {
                     <View style={[styles.listAbsolute,]}>
                       <ScrollView horizontal
                         contentContainerStyle={{
-                          maxHeight: 280, width: SCREEN_WIDTH,
+                          maxHeight: 280, width: SCREEN_WIDTH - 32,
                           flexGrow: 1
                         }}
                         showsHorizontalScrollIndicator={false}

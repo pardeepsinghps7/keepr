@@ -86,5 +86,7 @@
 		<string>com.example.keepr</string>
 	</dict>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs to get your location...</string>
 </dict>
 </plist>

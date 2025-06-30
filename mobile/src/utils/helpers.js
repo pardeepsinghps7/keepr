@@ -1,10 +1,12 @@
 // Helper functions
-import { Image, StyleSheet, Text, View, Platform } from "react-native";
+import { Image, StyleSheet, Text, View, Platform, Alert } from "react-native";
 import { showMessage } from "react-native-flash-message";
 import imagesPath from "../constants/images";
 import COLORS from "../constants/colors";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { STRINGS } from "../constants/strings";
+import GetLocation from "react-native-get-location";
+import { check, request, PERMISSIONS, RESULTS, openSettings } from 'react-native-permissions';
 
 const trimText = (text) => text.trim();
 const showError = (message) => {
@@ -106,6 +108,61 @@ const getStatusList = (label) => {
     return list;
 }
 
+const getCurrentLocation = async () => {
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) return;
+    return await GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 60000,
+    });
+
+    // .then(location => {
+    //     console.log(location);
+    //     return location;
+    // })
+    // .catch(error => {
+    //     const { code, message } = error;
+    //     // console.warn(code, message);
+    //     return error;
+    // })
+}
+export const requestLocationPermission = async () => {
+    const { LABELS } = STRINGS;
+    const permission =
+        Platform.OS === 'ios'
+            ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+            : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
+
+    const result = await check(permission);
+
+    if (result === RESULTS.GRANTED) {
+        return true;
+    }
+
+    if (result === RESULTS.DENIED) {
+        const req = await request(permission);
+        return req === RESULTS.GRANTED;
+    }
+
+    if (result === RESULTS.BLOCKED) {
+        // showCustomToast(LABELS.error,'Location permission is blocked. Open settings to enable it.')
+        // Alert.alert(
+        //     'Permission Blocked',
+        //     'Location permission is blocked. Open settings to enable it.',
+        //     [
+        //         { text: 'Cancel', style: 'cancel' },
+        //         {
+        //             text: 'Open Settings',
+        //             onPress: () => openSettings(),
+        //         },
+        //     ],
+        // );
+        return false;
+    }
+
+    return false;
+};
+
 const styles = StyleSheet.create({
     toastContainer: {
         flex: 1,
@@ -150,4 +207,5 @@ export {
     showSuccess,
     showCustomToast,
     getStatusList,
+    getCurrentLocation,
 }

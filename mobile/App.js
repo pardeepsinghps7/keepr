@@ -7,12 +7,13 @@ import store from './src/redux/store';
 import Routes from './src/Navigations/Route';
 import { getUserData } from './src/utils/utils';
 import { saveUserData } from './src/redux/actions/auth';
-import { logoutSupabase, refreshSupabaseToken } from './src';
+import { getCurrentLocation, logoutSupabase, refreshSupabaseToken } from './src';
 import actions from './src/redux/actions';
 
 const App = () => {
   useEffect(() => {
     init();
+    // getCurrentLocation();
   }, [])
 
   const init = async () => {

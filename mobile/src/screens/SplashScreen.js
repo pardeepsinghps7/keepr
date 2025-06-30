@@ -6,6 +6,7 @@ import COLORS from '../constants/colors';
 import { getData } from '../utils/utils';
 import { logout } from '../redux/actions/auth';
 import actions from '../redux/actions';
+import { getCurrentLocation } from '../utils/helpers';
 
 export default function SplashScreen({ navigation, route }) {
   const { MISC } = STRINGS;
