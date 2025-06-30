@@ -1,7 +1,7 @@
 import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "../../utils/utils";
 import store from "../store";
 import types from "../types";
-import { ADD_ITEM, ADD_LISTS, BEERS, BOOKS, BOURBONS, GET_AVATARS_LIST, GET_ICONS_LIST, GET_ITEM_DETAIL_BY_ID, GET_ITEM_DETAIL_LIST_BY_LIST_ID, GET_LATEST_ADDED_ITEM, GET_USER_LIST, GET_USER_LIST_WITH_ITEM_COUNT, ITEM_BY_ID, LIST_BY_ID, MOVIES, PODCASTS, PROFILE_BY_ID, PROFILE_DETAILS, RESTAURANTS, TV_SHOWS, WINES, } from "../../constants/urls";
+import { ADD_ITEM, ADD_LISTS, BEERS, BOOKS, BOURBONS, GET_AVATARS_LIST, GET_ICONS_LIST, GET_ITEM_DETAIL_BY_ID, GET_ITEM_DETAIL_LIST_BY_LIST_ID, GET_LATEST_ADDED_ITEM, GET_USER_LIST, GET_USER_LIST_WITH_ITEM_COUNT, ITEM_BY_ID, LIST_BY_ID, MOVIES, PODCASTS, PODCASTS_EPISODES, PROFILE_BY_ID, PROFILE_DETAILS, RESTAURANTS, TV_SHOWS, WINES, } from "../../constants/urls";
 
 const { dispatch } = store
 
@@ -101,6 +101,14 @@ export function getSearchRestaurantsList(searchText, latitude, longitude, page =
 export function getSearchPodcastsList(searchText, page = 1) {
     return apiGet(`${PODCASTS}?title=${searchText}&page=${page}`)
 }
+export function getSearchPodcastEpisodeList(searchText, seriesId = '', page = 1) {
+    console.log('iddddddddd', seriesId)
+    return apiGet(`${PODCASTS_EPISODES}?title=${searchText}&podcast_id=${seriesId}&page=${page}`)
+}
+//search for series episodes
+// export function getSearchSeriesEpisodesList(searchText, next_episode_pub_date = '') {
+//     return apiGet(`${PODCASTS_EPISODES}?podcast_id=${searchText}&next_episode_pub_date=${next_episode_pub_date}`)
+// }
 export function getSearchBourbonsList(searchText, page = 1) {
     return apiGet(`${BOURBONS}?title=${searchText}&page=${page}`)
 }

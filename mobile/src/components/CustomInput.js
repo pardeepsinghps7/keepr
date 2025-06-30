@@ -21,7 +21,7 @@ const CustomInput = ({
 }) => (
   <View style={[mainViewProps, styles.mainViewProps]}>
     <View style={styles.labelContainer}>
-      <Text style={styles.inputLabel}>{label}</Text>
+      {label && <Text style={styles.inputLabel}>{label}</Text>}
       {isOptional && <Text style={styles.optional}>(Optional)</Text>}
     </View>
     <View style={[styles.inputWrapper, style]}>

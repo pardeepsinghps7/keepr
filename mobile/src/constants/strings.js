@@ -49,6 +49,7 @@ export const STRINGS = {
     podcastsType: 'Podcasts Type',
     rating: 'Rating',
     releaseDate: 'Release Date',
+    searchItems:'Search your items',
   },
   ONBOARDING: {
     title1: 'Save what you love',

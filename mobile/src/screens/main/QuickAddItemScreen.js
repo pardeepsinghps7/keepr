@@ -73,7 +73,9 @@ const QuickAddItemScreen = ({ navigation }) => {
     brewery: '',
     podcastType: podcastList[0],
     searchList: [],
+    searchSeriesList: [],
     showDropdown: false,
+    showSeriesDropdown: false,
     seriesTitle: '',
     episodeTitle: '',
     imageModalVisible: false,
@@ -95,7 +97,7 @@ const QuickAddItemScreen = ({ navigation }) => {
     title, seriesTitle, episodeTitle, recommendedBy, notes, dataList,
     loading, selectedListId, selectedListLabel, location, brewery,
     author, statusList, status, value, year, imageUrl, podcastType,
-    searchList, showDropdown, imageModalVisible, imageLoading, clientId, movieReleaseDate,
+    searchList, searchSeriesList, showDropdown, showSeriesDropdown, imageModalVisible, imageLoading, clientId, movieReleaseDate,
     rating, variety, winery, province,
     tvShowsType, language, genres, publisher, currentLocation
   } = state;
@@ -116,7 +118,9 @@ const QuickAddItemScreen = ({ navigation }) => {
     year: '',
     podcastType: podcastList[0],
     searchList: [],
+    searchSeriesList: [],
     showDropdown: false,
+    showSeriesDropdown: false,
     saveForLater: false,
     imageLoading: false,
     clientId: '',
@@ -141,9 +145,9 @@ const QuickAddItemScreen = ({ navigation }) => {
     }, [])
   );
 
-  useEffect(()=>{
+  useEffect(() => {
     getLocation();
-  },[]);
+  }, []);
 
   const getLocation = async () => {
     try {
@@ -276,7 +280,7 @@ const QuickAddItemScreen = ({ navigation }) => {
               : selectedListLabel.toLowerCase() === MISC.restaurants
                 ? await actions.getSearchRestaurantsList(query, currentLocation?.latitude, currentLocation?.longitude, 1)
                 : selectedListLabel.toLowerCase() === MISC.podcasts
-                  ? await actions.getSearchPodcastsList(query)
+                  ? await actions.getSearchPodcastEpisodeList(query, clientId)
                   : selectedListLabel.toLowerCase() === MISC.bourbon
                     ? await actions.getSearchBourbonsList(query)
                     : await actions.getSearchWinesList(query);
@@ -301,10 +305,36 @@ const QuickAddItemScreen = ({ navigation }) => {
     }
   }
 
+  const fetchSeriesResults = async (query) => {
+    console.log('fdfsfs', currentLocation?.latitude, currentLocation?.longitude)
+    // updateState({ loading: true });
+    try {
+      const response = await actions.getSearchPodcastsList(query);
+      console.log('getSearchPodcastsList response', response);
+
+      if (response && response.data.length > 0) {
+        updateState({
+          searchSeriesList: response.data,
+          showSeriesDropdown: true,
+        });
+      } else {
+        updateState({
+          searchSeriesList: [],
+          showSeriesDropdown: false,
+        });
+      }
+    } catch (error) {
+      console.log('getSearchBooksList failed:', error.message);
+      showCustomToast(LABELS.error, error.message);
+    } finally {
+      // updateState({ loading: false });
+    }
+  }
+
   const onChangeText = (text) => {
     console.log('client id in change text', clientId);
     if (selectedListLabel.toLowerCase() === MISC.podcasts) {
-      updateState({ episodeTitle: text, clientId: '' });
+      updateState({ episodeTitle: text, showSeriesDropdown: false });
     } else {
       updateState({ title: text, clientId: '' });
     }
@@ -327,25 +357,58 @@ const QuickAddItemScreen = ({ navigation }) => {
     }
   };
 
+  const onSeriesChangeText = (text) => {
+    console.log('client id in change text', clientId);
+    updateState({ seriesTitle: text, clientId: '', showDropdown: false });
+    if (text.length > 2 && (selectedListLabel.toLowerCase() === MISC.podcasts)
+    ) {
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+      // Debounce API call by 500ms
+      debounceTimeout.current = setTimeout(() => {
+        fetchSeriesResults(text.trim());
+      }, 500);
+    }
+  };
+
+  const handleSeriesSelectTitle = (item) => {
+    console.log('selected item client id', item?.client_id);
+    updateState({
+      seriesTitle: item?.title || '',
+      clientId: item?.client_id || '',
+      showDropdown: false,
+      showSeriesDropdown: false,
+      searchList: [],
+      searchSeriesList: [],
+      publisher: item?.publisher || '',
+    });
+  }
+
   const handleSelectTitle = (item) => {
     if (selectedListLabel.toLowerCase() === MISC.podcasts) {
       updateState({
         episodeTitle: item?.title || '',
         clientId: item?.client_id || '',
         showDropdown: false,
+        showSeriesDropdown: false,
         searchList: [],
+        searchSeriesList: [],
         publisher: item?.publisher || '',
       });
     } else {
       updateState({
-        title: item?.title || item?.name || '',
+        title: selectedListLabel.toLowerCase() === MISC.wine
+          ? `${item?.winery || ''} ${item?.variety || ''}`
+          : item?.title || item?.name || '',
         author: item?.author || '',
         brewery: item?.brewery || '',
         movieReleaseDate: item?.release_date || '',
         location: item?.location?.formatted_address || '',
         clientId: item?.client_id || '',
         showDropdown: false,
+        showSeriesDropdown: false,
         searchList: [],
+        searchSeriesList: [],
         variety: item?.variety || '',
         winery: item?.winery || '',
         province: item?.province || '',
@@ -382,15 +445,22 @@ const QuickAddItemScreen = ({ navigation }) => {
     <TouchableOpacity style={styles.item} onPress={() => handleSelectTitle(item)}>
       {(selectedListLabel.toLowerCase() === MISC.restaurants)
         ? <Text style={styles.label}>{item.name} - ({item?.location?.formatted_address})</Text>
-        : <Text style={styles.label}>
-          {item.title || item.name || item.series_title || item.episode_title}
-          {item?.release_date ? ` (${moment(item?.release_date, 'YYYY-MM-DD').year()})`
-            : item?.author ? ` - (${item?.author})`
-              : item?.publisher ? ` - (${item?.publisher})`
-                : item?.type ? ` - (${item?.type})`
-                  : item?.brewery ? ` - (${item?.brewery})`
-                    : item?.variety ? ` - (${item?.variety})` : ''}
-        </Text>}
+        : selectedListLabel.toLowerCase() === MISC.wine
+          ? <Text style={styles.label}>{item?.winery} {item?.variety}</Text>
+          : <Text style={styles.label}>
+            {item.title || item.name || item.series_title || item.episode_title}
+            {item?.release_date ? ` (${moment(item?.release_date, 'YYYY-MM-DD').year()})`
+              : item?.author ? ` - (${item?.author})`
+                : item?.publisher ? ` (${item?.publisher})`
+                  // : item?.type ? ` - (${item?.type})`
+                  : item?.brewery ? ` - (${item?.brewery})` : ''}
+          </Text>}
+    </TouchableOpacity>
+  );
+
+  const renderSeriesItem = ({ item }) => (
+    <TouchableOpacity style={styles.item} onPress={() => handleSeriesSelectTitle(item)}>
+      <Text style={styles.label}>{item.title} ({item?.publisher})</Text>
     </TouchableOpacity>
   );
 
@@ -458,14 +528,40 @@ const QuickAddItemScreen = ({ navigation }) => {
                     </TouchableOpacity>
                   ))}
               </View>
-              <CustomInput
-                placeholder={LABELS.typeSomethingHere}
-                value={seriesTitle}
-                mainViewProps={{ marginVertical: 12 }}
-                onChangeText={(val) => updateState({ seriesTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                label={LABELS.seriesTitle}
-                isOptional={podcastType.label === MISC.episode}
-              />
+              <View>
+                <CustomInput
+                  placeholder={LABELS.typeSomethingHere}
+                  value={seriesTitle}
+                  mainViewProps={{ marginVertical: 12 }}
+                  // onChangeText={(val) => updateState({ seriesTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                  onChangeText={onSeriesChangeText}
+                  label={LABELS.seriesTitle}
+                  isOptional={podcastType.label === MISC.episode}
+                />
+                {showSeriesDropdown && dataList.length > 0 && (seriesTitle.length > 0)
+                  && (
+                    <View style={[styles.listAbsolute,]}>
+                      <ScrollView horizontal
+                        contentContainerStyle={{
+                          maxHeight: 280, width: SCREEN_WIDTH - 32,
+                          flexGrow: 1
+                        }}
+                        showsHorizontalScrollIndicator={false}
+                        scrollEnabled={false}>
+                        <FlatList
+                          data={searchSeriesList}
+                          keyExtractor={(item, index) => index.toString()}
+                          renderItem={renderSeriesItem}
+                          contentContainerStyle={{ padding: 8, gap: 8, flexGrow: 1 }}
+                          // keyboardShouldPersistTaps="handled"
+                          showsHorizontalScrollIndicator={false}
+                          nestedScrollEnabled={true}
+                          scrollEnabled={true}
+                        />
+                      </ScrollView>
+                    </View>
+                  )}
+              </View>
             </>}
 
             {/* Title Input */}
