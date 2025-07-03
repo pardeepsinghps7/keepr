@@ -510,14 +510,14 @@ const AddScreen = ({ navigation, route }) => {
       {(selectedListLabel.toLowerCase() === MISC.restaurants)
         ? <Text style={styles.label}>{item.name} - ({item?.location?.formatted_address})</Text>
         : selectedListLabel.toLowerCase() === MISC.wine
-          ? <Text style={styles.label}>{item?.winery} {item?.variety}</Text>
+          ? <Text style={styles.label}>{item?.winery} - {item?.variety}</Text>
           : <Text style={styles.label}>
             {item.title || item.name || item.series_title || item.episode_title}
             {item?.release_date ? ` (${moment(item?.release_date, 'YYYY-MM-DD').year()})`
-              : item?.author ? ` - (${item?.author})`
-                : item?.publisher ? ` (${item?.publisher})`
+              : item?.author ? ` (${item?.author})`
+                : item?.publisher ? ` - (${item?.publisher})`
                   // : item?.type ? ` - (${item?.type})`
-                  : item?.brewery ? ` - (${item?.brewery})` : ''}
+                  : item?.brewery ? ` (${item?.brewery})` : ''}
           </Text>}
     </TouchableOpacity>
   );
