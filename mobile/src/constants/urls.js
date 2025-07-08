@@ -24,6 +24,7 @@ export const ADD_ITEM = getApiUrl('/items');
 export const ITEM_BY_ID = getApiUrl('/items?id=eq');
 export const PROFILE_DETAILS = getApiUrl('/profiles');
 export const PROFILE_BY_ID = getApiUrl('/profiles?id=eq');
+export const SEARCH_ITEMS = getApiUrl('/items');
 
 //external apis
 export const BOOKS = getExternalApiUrl('/get-books');

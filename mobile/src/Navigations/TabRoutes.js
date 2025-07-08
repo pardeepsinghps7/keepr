@@ -78,18 +78,6 @@ const TabRoutes = () => {
         }}
       />
       <BottomTab.Screen
-        name={ROUTES.mainLists}
-        // component={ListStackNavigator}
-        children={() => <SharedStack initialRouteName={ROUTES.lists} component={ListsScreen} />}
-        options={{
-          tabBarLabel: ROUTES.lists,
-          tabBarIcon: ({ color, size }) => (
-            <Image source={imagesPath.lists} style={styles.iconWrapper(color, size)} />
-          ),
-          // tabBarBadge: 3,
-        }}
-      />
-      <BottomTab.Screen
         name={ROUTES.mainAdd}
         // component={AddStackNavigator}
         children={() => <SharedStack initialRouteName={ROUTES.add} component={AddScreen} />}
@@ -101,6 +89,18 @@ const TabRoutes = () => {
         }}
       />
       <BottomTab.Screen
+        name={ROUTES.mainLists}
+        // component={ListStackNavigator}
+        children={() => <SharedStack initialRouteName={ROUTES.lists} component={ListsScreen} />}
+        options={{
+          tabBarLabel: ROUTES.lists,
+          tabBarIcon: ({ color, size }) => (
+            <Image source={imagesPath.lists} style={styles.iconWrapper(color, size)} />
+          ),
+          // tabBarBadge: 3,
+        }}
+      />
+      {/* <BottomTab.Screen
         name={ROUTES.share}
         options={{
           tabBarLabel: ({ focused }) => (
@@ -134,7 +134,7 @@ const TabRoutes = () => {
         }}
       >
         {() => null}
-      </BottomTab.Screen>
+      </BottomTab.Screen> */}
     </BottomTab.Navigator>
   );
 }

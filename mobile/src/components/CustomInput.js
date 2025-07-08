@@ -1,8 +1,9 @@
 import React from 'react';
-import { TextInput, StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { TextInput, StyleSheet, View, TouchableOpacity, Text, Image } from 'react-native';
 
 import COLORS from '../constants/colors';
 import Icon from 'react-native-vector-icons/Ionicons';
+import imagesPath from '../constants/images';
 
 const CustomInput = ({
   label,
@@ -15,6 +16,7 @@ const CustomInput = ({
   icon,
   iconSize,
   iconPress,
+  isSearch = false,
   keyboardType,
   mainViewProps,
   ...props
@@ -25,6 +27,7 @@ const CustomInput = ({
       {isOptional && <Text style={styles.optional}>(Optional)</Text>}
     </View>
     <View style={[styles.inputWrapper, style]}>
+      {isSearch && <Image source={imagesPath.search} style={styles.search} />}
       <TextInput
         style={styles.input}
         value={value}
@@ -40,7 +43,7 @@ const CustomInput = ({
       />
       {icon && (
         <TouchableOpacity onPress={iconPress} style={styles.icon}>
-          <Icon name={icon} size={iconSize || 20} color={COLORS.primary} />
+          <Icon name={icon} size={iconSize || 20} color={COLORS.placeholderText} />
         </TouchableOpacity>
       )}
     </View>
@@ -82,6 +85,12 @@ const styles = StyleSheet.create({
   icon: {
     // marginLeft: 8,
     paddingHorizontal: 12,
+  },
+  search: {
+    width: 20,
+    height: 20,
+    tintColor: COLORS.placeholderText,
+    marginLeft: 12
   },
 });
 

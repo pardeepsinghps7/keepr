@@ -582,7 +582,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                     onChangeText={(val) => updateState({ publisher: val })}
                     label={LABELS.publisher}
                     mainViewProps={{ marginVertical: 12 }}
-                    editable={false}
+                    // editable={false}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -667,7 +667,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                   onChangeText={(val) => updateState({ tvShowsType: val })}
                   label={LABELS.type}
                   mainViewProps={{ marginVertical: 12 }}
-                  editable={false}
+                  // editable={false}
                   maxLength={100}
                   isOptional={true}
                 />
@@ -677,7 +677,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                   onChangeText={(val) => updateState({ language: val })}
                   label={LABELS.language}
                   mainViewProps={{ marginVertical: 12 }}
-                  editable={false}
+                  // editable={false}
                   maxLength={100}
                   isOptional={true}
                 />
@@ -687,7 +687,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                   onChangeText={(val) => updateState({ genres: val })}
                   label={LABELS.genres}
                   mainViewProps={{ marginVertical: 12 }}
-                  editable={false}
+                  // editable={false}
                   maxLength={100}
                   isOptional={true}
                 />
@@ -703,7 +703,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                   onChangeText={(val) => updateState({ variety: val })}
                   label={LABELS.variety}
                   mainViewProps={{ marginVertical: 12 }}
-                  editable={false}
+                  // editable={false}
                   maxLength={100}
                   isOptional={true}
                 />
@@ -713,7 +713,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                   onChangeText={(val) => updateState({ winery: val })}
                   label={LABELS.winery}
                   mainViewProps={{ marginVertical: 12 }}
-                  editable={false}
+                  // editable={false}
                   maxLength={100}
                   isOptional={true}
                 />
@@ -723,7 +723,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                   onChangeText={(val) => updateState({ province: val })}
                   label={LABELS.province}
                   mainViewProps={{ marginVertical: 12 }}
-                  editable={false}
+                  // editable={false}
                   maxLength={100}
                   isOptional={true}
                 />

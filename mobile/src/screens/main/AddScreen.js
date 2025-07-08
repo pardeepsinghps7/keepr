@@ -602,7 +602,10 @@ const AddScreen = ({ navigation, route }) => {
       >
 
         <Header title={MISC.addItem} />
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <TouchableWithoutFeedback onPress={() => {
+          Keyboard.dismiss();
+          // updateState({ showDropdown: false })
+        }}>
           <ScrollView
             ref={scrollRef}
             nestedScrollEnabled
@@ -719,7 +722,7 @@ const AddScreen = ({ navigation, route }) => {
                       onChangeText={(val) => updateState({ publisher: val })}
                       label={LABELS.publisher}
                       mainViewProps={{ marginVertical: 12 }}
-                      editable={false}
+                      // editable={false}
                       maxLength={100}
                       isOptional={true}
                     />
@@ -729,6 +732,7 @@ const AddScreen = ({ navigation, route }) => {
                     value={title}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={onChangeText}
+                    // onBlur={() => updateState({ showDropdown: false })}
                     maxLength={100}
                     label={(selectedListLabel.toLowerCase() === MISC.bourbon
                       || selectedListLabel.toLowerCase() === MISC.wine
@@ -803,7 +807,7 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ tvShowsType: val })}
                     label={LABELS.type}
                     mainViewProps={{ marginVertical: 12 }}
-                    editable={false}
+                    // editable={false}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -813,7 +817,7 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ language: val })}
                     label={LABELS.language}
                     mainViewProps={{ marginVertical: 12 }}
-                    editable={false}
+                    // editable={false}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -823,7 +827,7 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ genres: val })}
                     label={LABELS.genres}
                     mainViewProps={{ marginVertical: 12 }}
-                    editable={false}
+                    // editable={false}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -838,7 +842,7 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ variety: val })}
                     label={LABELS.variety}
                     mainViewProps={{ marginVertical: 12 }}
-                    editable={false}
+                    // editable={false}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -848,7 +852,7 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ winery: val })}
                     label={LABELS.winery}
                     mainViewProps={{ marginVertical: 12 }}
-                    editable={false}
+                    // editable={false}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -858,7 +862,7 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ province: val })}
                     label={LABELS.province}
                     mainViewProps={{ marginVertical: 12 }}
-                    editable={false}
+                    // editable={false}
                     maxLength={100}
                     isOptional={true}
                   />

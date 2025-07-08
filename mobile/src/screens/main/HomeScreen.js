@@ -68,7 +68,7 @@ const HomeScreen = ({ navigation }) => {
                 email: userDetails[0]?.email,
                 avatar_url: userDetails[0]?.avatar_url
             });
-            updateState({ dataList: response.slice(0, 4), latestItem: latestItemResopnse[0] });
+            updateState({ dataList: response.slice(0, 20), latestItem: latestItemResopnse[0] });
         } catch (error) {
             console.log('getUserListWithItemCount failed:', error.message);
             showCustomToast(LABELS.error, error.message);
@@ -97,59 +97,59 @@ const HomeScreen = ({ navigation }) => {
         <SafeAreaView style={styles.container} edges={['top']}>
             <Loader modalVisible={loading} />
             <Header title={ROUTES.listkeeprHome} onLeftIconTap={onLeftIconTap} />
-            {/* <ScrollView
+            <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 0, }}
                 keyboardShouldPersistTaps="handled"
-            > */}
-            <View style={styles.viewContainer}>
-                <Text style={styles.welcome}>Welcome {userData?.first_name ? `${userData?.first_name} ` : ''}<Text style={styles.wave}>👋</Text></Text>
-                <Text style={styles.subtext}>Your clever space to keep what you love.</Text>
-                <View style={styles.mainView} >
-                    <View style={styles.row}>
-                        <TouchableOpacity
-                            style={[styles.card, { alignItems: 'center', justifyContent: 'center' }]}
-                            onPress={() => navigation.navigate(ROUTES.quickAdd)}
-                        >
-                            <Icon name="add" size={20} color={COLORS.accent} style={styles.plus} />
-                            <Text style={styles.addLabel}>Quick Add</Text>
-                        </TouchableOpacity>
+            >
+                <View style={styles.viewContainer}>
+                    <Text style={styles.welcome}>Welcome {userData?.first_name ? `${userData?.first_name} ` : ''}<Text style={styles.wave}>👋</Text></Text>
+                    <Text style={styles.subtext}>Your clever space to keep what you love.</Text>
+                    <View style={styles.mainView} >
+                        <View style={styles.row}>
+                            <TouchableOpacity
+                                style={[styles.card, { alignItems: 'center', justifyContent: 'center' }]}
+                                onPress={() => navigation.navigate(ROUTES.quickAdd)}
+                            >
+                                <Icon name="add" size={20} color={COLORS.accent} style={styles.plus} />
+                                <Text style={styles.addLabel}>Quick Add</Text>
+                            </TouchableOpacity>
 
 
-                        <TouchableOpacity style={[styles.card, { justifyContent: 'flex-start' }]} onPress={() =>
-                            (latestItem?.title || latestItem?.series_title || latestItem?.episode_title)
-                                ? navigation.navigate(ROUTES.itemDetailsScreen, { item: latestItem })
-                                : null}>
-                            <Text style={styles.latestTitle}>Latest Added</Text>
-                            {(latestItem?.title || latestItem?.episode_title || latestItem?.series_title) &&
-                                <><View style={styles.latestRow}>
-                                    <Image source={{ uri: latestItem?.lists?.icon }} style={styles.latestMovieImageStyle} />
-                                    <Text style={styles.latestText} numberOfLines={1}>{latestItem?.title || latestItem?.episode_title || latestItem?.series_title}</Text>
-                                </View>
-                                    <View style={[styles.latestRow, { marginTop: 4 }]}>
-                                        <Image source={imagesPath.watch} style={styles.watchImageStyle} />
-                                        <Text style={styles.latestSub} numberOfLines={1}>{latestItem?.status?.replace(/_/g, ' ')}</Text>
+                            <TouchableOpacity style={[styles.card, { justifyContent: 'flex-start' }]} onPress={() =>
+                                (latestItem?.title || latestItem?.series_title || latestItem?.episode_title)
+                                    ? navigation.navigate(ROUTES.itemDetailsScreen, { item: latestItem })
+                                    : null}>
+                                <Text style={styles.latestTitle}>Latest Added</Text>
+                                {(latestItem?.title || latestItem?.episode_title || latestItem?.series_title) &&
+                                    <><View style={styles.latestRow}>
+                                        <Image source={{ uri: latestItem?.lists?.icon }} style={styles.latestMovieImageStyle} />
+                                        <Text style={styles.latestText} numberOfLines={1}>{latestItem?.title || latestItem?.episode_title || latestItem?.series_title}</Text>
                                     </View>
-                                    <Text style={styles.latestSub} numberOfLines={1}>{moment(latestItem?.updated_at || latestItem?.created_at).fromNow()}</Text>
-                                </>}
-                        </TouchableOpacity>
-                    </View>
+                                        <View style={[styles.latestRow, { marginTop: 4 }]}>
+                                            <Image source={imagesPath.watch} style={styles.watchImageStyle} />
+                                            <Text style={styles.latestSub} numberOfLines={1}>{latestItem?.status?.replace(/_/g, ' ')}</Text>
+                                        </View>
+                                        <Text style={styles.latestSub} numberOfLines={1}>{moment(latestItem?.updated_at || latestItem?.created_at).fromNow()}</Text>
+                                    </>}
+                            </TouchableOpacity>
+                        </View>
 
-                    {/* FlatList Grid */}
-                    <FlatList
-                        data={dataList}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.id}
-                        numColumns={2}
-                        columnWrapperStyle={styles.grid}
-                        contentContainerStyle={{ padding: 2 }}
-                        showsVerticalScrollIndicator={false}
-                        nestedScrollEnabled={true}
-                        scrollEnabled={false}
-                    />
+                        {/* FlatList Grid */}
+                        <FlatList
+                            data={dataList}
+                            renderItem={renderItem}
+                            keyExtractor={(item) => item.id}
+                            numColumns={2}
+                            columnWrapperStyle={styles.grid}
+                            contentContainerStyle={{ padding: 2 }}
+                            showsVerticalScrollIndicator={false}
+                            nestedScrollEnabled={true}
+                            scrollEnabled={false}
+                        />
+                    </View>
                 </View>
-            </View>
-            {/* </ScrollView> */}
+            </ScrollView>
         </SafeAreaView>
     );
 };
