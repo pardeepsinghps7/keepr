@@ -36,6 +36,7 @@ import { uploadAvatarToSupabase } from '../../lib/supabase';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
 // import { FontAwesome } from '@expo/vector-icons';
+import DatePicker from 'react-native-date-picker';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
 const EditItemScreen = ({ navigation, route }) => {
@@ -105,6 +106,8 @@ const EditItemScreen = ({ navigation, route }) => {
     genres: itemDetails?.raw_json?.genres || '',
     publisher: itemDetails?.raw_json?.publisher || '',
     currentLocation: {},
+    releaseDate: moment().toDate(),
+    showDatePopup: false,
   });
 
   const {
@@ -114,7 +117,7 @@ const EditItemScreen = ({ navigation, route }) => {
     author, statusList, status, value, year, imageUrl, podcastType,
     searchList, searchSeriesList, showDropdown, showSeriesDropdown, saveForLater, rating, imageModalVisible, imageLoading,
     clientId, movieReleaseDate, variety, winery, province,
-    tvShowsType, language, genres, publisher, currentLocation,
+    tvShowsType, language, genres, publisher, currentLocation, releaseDate, showDatePopup,
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -504,16 +507,31 @@ const EditItemScreen = ({ navigation, route }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardShouldPersistTaps="handled"
       >
-        <Header title={MISC.editItem} isBack />
+        {showDatePopup && <DatePicker
+          modal
+          mode="date"
+          open={showDatePopup}
+          date={releaseDate}
+          maximumDate={moment().toDate()}
+          onConfirm={(date) => {
+            updateState({ showDatePopup: false, releaseDate: date, movieReleaseDate: moment(date).format('YYYY-MM-DD') });
+          }}
+          onCancel={() => {
+            updateState({ showDatePopup: false });
+          }}
+        />}
 
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ScrollView
-            ref={scrollRef}
-            nestedScrollEnabled
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 0, flexGrow: 1 }}
-            keyboardShouldPersistTaps="handled"
-          >
+        <Header title={MISC.editItem} isBack />
+        <ScrollView
+          ref={scrollRef}
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          <TouchableWithoutFeedback onPress={() => {
+            Keyboard.dismiss();
+            updateState({ showDropdown: false })
+          }}>
             <View style={styles.mainView}>
               {selectedListLabel.toLowerCase() === MISC.podcasts && <>
                 <Text style={styles.label}>Podcasts Type</Text>
@@ -535,8 +553,8 @@ const EditItemScreen = ({ navigation, route }) => {
                     placeholder={LABELS.typeSomethingHere}
                     value={seriesTitle}
                     mainViewProps={{ marginVertical: 12 }}
-                    // onChangeText={(val) => updateState({ seriesTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                    onChangeText={onSeriesChangeText}
+                    onChangeText={(val) => updateState({ seriesTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                    // onChangeText={onSeriesChangeText}
                     label={LABELS.seriesTitle}
                     isOptional={podcastType.label === MISC.episode}
                   />
@@ -572,7 +590,8 @@ const EditItemScreen = ({ navigation, route }) => {
                     placeholder={LABELS.typeSomethingHere}
                     value={episodeTitle}
                     mainViewProps={{ marginVertical: 12 }}
-                    onChangeText={onChangeText}
+                    onChangeText={(val) => updateState({ episodeTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                    // onChangeText={onChangeText}
                     maxLength={100}
                     label={LABELS.episodeTitle}
                     isOptional={podcastType.label === MISC.series}
@@ -625,10 +644,11 @@ const EditItemScreen = ({ navigation, route }) => {
 
               {selectedListLabel.toLowerCase() === MISC.movies &&
                 <CustomInput
-                  placeholder={LABELS.typeSomethingHere}
                   value={movieReleaseDate}
                   mainViewProps={{ marginVertical: 12 }}
-                  onChangeText={(val) => updateState({ movieReleaseDate: val.replace(/[^A-Za-z0-9 -]/g, '') })}
+                  placeholder="YYYY-MM-DD"
+                  editable={false}
+                  onPressIn={() => updateState({ showDatePopup: true })}
                   label={LABELS.releaseDate}
                   isOptional={true}
                 />}
@@ -894,8 +914,8 @@ const EditItemScreen = ({ navigation, route }) => {
                 onPress={handleSavePress}
               />
             </View>
-          </ScrollView>
-        </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback>
+        </ScrollView>
       </KeyboardAvoidingView>
 
       {/* Add New List Popup Modal */}
@@ -921,7 +941,7 @@ export default EditItemScreen;
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContainer: {},
-  mainView: { padding: 16 },
+  mainView: { padding: 16, flex: 1 },
   headerIndicator: {
     alignSelf: 'center',
     width: 40,

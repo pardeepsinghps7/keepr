@@ -41,9 +41,9 @@ const Header = ({
 
     useFocusEffect(
         useCallback(() => {
-          clearData();
+            clearData();
         }, [])
-      );
+    );
 
     const fetchResults = async (query) => {
         console.log('query', query)
@@ -101,7 +101,11 @@ const Header = ({
 
     const onChangeText = (text) => {
         updateState({ searchText: text });
-        if (text.length > 2) {
+
+        if (text.length == 0) {
+            updateState({ showDropdown: false, searchList: [] });
+        }
+        else if (text.length > 2) {
             if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
             // Debounce API call by 500ms
@@ -166,7 +170,7 @@ const Header = ({
                     <View style={[styles.listAbsolute,]}>
                         <ScrollView horizontal
                             contentContainerStyle={{
-                                maxHeight: 280, width: SCREEN_WIDTH - 32,
+                                maxHeight: 280, width: SCREEN_WIDTH - 54,
                                 flexGrow: 1
                             }}
                             showsHorizontalScrollIndicator={false}
@@ -248,9 +252,9 @@ const styles = StyleSheet.create({
     },
     listAbsolute: {
         position: "absolute",
-        top: 90,
+        top: 100,
         left: 16,
-        right: 16,
+        right: 54,
         backgroundColor: "white",
         borderWidth: 1,
         borderColor: "#ccc",

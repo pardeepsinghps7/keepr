@@ -37,6 +37,7 @@ import { uploadAvatarToSupabase } from '../../lib/supabase';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
 // import { FontAwesome } from '@expo/vector-icons';
+import DatePicker from 'react-native-date-picker';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
 const AddScreen = ({ navigation, route }) => {
@@ -106,6 +107,8 @@ const AddScreen = ({ navigation, route }) => {
     genres: '',
     publisher: '',
     currentLocation: {},
+    releaseDate: moment().toDate(),
+    showDatePopup: false,
   });
 
   const {
@@ -115,7 +118,7 @@ const AddScreen = ({ navigation, route }) => {
     author, statusList, status, value, year, imageUrl, podcastType,
     searchList, searchSeriesList, showDropdown, showSeriesDropdown, saveForLater, imageModalVisible, imageLoading,
     clientId, newelyAddedList, movieReleaseDate, variety, winery, province,
-    tvShowsType, language, genres, publisher, currentLocation
+    tvShowsType, language, genres, publisher, currentLocation, releaseDate, showDatePopup,
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -149,6 +152,8 @@ const AddScreen = ({ navigation, route }) => {
     language: '',
     genres: '',
     publisher: '',
+    showDropdown: false,
+    releaseDate: moment().toDate(),
   }
 
   useFocusEffect(
@@ -600,21 +605,33 @@ const AddScreen = ({ navigation, route }) => {
         keyboardVerticalOffset={0}
         keyboardShouldPersistTaps="handled"
       >
-
+        {showDatePopup && <DatePicker
+          modal
+          mode="date"
+          open={showDatePopup}
+          date={releaseDate}
+          maximumDate={moment().toDate()}
+          onConfirm={(date) => {
+            updateState({ showDatePopup: false, releaseDate: date, movieReleaseDate: moment(date).format('YYYY-MM-DD') });
+          }}
+          onCancel={() => {
+            updateState({ showDatePopup: false });
+          }}
+        />}
         <Header title={MISC.addItem} />
-        <TouchableWithoutFeedback onPress={() => {
-          Keyboard.dismiss();
-          // updateState({ showDropdown: false })
-        }}>
-          <ScrollView
-            ref={scrollRef}
-            nestedScrollEnabled
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              flexGrow: 1,
-            }}
-          // keyboardShouldPersistTaps="handled"
-          >
+        <ScrollView
+          ref={scrollRef}
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            flexGrow: 1,
+          }}
+        // keyboardShouldPersistTaps="handled"
+        >
+          <TouchableWithoutFeedback onPress={() => {
+            Keyboard.dismiss();
+            updateState({ showDropdown: false })
+          }}>
             <View style={styles.mainView}>
 
               <Text style={styles.label}>Select List Type</Text>
@@ -673,8 +690,8 @@ const AddScreen = ({ navigation, route }) => {
                       placeholder={LABELS.typeSomethingHere}
                       value={seriesTitle}
                       mainViewProps={{ marginVertical: 12 }}
-                      // onChangeText={(val) => updateState({ seriesTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                      onChangeText={onSeriesChangeText}
+                      onChangeText={(val) => updateState({ seriesTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                      // onChangeText={onSeriesChangeText}
                       label={LABELS.seriesTitle}
                       isOptional={podcastType.label === MISC.episode}
                     />
@@ -711,7 +728,8 @@ const AddScreen = ({ navigation, route }) => {
                     placeholder={LABELS.typeSomethingHere}
                     value={episodeTitle}
                     mainViewProps={{ marginVertical: 12 }}
-                    onChangeText={onChangeText}
+                    onChangeText={(val) => updateState({ episodeTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                    // onChangeText={onChangeText}
                     maxLength={100}
                     label={LABELS.episodeTitle}
                     isOptional={podcastType.label === MISC.series}
@@ -732,6 +750,10 @@ const AddScreen = ({ navigation, route }) => {
                     value={title}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={onChangeText}
+                    // onSubmitEditing={() => {
+                    //   Keyboard.dismiss();
+                    //   updateState({ showDropdown: false })
+                    // }}
                     // onBlur={() => updateState({ showDropdown: false })}
                     maxLength={100}
                     label={(selectedListLabel.toLowerCase() === MISC.bourbon
@@ -766,10 +788,11 @@ const AddScreen = ({ navigation, route }) => {
 
               {selectedListLabel.toLowerCase() === MISC.movies &&
                 <CustomInput
-                  placeholder={LABELS.typeSomethingHere}
                   value={movieReleaseDate}
                   mainViewProps={{ marginVertical: 12 }}
-                  onChangeText={(val) => updateState({ movieReleaseDate: val.replace(/[^A-Za-z0-9 -]/g, '') })}
+                  placeholder="YYYY-MM-DD"
+                  editable={false}
+                  onPressIn={() => updateState({ showDatePopup: true })}
                   label={LABELS.releaseDate}
                   isOptional={true}
                 />}
@@ -1034,8 +1057,8 @@ const AddScreen = ({ navigation, route }) => {
                 onPress={handleSavePress}
               />
             </View>
-          </ScrollView>
-        </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback>
+        </ScrollView>
       </KeyboardAvoidingView>
 
       {/* Add New List Popup Modal */}
