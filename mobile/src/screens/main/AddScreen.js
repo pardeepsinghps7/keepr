@@ -14,6 +14,8 @@ import {
   Image,
   ActivityIndicator,
   TouchableWithoutFeedback,
+  findNodeHandle,
+  UIManager,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -156,6 +158,18 @@ const AddScreen = ({ navigation, route }) => {
     releaseDate: moment().toDate(),
   }
 
+  const [inputLayout, setInputLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
+
+  const inputRef = useRef(null);
+
+  const measureInput = () => {
+    const handle = findNodeHandle(inputRef.current);
+    if (handle) {
+      UIManager.measure(handle, (x, y, width, height, pageX, pageY) => {
+        setInputLayout({ x: pageX, y: pageY, width, height });
+      });
+    }
+  };
   useFocusEffect(
     useCallback(() => {
       // Scroll to top every time screen comes back into focus
@@ -626,7 +640,10 @@ const AddScreen = ({ navigation, route }) => {
           contentContainerStyle={{
             flexGrow: 1,
           }}
-          onScrollBeginDrag={() => Keyboard.dismiss()} // 👈 Dismiss keyboard on scroll start
+          onScrollBeginDrag={() => {
+            Keyboard.dismiss();
+            updateState({ showDropdown: false })
+          }} // 👈 Dismiss keyboard on scroll start
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
         >
@@ -645,6 +662,10 @@ const AddScreen = ({ navigation, route }) => {
                   value={value}
                   items={dataList}
                   setOpen={setOpen}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    updateState({ showDropdown: false, searchList: [] });
+                  }}
                   onSelectItem={(item) => {
                     const list = getStatusList(item.label);
                     updateState({
@@ -727,6 +748,8 @@ const AddScreen = ({ navigation, route }) => {
               <View style={styles.searchBox}>
                 {selectedListLabel.toLowerCase() === MISC.podcasts
                   ? <><CustomInput
+                    ref={inputRef}
+                    onFocus={measureInput}
                     placeholder={LABELS.typeSomethingHere}
                     value={episodeTitle}
                     mainViewProps={{ marginVertical: 12 }}
@@ -748,6 +771,8 @@ const AddScreen = ({ navigation, route }) => {
                     />
                   </>
                   : <CustomInput
+                    ref={inputRef}
+                    onFocus={measureInput}
                     placeholder={LABELS.typeSomethingHere}
                     value={title}
                     mainViewProps={{ marginVertical: 12 }}
@@ -763,9 +788,13 @@ const AddScreen = ({ navigation, route }) => {
                       || selectedListLabel.toLowerCase() === MISC.restaurants
                       || selectedListLabel.toLowerCase() === MISC.beer) ? LABELS.name : LABELS.title}
                   />}
-                {showDropdown && dataList.length > 0 && (title.length > 0 || episodeTitle.length > 0)
+                {/* {showDropdown && dataList.length > 0 && (title.length > 0 || episodeTitle.length > 0)
                   && (
-                    <View style={[styles.listAbsolute,]}>
+                    <View style={[styles.listAbsolute,{
+                      top: inputLayout.y + inputLayout.height,
+                      left: inputLayout.x,
+                      width: inputLayout.width || SCREEN_WIDTH - 32,
+                    },]}>
                       <ScrollView horizontal
                         contentContainerStyle={{
                           maxHeight: 280, width: SCREEN_WIDTH - 32,
@@ -778,7 +807,7 @@ const AddScreen = ({ navigation, route }) => {
                           keyExtractor={(item, index) => index.toString()}
                           renderItem={renderItem}
                           contentContainerStyle={{ padding: 8, gap: 8, flexGrow: 1 }}
-                          // keyboardShouldPersistTaps="handled"
+                          keyboardShouldPersistTaps="handled"
                           showsHorizontalScrollIndicator={false}
                           nestedScrollEnabled={true}
                           scrollEnabled={true}
@@ -786,7 +815,7 @@ const AddScreen = ({ navigation, route }) => {
                         />
                       </ScrollView>
                     </View>
-                  )}
+                  )} */}
               </View>
 
               {selectedListLabel.toLowerCase() === MISC.movies &&
@@ -1066,6 +1095,32 @@ const AddScreen = ({ navigation, route }) => {
             </View>
           </TouchableWithoutFeedback>
         </ScrollView>
+        {showDropdown && dataList.length > 0 && (title.length > 0 || episodeTitle.length > 0)
+          && (
+
+            <View
+              style={[
+                styles.listAbsolute,
+                {
+                  top: inputLayout.y, // inputLayout.y + inputLayout.height
+                  left: inputLayout.x,
+                  width: inputLayout.width || SCREEN_WIDTH - 32,
+                },
+              ]}
+            >
+              <FlatList
+                data={searchList}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderItem}
+                contentContainerStyle={{ padding: 8, gap: 8, flexGrow: 1 }}
+                keyboardShouldPersistTaps="handled"
+                showsHorizontalScrollIndicator={false}
+                nestedScrollEnabled={true}
+                scrollEnabled={true}
+              // keyboardDismissMode="on-drag"
+              />
+            </View>
+          )}
       </KeyboardAvoidingView>
 
       {/* Add New List Popup Modal */}
@@ -1172,7 +1227,7 @@ const styles = StyleSheet.create({
   },
   listAbsolute: {
     position: "absolute",
-    top: 90,
+    top: 0,
     left: 0,
     right: 0,
     backgroundColor: "white",
@@ -1180,7 +1235,11 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     maxHeight: 350,
-    zIndex: 10,
+    zIndex: 1000,
+    elevation: 4, // for Android shadow
+    shadowColor: '#000', // for iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
   },
   item: {
     padding: 4,

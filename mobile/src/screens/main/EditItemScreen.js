@@ -14,6 +14,8 @@ import {
   Image,
   ActivityIndicator,
   TouchableWithoutFeedback,
+  findNodeHandle,
+  UIManager,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -121,6 +123,20 @@ const EditItemScreen = ({ navigation, route }) => {
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
+
+
+  const [inputLayout, setInputLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
+
+  const inputRef = useRef(null);
+
+  const measureInput = () => {
+    const handle = findNodeHandle(inputRef.current);
+    if (handle) {
+      UIManager.measure(handle, (x, y, width, height, pageX, pageY) => {
+        setInputLayout({ x: pageX, y: pageY, width, height });
+      });
+    }
+  };
 
   useEffect(() => {
     if (isFocused) {
@@ -505,7 +521,7 @@ const EditItemScreen = ({ navigation, route }) => {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        // keyboardShouldPersistTaps="handled"
+      // keyboardShouldPersistTaps="handled"
       >
         {showDatePopup && <DatePicker
           modal
@@ -527,7 +543,10 @@ const EditItemScreen = ({ navigation, route }) => {
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flexGrow: 1 }}
-          onScrollBeginDrag={() => Keyboard.dismiss()} // 👈 Dismiss keyboard on scroll start
+          onScrollBeginDrag={() => {
+            Keyboard.dismiss();
+            updateState({ showDropdown: false })
+          }} // 👈 Dismiss keyboard on scroll start
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
         >
@@ -590,6 +609,8 @@ const EditItemScreen = ({ navigation, route }) => {
               <View style={styles.searchBox}>
                 {selectedListLabel.toLowerCase() === MISC.podcasts
                   ? <><CustomInput
+                    ref={inputRef}
+                    onFocus={measureInput}
                     placeholder={LABELS.typeSomethingHere}
                     value={episodeTitle}
                     mainViewProps={{ marginVertical: 12 }}
@@ -611,6 +632,8 @@ const EditItemScreen = ({ navigation, route }) => {
                     />
                   </>
                   : <CustomInput
+                    ref={inputRef}
+                    onFocus={measureInput}
                     placeholder={LABELS.typeSomethingHere}
                     value={title}
                     mainViewProps={{ marginVertical: 12 }}
@@ -621,7 +644,7 @@ const EditItemScreen = ({ navigation, route }) => {
                       || selectedListLabel.toLowerCase() === MISC.restaurants
                       || selectedListLabel.toLowerCase() === MISC.beer) ? LABELS.name : LABELS.title}
                   />}
-                {showDropdown && searchList.length > 0 && (title.length > 0 || episodeTitle.length > 0)
+                {/* {showDropdown && searchList.length > 0 && (title.length > 0 || episodeTitle.length > 0)
                   && (
                     <View style={[styles.listAbsolute,]}>
                       <ScrollView horizontal
@@ -642,7 +665,7 @@ const EditItemScreen = ({ navigation, route }) => {
                         />
                       </ScrollView>
                     </View>
-                  )}
+                  )} */}
               </View>
 
               {selectedListLabel.toLowerCase() === MISC.movies &&
@@ -757,7 +780,7 @@ const EditItemScreen = ({ navigation, route }) => {
                   <CustomInput
                     placeholder={LABELS.typeSomethingHere}
                     value={year}
-                    onFocus={()=> updateState({ showDropdown: false })}
+                    onFocus={() => updateState({ showDropdown: false })}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => {
                       // Allow only digits
@@ -847,7 +870,7 @@ const EditItemScreen = ({ navigation, route }) => {
                 placeholder={LABELS.recommendedByPlaceholder}
                 value={recommendedBy}
                 onChangeText={(val) => updateState({ recommendedBy: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                onFocus={()=> updateState({ showDropdown: false })}
+                onFocus={() => updateState({ showDropdown: false })}
                 label={LABELS.recommendedBy}
                 mainViewProps={{ marginVertical: 12 }}
                 isOptional={true}
@@ -882,7 +905,7 @@ const EditItemScreen = ({ navigation, route }) => {
                     value={imageUrl}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => updateState({ imageUrl: val })}
-                    onFocus={()=> updateState({ showDropdown: false })}
+                    onFocus={() => updateState({ showDropdown: false })}
                     label={LABELS.imageUrl}
                     isOptional={true}
                     maxLength={150}
@@ -923,6 +946,32 @@ const EditItemScreen = ({ navigation, route }) => {
             </View>
           </TouchableWithoutFeedback>
         </ScrollView>
+        {showDropdown && searchList.length > 0 && (title.length > 0 || episodeTitle.length > 0)
+          && (
+
+            <View
+              style={[
+                styles.listAbsolute,
+                {
+                  top: inputLayout.y, // inputLayout.y + inputLayout.height
+                  left: inputLayout.x,
+                  width: inputLayout.width || SCREEN_WIDTH - 32,
+                },
+              ]}
+            >
+              <FlatList
+                data={searchList}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderItem}
+                contentContainerStyle={{ padding: 8, gap: 8, flexGrow: 1 }}
+                keyboardShouldPersistTaps="handled"
+                showsHorizontalScrollIndicator={false}
+                nestedScrollEnabled={true}
+                scrollEnabled={true}
+              // keyboardDismissMode="on-drag"
+              />
+            </View>
+          )}
       </KeyboardAvoidingView>
 
       {/* Add New List Popup Modal */}
@@ -1030,7 +1079,7 @@ const styles = StyleSheet.create({
   },
   listAbsolute: {
     position: "absolute",
-    top: 90,
+    top: 0,
     left: 0,
     right: 0,
     backgroundColor: "white",
@@ -1038,7 +1087,11 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     maxHeight: 350,
-    zIndex: 10,
+    zIndex: 1000,
+    elevation: 4, // for Android shadow
+    shadowColor: '#000', // for iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
   },
   item: {
     padding: 4,

@@ -14,6 +14,8 @@ import {
   ActivityIndicator,
   Image,
   TouchableWithoutFeedback,
+  findNodeHandle,
+  UIManager,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -138,6 +140,19 @@ const QuickAddItemScreen = ({ navigation }) => {
     showDropdown: false,
     releaseDate: moment().toDate(),
   }
+
+  const [inputLayout, setInputLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
+
+  const inputRef = useRef(null);
+
+  const measureInput = () => {
+    const handle = findNodeHandle(inputRef.current);
+    if (handle) {
+      UIManager.measure(handle, (x, y, width, height, pageX, pageY) => {
+        setInputLayout({ x: pageX, y: pageY, width, height });
+      });
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -496,7 +511,10 @@ const QuickAddItemScreen = ({ navigation }) => {
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, flexGrow: 1 }}
-          onScrollBeginDrag={() => Keyboard.dismiss()} // 👈 Dismiss keyboard on scroll start
+          onScrollBeginDrag={() => {
+            Keyboard.dismiss();
+            updateState({ showDropdown: false })
+          }} // 👈 Dismiss keyboard on scroll start
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
         >
@@ -516,6 +534,10 @@ const QuickAddItemScreen = ({ navigation }) => {
                   open={open}
                   value={value}
                   items={dataList}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    updateState({ showDropdown: false, searchList: [] });
+                  }}
                   setOpen={setOpen}
                   onSelectItem={(item) => {
                     const list = getStatusList(item.label);
@@ -593,6 +615,8 @@ const QuickAddItemScreen = ({ navigation }) => {
               <View style={styles.searchBox}>
                 {selectedListLabel.toLowerCase() === MISC.podcasts
                   ? <><CustomInput
+                    ref={inputRef}
+                    onFocus={measureInput}
                     placeholder={LABELS.typeSomethingHere}
                     value={episodeTitle}
                     mainViewProps={{ marginVertical: 12 }}
@@ -614,6 +638,8 @@ const QuickAddItemScreen = ({ navigation }) => {
                     />
                   </>
                   : <CustomInput
+                    ref={inputRef}
+                    onFocus={measureInput}
                     placeholder={LABELS.typeSomethingHere}
                     value={title}
                     mainViewProps={{ marginVertical: 12 }}
@@ -624,7 +650,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                       || selectedListLabel.toLowerCase() === MISC.restaurants
                       || selectedListLabel.toLowerCase() === MISC.beer) ? LABELS.name : LABELS.title}
                   />}
-                {showDropdown && dataList.length > 0 && (title.length > 0 || episodeTitle.length > 0)
+                {/* {showDropdown && dataList.length > 0 && (title.length > 0 || episodeTitle.length > 0)
                   && (
                     <View style={[styles.listAbsolute,]}>
                       <ScrollView horizontal
@@ -646,12 +672,12 @@ const QuickAddItemScreen = ({ navigation }) => {
                         />
                       </ScrollView>
                     </View>
-                  )}
+                  )} */}
               </View>
 
               {/* {searchList.length == 0 && (title.length > 2 || episodeTitle.length > 2)
                   && <Text style={{color:COLORS.red}}>(No Data found)</Text>} */}
-                  
+
               {selectedListLabel.toLowerCase() === MISC.movies &&
                 <CustomInput
                   value={movieReleaseDate}
@@ -766,7 +792,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                   <CustomInput
                     placeholder={LABELS.typeSomethingHere}
                     value={year}
-                    onFocus={()=> updateState({ showDropdown: false })}
+                    onFocus={() => updateState({ showDropdown: false })}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => {
                       // Allow only digits
@@ -859,7 +885,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                 label={LABELS.recommendedBy}
                 mainViewProps={{ marginVertical: 12 }}
                 isOptional={true}
-                onFocus={()=> updateState({ showDropdown: false })}
+                onFocus={() => updateState({ showDropdown: false })}
               />
 
               {/* Recommend Input */}
@@ -891,7 +917,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                     value={imageUrl}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => updateState({ imageUrl: val })}
-                    onFocus={()=> updateState({ showDropdown: false })}
+                    onFocus={() => updateState({ showDropdown: false })}
                     label={LABELS.imageUrl}
                     isOptional={true}
                     maxLength={150}
@@ -935,6 +961,32 @@ const QuickAddItemScreen = ({ navigation }) => {
             </View>
           </TouchableWithoutFeedback>
         </ScrollView>
+        {showDropdown && dataList.length > 0 && (title.length > 0 || episodeTitle.length > 0)
+          && (
+
+            <View
+              style={[
+                styles.listAbsolute,
+                {
+                  top: inputLayout.y, // inputLayout.y + inputLayout.height
+                  left: inputLayout.x,
+                  width: inputLayout.width || SCREEN_WIDTH - 32,
+                },
+              ]}
+            >
+              <FlatList
+                data={searchList}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderItem}
+                contentContainerStyle={{ padding: 8, gap: 8, flexGrow: 1 }}
+                keyboardShouldPersistTaps="handled"
+                showsHorizontalScrollIndicator={false}
+                nestedScrollEnabled={true}
+                scrollEnabled={true}
+              // keyboardDismissMode="on-drag"
+              />
+            </View>
+          )}
       </KeyboardAvoidingView>
 
       {/* Image Picker Modal */}
@@ -1032,7 +1084,7 @@ const styles = StyleSheet.create({
   },
   listAbsolute: {
     position: "absolute",
-    top: 90,
+    top: 0,
     left: 0,
     right: 0,
     backgroundColor: "white",
@@ -1040,7 +1092,11 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     maxHeight: 350,
-    zIndex: 10,
+    zIndex: 1000,
+    elevation: 4, // for Android shadow
+    shadowColor: '#000', // for iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
   },
   item: {
     padding: 4,
