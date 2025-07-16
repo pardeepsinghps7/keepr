@@ -75,18 +75,6 @@ const Header = ({
         console.log('item search', item);
         return <TouchableOpacity style={styles.item} onPress={() => handleSelectTitle(item)}>
             <Text style={styles.label}>{item.title || item.name || item.series_title || item.episode_title}</Text>
-            {/* {(selectedListLabel.toLowerCase() === MISC.restaurants)
-                ? <Text style={styles.label}>{item.name} - ({item?.location?.formatted_address})</Text>
-                : selectedListLabel.toLowerCase() === MISC.wine
-                    ? <Text style={styles.label}>{item?.winery} - {item?.variety}</Text>
-                    : <Text style={styles.label}>
-                        {item.title || item.name || item.series_title || item.episode_title}
-                        {item?.release_date ? ` (${moment(item?.release_date, 'YYYY-MM-DD').year()})`
-                            : item?.author ? ` (${item?.author})`
-                                : item?.publisher ? ` - (${item?.publisher})`
-                                    // : item?.type ? ` - (${item?.type})`
-                                    : item?.brewery ? ` (${item?.brewery})` : ''}
-                    </Text>} */}
         </TouchableOpacity>
     };
 
@@ -133,8 +121,8 @@ const Header = ({
                 {isBack && <View style={styles.headerTitleView}>
                     <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
                 </View>}
-                {!isBack && <View style={styles.headerRight}>
-                    <View style={styles.inputWrapper}>
+                {!isBack && title != MISC.addItem &&<View style={styles.headerRight}>
+                    {<View style={styles.inputWrapper}>
                         <CustomInput
                             placeholder={LABELS.searchItems}
                             value={searchText}
@@ -144,7 +132,7 @@ const Header = ({
                             isSearch={true}
                             iconPress={clearData}
                         />
-                    </View>
+                    </View>}
                     {/* <TouchableOpacity style={styles.button} onPress={() => showCustomToast(LABELS.success, MISC.comingSoon)}>
                         <Image source={imagesPath.search} style={styles.search} />
                     </TouchableOpacity> */}
@@ -234,9 +222,10 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent:'flex-end',
         gap: 8, // optional spacing
     },
-    button: { paddingHorizontal: 4, paddingVertical: 8 },
+    button: { paddingHorizontal: 4, paddingVertical: 8,alignSelf:'flex-end' },
     search: {
         width: 24,
         height: 24,

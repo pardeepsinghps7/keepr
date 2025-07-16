@@ -603,7 +603,7 @@ const AddScreen = ({ navigation, route }) => {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
-        keyboardShouldPersistTaps="handled"
+      // keyboardShouldPersistTaps="handled"
       >
         {showDatePopup && <DatePicker
           modal
@@ -626,7 +626,9 @@ const AddScreen = ({ navigation, route }) => {
           contentContainerStyle={{
             flexGrow: 1,
           }}
-        // keyboardShouldPersistTaps="handled"
+          onScrollBeginDrag={() => Keyboard.dismiss()} // 👈 Dismiss keyboard on scroll start
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
         >
           <TouchableWithoutFeedback onPress={() => {
             Keyboard.dismiss();
@@ -780,6 +782,7 @@ const AddScreen = ({ navigation, route }) => {
                           showsHorizontalScrollIndicator={false}
                           nestedScrollEnabled={true}
                           scrollEnabled={true}
+                        // keyboardDismissMode="on-drag"
                         />
                       </ScrollView>
                     </View>
@@ -898,6 +901,7 @@ const AddScreen = ({ navigation, route }) => {
                   <CustomInput
                     placeholder={LABELS.typeSomethingHere}
                     value={year}
+                    onFocus={() => updateState({ showDropdown: false })}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => {
                       // Allow only digits
@@ -990,6 +994,7 @@ const AddScreen = ({ navigation, route }) => {
                 label={LABELS.recommendedBy}
                 mainViewProps={{ marginVertical: 12 }}
                 isOptional={true}
+                onFocus={() => updateState({ showDropdown: false })}
               />
 
               {/* Recommend Input */}
@@ -1006,6 +1011,7 @@ const AddScreen = ({ navigation, route }) => {
                 maxLength={200}
                 height={100}
                 onFocus={() => {
+                  updateState({ showDropdown: false });
                   setTimeout(() => {
                     scrollRef.current?.scrollToEnd({ animated: true });
                   }, 100); // delay helps wait for keyboard to show
@@ -1024,6 +1030,7 @@ const AddScreen = ({ navigation, route }) => {
                     maxLength={150}
                     icon={'cloud-upload-outline'}
                     iconPress={() => updateState({ imageModalVisible: true })}
+                    onFocus={() => updateState({ showDropdown: false })}
                   />
                   {imageUrl.length > 0 && (imageUrl.includes('http://') || imageUrl.includes('https://')) &&
                     <View

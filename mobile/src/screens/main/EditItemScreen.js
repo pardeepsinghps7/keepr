@@ -505,7 +505,7 @@ const EditItemScreen = ({ navigation, route }) => {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardShouldPersistTaps="handled"
+        // keyboardShouldPersistTaps="handled"
       >
         {showDatePopup && <DatePicker
           modal
@@ -527,6 +527,9 @@ const EditItemScreen = ({ navigation, route }) => {
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flexGrow: 1 }}
+          onScrollBeginDrag={() => Keyboard.dismiss()} // 👈 Dismiss keyboard on scroll start
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
         >
           <TouchableWithoutFeedback onPress={() => {
             Keyboard.dismiss();
@@ -754,6 +757,7 @@ const EditItemScreen = ({ navigation, route }) => {
                   <CustomInput
                     placeholder={LABELS.typeSomethingHere}
                     value={year}
+                    onFocus={()=> updateState({ showDropdown: false })}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => {
                       // Allow only digits
@@ -843,6 +847,7 @@ const EditItemScreen = ({ navigation, route }) => {
                 placeholder={LABELS.recommendedByPlaceholder}
                 value={recommendedBy}
                 onChangeText={(val) => updateState({ recommendedBy: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                onFocus={()=> updateState({ showDropdown: false })}
                 label={LABELS.recommendedBy}
                 mainViewProps={{ marginVertical: 12 }}
                 isOptional={true}
@@ -862,6 +867,7 @@ const EditItemScreen = ({ navigation, route }) => {
                 maxLength={200}
                 height={100}
                 onFocus={() => {
+                  updateState({ showDropdown: false });
                   setTimeout(() => {
                     scrollRef.current?.scrollToEnd({ animated: true });
                   }, 100); // delay helps wait for keyboard to show
@@ -876,6 +882,7 @@ const EditItemScreen = ({ navigation, route }) => {
                     value={imageUrl}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => updateState({ imageUrl: val })}
+                    onFocus={()=> updateState({ showDropdown: false })}
                     label={LABELS.imageUrl}
                     isOptional={true}
                     maxLength={150}

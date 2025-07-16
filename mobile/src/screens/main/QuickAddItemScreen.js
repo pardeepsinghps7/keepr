@@ -496,11 +496,14 @@ const QuickAddItemScreen = ({ navigation }) => {
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, flexGrow: 1 }}
+          onScrollBeginDrag={() => Keyboard.dismiss()} // 👈 Dismiss keyboard on scroll start
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
         >
           <TouchableWithoutFeedback onPress={() => {
-          Keyboard.dismiss();
-          updateState({ showDropdown: false })
-        }}>
+            Keyboard.dismiss();
+            updateState({ showDropdown: false })
+          }}>
             <View style={styles.mainView}>
               <View style={styles.headerIndicator} />
               <Text style={styles.header}>Add Quick Item</Text>
@@ -646,6 +649,9 @@ const QuickAddItemScreen = ({ navigation }) => {
                   )}
               </View>
 
+              {/* {searchList.length == 0 && (title.length > 2 || episodeTitle.length > 2)
+                  && <Text style={{color:COLORS.red}}>(No Data found)</Text>} */}
+                  
               {selectedListLabel.toLowerCase() === MISC.movies &&
                 <CustomInput
                   value={movieReleaseDate}
@@ -760,6 +766,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                   <CustomInput
                     placeholder={LABELS.typeSomethingHere}
                     value={year}
+                    onFocus={()=> updateState({ showDropdown: false })}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => {
                       // Allow only digits
@@ -852,6 +859,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                 label={LABELS.recommendedBy}
                 mainViewProps={{ marginVertical: 12 }}
                 isOptional={true}
+                onFocus={()=> updateState({ showDropdown: false })}
               />
 
               {/* Recommend Input */}
@@ -868,6 +876,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                 maxLength={200}
                 height={100}
                 onFocus={() => {
+                  updateState({ showDropdown: false });
                   setTimeout(() => {
                     scrollRef.current?.scrollToEnd({ animated: true });
                   }, 100); // delay helps wait for keyboard to show
@@ -882,6 +891,7 @@ const QuickAddItemScreen = ({ navigation }) => {
                     value={imageUrl}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => updateState({ imageUrl: val })}
+                    onFocus={()=> updateState({ showDropdown: false })}
                     label={LABELS.imageUrl}
                     isOptional={true}
                     maxLength={150}
