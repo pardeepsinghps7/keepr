@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from ..controllers.api.external.supabase_controller import test_supabase
+from ..controllers.api.external.delete_account_controller import delete_account
 from ..controllers.api.external.movies_controller import get_all_movies
 from ..controllers.api.external.bourbons_controller import get_all_bourbons
 from ..controllers.api.external.wines_controller import get_all_wines
@@ -19,6 +20,10 @@ def home():
 @api.route('/test-supabase', methods=["GET"])
 def testSupabase():
     return test_supabase()
+
+@api.route('/delect-account', methods=["POST"])
+def deleteAccount():
+    return delete_account()
 
 @api.route('/get-movies', methods=["GET"])
 def getMovies():

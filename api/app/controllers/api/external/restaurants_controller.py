@@ -5,8 +5,9 @@ import os
 def get_all_restaurants():
 
     name = request.args.get("name", "").strip()
-    latitude = request.args.get("latitude", "").strip()
-    longitude = request.args.get("longitude", "").strip()
+    near = request.args.get("near", "").strip()
+#     latitude = request.args.get("latitude", "").strip()
+#     longitude = request.args.get("longitude", "").strip()
 
     if not name:
         return jsonify({"status": False, "error": "Name is required"}), 400
@@ -18,9 +19,11 @@ def get_all_restaurants():
         "categories": "4d4b7105d754a06374d81259",
         "limit": 50,
     }
-    if latitude and longitude:
-        params["ll"] = f"{latitude},{longitude}"
-        params["radius"] = 100000
+#     if latitude and longitude:
+#         params["ll"] = f"{latitude},{longitude}"
+#         params["radius"] = 100000
+
+    params["near"] = near
 
     FOUR_SQUARE_API_KEY = os.environ.get("FOUR_SQUARE_API_KEY")
     if not FOUR_SQUARE_API_KEY:
