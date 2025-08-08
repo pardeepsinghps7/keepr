@@ -21,7 +21,7 @@ def home():
 def testSupabase():
     return test_supabase()
 
-@api.route('/delect-account', methods=["POST"])
+@api.route('/delete-account', methods=["POST"])
 def deleteAccount():
     return delete_account()
 
