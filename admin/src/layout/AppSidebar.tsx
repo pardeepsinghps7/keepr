@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
+  ChatIcon,
   ChevronDownIcon,
   GridIcon,
   GroupIcon,
@@ -67,6 +68,11 @@ const navItems: NavItem[] = [
         pro: false
       },
     ]
+  },
+  {
+    icon: <ChatIcon />,
+    name: "Feedbacks",
+    path: "/feedbacks",
   },
 ];
 
