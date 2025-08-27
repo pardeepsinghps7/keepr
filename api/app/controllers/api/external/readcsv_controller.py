@@ -69,7 +69,6 @@ def read_csv_api():
         if rows is None:
             return jsonify({"status": False, "error": "Could not read file"}), 500
 
-        # optional: accept user_id from form for admin-style imports
         body_user_id = request.form.get("user_id")
 
         # get list_id where label = 'Books'
@@ -80,6 +79,8 @@ def read_csv_api():
 
         inserted_ids = []
         skipped_isbns = []
+        skipped_no_title = 0
+        valid_title_found = False
 
         for row in rows:
             matched = {}
@@ -89,30 +90,28 @@ def read_csv_api():
                 norm = normalize_key(orig_key)
                 if norm in SCHEMA_MAP:
                     actual_col = SCHEMA_MAP[norm]
-                    if actual_col in ("list_id", "raw_json"):
-                        continue
-                    if actual_col == "user_id":
+                    if actual_col in ("list_id", "raw_json", "user_id"):
                         continue
                     matched[actual_col] = coerce_value(actual_col, val)
                 else:
                     unmatched[orig_key] = val
 
-            # force Books list
-            matched["list_id"] = list_id
+            # ❌ skip if no title
+            if not matched.get("title") or str(matched.get("title")).strip() == "":
+                skipped_no_title += 1
+                continue
 
-            # optional: body user_id
+            valid_title_found = True  # ✅ at least one row has title
+
+            matched["list_id"] = list_id
             if body_user_id:
                 matched["user_id"] = body_user_id
-
-            # default status
             if not matched.get("status"):
                 matched["status"] = "to_read"
-
-            # stash extra cols
             if unmatched:
                 matched["raw_json"] = unmatched
 
-            # 🔹 Uniqueness check on ISBN
+            # 🔹 ISBN uniqueness check
             isbn_val = row.get("ISBN") or row.get("isbn")
             if isbn_val:
                 try:
@@ -123,17 +122,22 @@ def read_csv_api():
                 except Exception as e:
                     print("Error checking ISBN uniqueness:", e)
 
-            # insert
             result = supabase.table("items").insert(matched).execute()
             if result.data:
                 inserted_ids.append(result.data[0]["id"])
+
+        # ❌ if no record had title at all
+        if not valid_title_found:
+            return jsonify({"status": False, "error": "Invalid records: no row contains title"}), 400
 
         return jsonify({
             "status": True,
             "inserted_ids": inserted_ids,
             "skipped_isbns": skipped_isbns,
+            "skipped_no_title": skipped_no_title,
             "count_inserted": len(inserted_ids),
-            "count_skipped": len(skipped_isbns),
+            "count_skipped_isbns": len(skipped_isbns),
+            "count_skipped_no_title": skipped_no_title,
             "message": "CSV uploaded successfully"
         }), 200
 
