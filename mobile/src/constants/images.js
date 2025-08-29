@@ -51,6 +51,10 @@ const imagesPath = {
     sortStatus: require('../assets/sort_status.png'),
     sortFavorite: require('../assets/sort_favorite.png'),
     noInternet: require('../assets/no_internet.png'),
+    invite_friend: require('../assets/invite_friend.png'),
+    import_list: require('../assets/import_list.png'),
+    feedback: require('../assets/feedback.png'),
+    logout: require('../assets/logout.png'),
 }
 
 export default imagesPath

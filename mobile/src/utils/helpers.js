@@ -1,5 +1,5 @@
 // Helper functions
-import { Image, StyleSheet, Text, View, Platform, Alert } from "react-native";
+import { Image, StyleSheet, Text, View, Platform, Alert, Share, PermissionsAndroid } from "react-native";
 import { showMessage } from "react-native-flash-message";
 import imagesPath from "../constants/images";
 import COLORS from "../constants/colors";
@@ -7,6 +7,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { STRINGS } from "../constants/strings";
 import GetLocation from "react-native-get-location";
 import { check, request, PERMISSIONS, RESULTS, openSettings } from 'react-native-permissions';
+import RNFS from 'react-native-fs';
+import FileViewer from 'react-native-file-viewer';
+import DocumentPicker from 'react-native-document-picker';
 
 const trimText = (text) => text.trim();
 const showError = (message) => {
@@ -163,6 +166,149 @@ export const requestLocationPermission = async () => {
     return false;
 };
 
+const inviteFriend = async () => {
+    try {
+        const result = await Share.share({
+            message: `Hey! Check out Keepr - your ultimate personal keeper. Download it now: https://example.com/download`, // Replace with your actual app link
+        });
+
+        if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+                // shared with activity type
+            } else {
+                // shared
+            }
+        } else if (result.action === Share.dismissedAction) {
+            // dismissed
+        }
+    } catch (error) {
+        console.error('Error sharing:', error.message);
+    }
+};
+
+const shareLink = async (url) => {
+    console.log('share Link', url)
+    try {
+        const result = await Share.share({
+            message: url,
+        });
+
+        if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+                console.log('Shared with activity type:', result.activityType);
+            } else {
+                console.log('Shared successfully');
+            }
+        } else if (result.action === Share.dismissedAction) {
+            console.log('Dismissed');
+        }
+    } catch (error) {
+        console.error('Error sharing link:', error.message);
+    }
+};
+
+// Request permission (only Android < 10 needs it)
+const requestStoragePermission = async () => {
+    if (Platform.OS !== 'android') return true;
+
+    if (Platform.Version < 29) {
+        const granted = await PermissionsAndroid.requestMultiple([
+            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        ]);
+
+        return (
+            granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
+            granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED
+        );
+    }
+    return true;
+};
+
+const downloadPDF = async (url, filename = 'terms-and-conditions.pdf') => {
+    const { LABELS } = STRINGS;
+    try {
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+            Alert.alert('Permission Denied', 'Storage permission is required to download the file.');
+            return;
+        }
+
+        let path = '';
+
+        if (Platform.OS === 'android') {
+            if (Platform.Version >= 29) {
+                // Android 10+ → Use Downloads folder without permission
+                path = `${RNFS.DownloadDirectoryPath}/${filename}`;
+            } else {
+                // Android 9 and below
+                path = `${RNFS.DownloadDirectoryPath}/${filename}`;
+            }
+        } else {
+            // iOS
+            path = `${RNFS.DocumentDirectoryPath}/${filename}`;
+        }
+
+        // Download file
+        const options = { fromUrl: url, toFile: path };
+        const download = await RNFS.downloadFile(options).promise;
+
+        if (download.statusCode === 200) {
+            showCustomToast(LABELS.success, 'File downloaded successfully.');
+
+            try {
+                await FileViewer.open(path, {
+                    showOpenWithDialog: true,
+                    type: 'application/pdf',
+                });
+            } catch (error) {
+                showCustomToast(LABELS.error,
+                    'No PDF Viewer Found. Please install a PDF reader to open this file.'
+                );
+            }
+        } else {
+            showCustomToast(LABELS.error, 'Could not download the file.');
+        }
+    } catch (err) {
+        console.error('Download error:', err);
+        showCustomToast(LABELS.error, 'Something went wrong while downloading.');
+    }
+};
+
+const pickCsvFile = async () => {
+    const { LABELS } = STRINGS;
+    try {
+        const res = await DocumentPicker.pick({
+            type: [DocumentPicker.types.allFiles],
+            // type: [
+            //     'text/csv',
+            //     'text/comma-separated-values',
+            //     'application/vnd.ms-excel',
+            //     'application/octet-stream'
+            // ], // restrict to CSV
+        });
+        // check extension manually
+        if (res[0].name.endsWith('.csv')) {
+            // res is an array, we return the first file
+            return {
+                uri: res[0].uri,
+                type: res[0].type,
+                name: res[0].name,
+                size: res[0].size,
+            };
+        } else {
+            // showCustomToast(LABELS.error, 'Please select a CSV file');
+        }
+    } catch (err) {
+        if (DocumentPicker.isCancel(err)) {
+            console.log('User cancelled file picker');
+            return null;
+        } else {
+            throw err;
+        }
+    }
+};
+
 const styles = StyleSheet.create({
     toastContainer: {
         flex: 1,
@@ -208,4 +354,8 @@ export {
     showCustomToast,
     getStatusList,
     getCurrentLocation,
+    inviteFriend,
+    shareLink,
+    downloadPDF,
+    pickCsvFile,
 }

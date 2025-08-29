@@ -16,11 +16,12 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import COLORS from '../../constants/colors'; // Assuming COLORS is defined elsewhere
 import { ROUTES, STRINGS } from '../../constants/strings'; // Assuming ROUTES is defined elsewhere
-import { CustomButton, CustomInput, showCustomToast, showSuccess, } from '../..';
+import { CustomButton, CustomInput, downloadPDF, showCustomToast, showSuccess, } from '../..';
 import imagesPath from '../../constants/images';
 import { signUp } from '../../lib/supabase';
 import validator from '../../utils/validators';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from '../../constants/urls';
 
 export default function SignupScreen({ navigation }) {
   const { LABELS, TITLES, SIGNUP, MISC, VALIDATIONS, BUTTONS } = STRINGS;
@@ -235,11 +236,13 @@ export default function SignupScreen({ navigation }) {
               />
               <Text style={styles.agreeText}>
                 {MISC.signupAgreeText}{' '}
-                <Text style={{ textDecorationLine: 'underline', color: COLORS.accent }}>
+                <Text style={{ textDecorationLine: 'underline', color: COLORS.accent }}
+                  onPress={() => downloadPDF(TERMS_CONDITIONS_URL, 'terms-and-conditions.pdf')}>
                   {MISC.termsConditions}
                 </Text>{' '}
                 {MISC.and}{' '}
-                <Text style={{ textDecorationLine: 'underline', color: COLORS.accent }}>
+                <Text style={{ textDecorationLine: 'underline', color: COLORS.accent }}
+                  onPress={() => downloadPDF(PRIVACY_POLICY_URL, 'privacy-policy.pdf')}>
                   {MISC.privacyPolicy}
                 </Text>.
               </Text>

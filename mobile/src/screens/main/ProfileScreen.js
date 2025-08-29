@@ -11,10 +11,11 @@ import {
   ActivityIndicator,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
 import COLORS from '../../constants/colors'; // Assuming COLORS is defined elsewhere
 import { ROUTES, STRINGS } from '../../constants/strings'; // Assuming ROUTES is defined elsewhere
-import { CustomButton, CustomInput, Header, Loader, showCustomToast, } from '../..';
+import { CustomButton, CustomInput, DeleteAccountPopupModal, FeedbackPopupModal, Header, ImportGoodreadPopupModal, inviteFriend, Loader, ProfileListPopupModal, showCustomToast, } from '../..';
 import imagesPath from '../../constants/images';
 import ImageSelectionModal from '../../components/ImageSelectionModal';
 import { logoutSupabase, uploadAvatarToSupabase } from '../../lib/supabase';
@@ -26,6 +27,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { saveUserData } from '../../redux/actions/auth';
 import { convertAvatarTimestamp, setData } from '../../utils/utils';
 import constants from '../../constants/constants';
+import DeviceInfo from 'react-native-device-info';
 
 const ProfileScreen = ({ navigation }) => {
   const isFocused = useIsFocused();
@@ -44,6 +46,15 @@ const ProfileScreen = ({ navigation }) => {
     userDetails: {},
     isAvatarImage: false,
     avatar_url: null,
+
+    feedbackText: '',
+    deleteReasonText: '',
+    importGoodreadsModalVisible: false,
+    feedbackModalVisible: false,
+    listActionModalVisible: false,
+    editListModalVisible: false,
+    deleteAccountModalVisible: false,
+    appVersion: constants.APP_VERSION,
   });
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -60,6 +71,14 @@ const ProfileScreen = ({ navigation }) => {
     userDetails,
     isAvatarImage,
     avatar_url,
+    selectedActionItem,
+    importGoodreadsModalVisible,
+    feedbackModalVisible,
+    listActionModalVisible,
+    feedbackText,
+    deleteReasonText,
+    deleteAccountModalVisible,
+    appVersion,
   } = state;
 
   useFocusEffect(
@@ -81,6 +100,7 @@ const ProfileScreen = ({ navigation }) => {
         avatar_url: userDetails[0]?.avatar_url,
         isUpdateAvatar: userDetails[0]?.avatar_url,
         userDetails: userDetails[0],
+        appVersion: DeviceInfo.getVersion(),
       });
     } catch (error) {
       console.log('getProfileDetail failed:', error.message);
@@ -96,21 +116,6 @@ const ProfileScreen = ({ navigation }) => {
       updateState({ imageLoading: true });
     }
   }, [avatar]);
-
-  const handleLogout = async () => {
-    updateState({ isLoading: true })
-    try {
-      await logoutSupabase();
-      actions.logout();
-      showCustomToast(LABELS.success, 'Logout Successfully');
-
-    } catch (error) {
-      console.log("error raised", error)
-      showCustomToast(LABELS.error, error?.message || error?.msg)
-    } finally {
-      updateState({ loading: false });
-    }
-  }
 
   const onImageSelectedHandler = async (uri, isAvatarImage) => {
     updateState({ loading: true });
@@ -149,7 +154,7 @@ const ProfileScreen = ({ navigation }) => {
     navigation.navigate(ROUTES.changePasswordScreen);
   };
 
-  const handleRightPress = async () => {
+  const handleSavePress = async () => {
     Keyboard.dismiss();
     const validation = validator.isValidData(
       {
@@ -181,6 +186,107 @@ const ProfileScreen = ({ navigation }) => {
     }
   }
 
+  const onMenuPress = () => {
+    updateState({ listActionModalVisible: true })
+  }
+
+  const handleInviteFriendPress = async () => {
+    updateState({ listActionModalVisible: false });
+    setTimeout(async () => {
+      await inviteFriend();
+    }, 100);
+  }
+
+  const handleImportGoodreadsListPress = () => {
+    updateState({ listActionModalVisible: false, importGoodreadsModalVisible: true });
+  }
+
+  const handleSendFeedbackPress = () => {
+    updateState({ listActionModalVisible: false, feedbackModalVisible: true });
+  }
+
+  const handleDeleteAccountPress = () => {
+    updateState({ listActionModalVisible: false, deleteAccountModalVisible: true });
+    // Alert.alert(
+    //   MISC.deleteAccount,
+    //   VALIDATIONS.areYouSureWantToDelete,
+    //   [{ text: BUTTONS.yes, onPress: {} }, { text: BUTTONS.no, }],
+    //   { cancelable: true }
+    // )
+  }
+
+  const handleLogout = async () => {
+    updateState({ isLoading: true })
+    try {
+      await logoutSupabase();
+      actions.logout();
+      showCustomToast(LABELS.success, 'Logout Successfully');
+
+    } catch (error) {
+      console.log("error raised", error)
+      showCustomToast(LABELS.error, error?.message || error?.msg)
+    } finally {
+      updateState({ loading: false });
+    }
+  }
+
+  const handleFeedbackSubmit = async () => {
+    if (!feedbackText) {
+      showCustomToast(LABELS.error, 'Please enter your feedback');
+      return;
+    }
+    updateState({ feedbackModalVisible: false, loading: true });
+    try {
+      await actions.sendFeedback({ version: appVersion, feedback: feedbackText });
+      showCustomToast(LABELS.success, 'Feedback sent successfully');
+      updateState({ feedbackText: '' });
+    } catch (error) {
+      console.log('Feedback submission failed:', error.message);
+      showCustomToast(LABELS.error, 'Feedback submission failed: ' + error.message);
+    } finally {
+      updateState({ loading: false });
+    }
+  }
+
+  const handleDeleteConfirm = async () => {
+
+    updateState({ deleteAccountModalVisible: false, loading: true });
+    try {
+      await actions.deleteAccount({ user_id: userData?.user?.id });
+      actions.logout();
+      showCustomToast(LABELS.success, 'Account deleted successfully');
+    } catch (error) {
+      console.log('Feedback submission failed:', error.message);
+      showCustomToast(LABELS.error, 'Feedback submission failed: ' + error.message);
+    } finally {
+      updateState({ loading: false });
+    }
+  }
+
+  const handleImportGoodreadsSubmit = async (file) => {
+
+    updateState({ importGoodreadsModalVisible: false, loading: true });
+    try {
+      const formData = new FormData();
+
+      // Append file (must use correct fields)
+      formData.append('file', {
+        uri: file.uri,
+        type: file.type || 'text/csv', // fallback type
+        name: file.name || 'upload.csv',
+      });
+      formData.append('user_id', userData?.user?.id);
+      const res = await actions.importGoodreadsListFile(formData);
+      console.log('File import res', res);
+      showCustomToast(LABELS.success, res.message);
+    } catch (error) {
+      console.log('File import failed:', error.message);
+      showCustomToast(LABELS.error, 'File import failed: ' + error.message);
+    } finally {
+      updateState({ loading: false });
+    }
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <Loader modalVisible={loading} />
@@ -189,7 +295,12 @@ const ProfileScreen = ({ navigation }) => {
         keyboardVerticalOffset={0}
         style={{ flex: 1 }}
       >
-        <Header title={ROUTES.profileScreen} isBack rightText={"Save"} onRightPress={handleRightPress} />
+        <Header
+          title={ROUTES.profileScreen}
+          // rightText={"Save"} 
+          // onRightPress={handleSavePress}
+          isBack
+          onMenuPress={onMenuPress} />
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView
             nestedScrollEnabled
@@ -285,10 +396,10 @@ const ProfileScreen = ({ navigation }) => {
 
               {/* Sign Up Button */}
               <CustomButton
-                title={BUTTONS.logout}
-                onPress={handleLogout}
-                style={styles.logout}
-                textStyle={styles.logoutText}
+                title={BUTTONS.save}
+                onPress={handleSavePress}
+                style={styles.save}
+                textStyle={styles.saveText}
               />
 
               {loading && (
@@ -305,6 +416,57 @@ const ProfileScreen = ({ navigation }) => {
           modalVisible={modalVisible}
           setModalVisible={(val) => updateState({ modalVisible: val })}
           onImageSelected={onImageSelectedHandler}
+        />
+
+        {/* Feedback Modal */}
+        <ImportGoodreadPopupModal
+          // title={TITLES.feedback}
+          // subTitle={TITLES.feedbackSubTitle}
+          modalVisible={importGoodreadsModalVisible}
+          setModalVisible={(val) => updateState({ importGoodreadsModalVisible: false })}
+          onCancel={() => updateState({ importGoodreadsModalVisible: false })}
+          onSubmit={handleImportGoodreadsSubmit}
+        />
+
+        {/* Feedback Modal */}
+        <FeedbackPopupModal
+          title={TITLES.feedback}
+          subTitle={TITLES.feedbackSubTitle}
+          modalVisible={feedbackModalVisible}
+          setModalVisible={(val) => updateState({ feedbackModalVisible: false })}
+          onCancel={() => updateState({ feedbackModalVisible: false })}
+          onSubmit={handleFeedbackSubmit}
+          isReasonInputRequire={true}
+          appVersion={appVersion}
+          textInputProps={{
+            height: 100,
+            onChangeText: (text) => updateState({ feedbackText: text }),
+          }}
+        />
+        {/* Delete Account Modal */}
+        <DeleteAccountPopupModal
+          title={BUTTONS.deleteAccount}
+          subTitle={VALIDATIONS.areYouSureWantToDelete}
+          modalVisible={deleteAccountModalVisible}
+          setModalVisible={(val) => updateState({ deleteAccountModalVisible: val })}
+          onCancel={() => updateState({ deleteAccountModalVisible: false })}
+          onSubmit={handleDeleteConfirm}
+          isReasonInputRequire={true}
+        // textInputProps={{
+        //   // height: 100,
+        //   onChangeText: (text) => updateState({ deleteReasonText: text }),
+        // }}
+        />
+        {/* List Popup Modal */}
+        <ProfileListPopupModal
+          selectedItem={selectedActionItem}
+          modalVisible={listActionModalVisible}
+          setModalVisible={(val) => updateState({ listActionModalVisible: val })}
+          onInviteFriend={handleInviteFriendPress}
+          onImportGoodreadsList={handleImportGoodreadsListPress}
+          onSendFeedback={handleSendFeedbackPress}
+          onDeleteAccount={handleDeleteAccountPress}
+          onLogout={handleLogout}
         />
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -496,10 +658,10 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 16
   },
-  logout: {
-    backgroundColor: COLORS.red,
+  save: {
+    backgroundColor: COLORS.green,
   },
-  logoutText: {
+  saveText: {
     color: COLORS.white,
   },
   loaderOverlay: {

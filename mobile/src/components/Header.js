@@ -145,7 +145,7 @@ const Header = ({
 
                 {onMenuPress &&
                     <TouchableOpacity style={styles.button} onPress={onMenuPress}>
-                        <Icon name={"ellipsis-vertical-sharp"} size={20} color={COLORS.black} />
+                        <Icon name={"ellipsis-horizontal-sharp"} size={20} color={COLORS.black} />
                     </TouchableOpacity>}
                 {rightText &&
                     <TouchableOpacity style={styles.button} onPress={onRightPress}>

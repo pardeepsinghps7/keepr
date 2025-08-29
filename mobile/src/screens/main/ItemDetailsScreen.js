@@ -25,7 +25,7 @@ import actions from '../../redux/actions';
 import { useIsFocused } from '@react-navigation/native';
 import Loader from '../../components/Loader';
 import validator from '../../utils/validators';
-import { showCustomToast } from '../../utils/helpers';
+import { shareLink, showCustomToast } from '../../utils/helpers';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../components/Header';
 import AddNewListModal from '../../components/AddNewListModal';
@@ -34,6 +34,7 @@ import ListPopupModal from '../../components/ListPopupModal';
 import EditListModal from '../../components/EditListModal';
 import CustomRatings from '../../components/CustomRatings';
 import PreviewDocument from '../../components/PreviewDocument';
+import { SHARE_ITEM } from '../../constants/urls';
 // import { FontAwesome } from '@expo/vector-icons';
 
 const ItemDetailsScreen = ({ navigation, route }) => {
@@ -124,6 +125,13 @@ const ItemDetailsScreen = ({ navigation, route }) => {
   const handleEdit = () => {
     updateState({ listActionModalVisible: false });
     navigation.navigate(ROUTES.editItemScreen, { item: dataList });
+  }
+
+  const handleSharePress = () => {
+    updateState({ listActionModalVisible: false });
+    setTimeout(async () => {
+      await shareLink(`keepr://item/${routeItemData?.id}`);
+    }, 100);
   }
 
   // const showDocumentPreviewModal = () => {
@@ -328,6 +336,7 @@ const ItemDetailsScreen = ({ navigation, route }) => {
         onDelete={onDeletePress}
         editText={MISC.editItem}
         deleteText={MISC.deleteItem}
+        onShare={handleSharePress}
       />
 
       {/* Edit List Popup Modal */}

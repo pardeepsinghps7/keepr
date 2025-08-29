@@ -19,6 +19,7 @@ const CustomInput = ({
   isSearch = false,
   keyboardType,
   mainViewProps,
+  textInputProps = {},
   ...props
 }) => (
   <View style={[mainViewProps, styles.mainViewProps]}>
@@ -29,7 +30,7 @@ const CustomInput = ({
     <View style={[styles.inputWrapper, style]}>
       {isSearch && <Image source={imagesPath.search} style={styles.search} />}
       <TextInput
-        style={styles.input}
+        style={[styles.input, textInputProps]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}

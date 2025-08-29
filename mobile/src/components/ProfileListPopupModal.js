@@ -19,12 +19,19 @@ const horizontalPadding = 48;
 const totalSpacing = 10 * 2;
 const avatarItemSize = (screenWidth - horizontalPadding - totalSpacing) / 3;
 
-const ListPopupModal = ({ modalVisible,
-  setModalVisible, selectedItem, onView, onEdit,
-  onDelete, editText, deleteText,
-  onShare,
+const ProfileListPopupModal = ({
+  modalVisible,
+  setModalVisible,
+  selectedItem,
+  onInviteFriend,
+  onImportGoodreadsList,
+  onSendFeedback,
+  onDeleteAccount,
+  onLogout,
+  editText,
+  deleteText
 }) => {
-  const { MISC } = STRINGS
+  const { MISC, BUTTONS } = STRINGS
 
   return (
     <Modal
@@ -36,45 +43,40 @@ const ListPopupModal = ({ modalVisible,
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <View style={styles.headerIndicator} />
-          {/* Tabs */}
-          {/* <View style={styles.cardItems}>
-            <Image style={styles.iconImageStyle} source={{uri:selectedItem.icon}} />
-            <View>
-              <Text style={styles.cardTitle}>{selectedItem.label}</Text>
-              <Text style={styles.itemCount}>{selectedItem.items_count} Items</Text>
-            </View>
-          </View> */}
 
-          {/* Conditional content */}
-
-          {/* <TouchableOpacity style={styles.modalButton} onPress={() => {
-            onView(selectedItem);
-          }}>
+          <TouchableOpacity style={styles.modalButton} onPress={onInviteFriend}>
             <View style={styles.cameraContainer}>
-              <Image source={imagesPath.eye_open} style={styles.cameraImage} />
+              <Image source={imagesPath.invite_friend} style={styles.cameraImage} />
             </View>
-            <Text style={styles.modalButtonText}>{MISC.viewList}</Text>
-          </TouchableOpacity> */}
-
-          {!!onShare && <TouchableOpacity style={styles.modalButton} onPress={onShare}>
-            <View style={styles.cameraContainer}>
-              <Image source={imagesPath.share} style={[styles.cameraImage,{tintColor:COLORS.black}]} />
-            </View>
-            <Text style={styles.modalButtonText}>{MISC.shareItem}</Text>
-          </TouchableOpacity>}
-
-          <TouchableOpacity style={styles.modalButton} onPress={onEdit}>
-            <View style={styles.cameraContainer}>
-              <Image source={imagesPath.edit} style={styles.cameraImage} />
-            </View>
-            <Text style={styles.modalButtonText}>{editText || MISC.editList}</Text>
+            <Text style={styles.modalButtonText}>{BUTTONS.inviteFriend}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.modalButton} onPress={onDelete}>
+          <TouchableOpacity style={styles.modalButton} onPress={onImportGoodreadsList}>
+            <View style={styles.cameraContainer}>
+              <Image source={imagesPath.import_list} style={styles.cameraImage} />
+            </View>
+            <Text style={styles.modalButtonText}>{BUTTONS.importGoodreadsList}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.modalButton} onPress={onSendFeedback}>
+            <View style={styles.cameraContainer}>
+              <Image source={imagesPath.feedback} style={styles.cameraImage} />
+            </View>
+            <Text style={styles.modalButtonText}>{BUTTONS.sendFeedback}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.modalButton} onPress={onDeleteAccount}>
             <View style={[styles.cameraContainer, { backgroundColor: COLORS.red10 }]}>
               <Image source={imagesPath.delete} style={styles.cameraImage} />
             </View>
-            <Text style={[styles.modalButtonText, { color: COLORS.red }]}>{deleteText || MISC.deleteList}</Text>
+            <Text style={[styles.modalButtonText, { color: COLORS.red }]}>{BUTTONS.deleteAccount}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.modalButton} onPress={onLogout}>
+            <View style={[styles.cameraContainer, { backgroundColor: COLORS.red10 }]}>
+              <Image source={imagesPath.logout} style={[styles.cameraImage,{tintColor:COLORS.red}]} />
+            </View>
+            <Text style={[styles.modalButtonText, { color: COLORS.red }]}>{BUTTONS.logout}</Text>
           </TouchableOpacity>
 
 
@@ -168,7 +170,7 @@ const styles = StyleSheet.create({
   cameraImage: {
     width: 20,
     height: 20,
-    resizeMode:'contain'
+    resizeMode: 'contain',
   },
   image: {
     width: 20,
@@ -200,4 +202,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ListPopupModal;
+export default ProfileListPopupModal;

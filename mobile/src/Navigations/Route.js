@@ -27,10 +27,11 @@ const handledUrlsRef = new Set(); // ✅ don't mark failed URLs as handled
 const deepLinkHandledRef = { current: false };
 
 const linking = {
-    prefixes: ['keepr://'],
+    prefixes: ["keepr://"], // universal + custom scheme
     config: {
         screens: {
             [ROUTES.updatePassword]: 'reset',
+            [ROUTES.itemDetailsScreen]: "item/:id", // map /item/:id to ItemDetail screen
         },
     },
 };
@@ -51,6 +52,10 @@ export default function Routes() {
             const refresh_token = params.get('refresh_token');
             const type = params.get('type');
 
+            // 🔹 Extract path from custom scheme (keepr://item/123)
+            const path = url.replace(/.*?:\/\//g, ''); // "item/123"
+            const segments = path.split('/'); // ["item", "123"]
+
             if (access_token && refresh_token) {
                 await setSession(access_token, refresh_token);
 
@@ -61,6 +66,17 @@ export default function Routes() {
                 if (type === 'recovery') {
                     navigationRef.current?.navigate(ROUTES.updatePassword);
                 }
+            }
+            // 🔹 Handle item deep link
+            else if (segments[0] === 'item' && segments[1]) {
+                const itemId = segments[1];
+                console.log('🟢 Open Item Screen with ID:', itemId);
+
+                // show a toast for now
+                showCustomToast('success', `Item ID: ${itemId}`);
+
+                // navigate to your item details screen
+                navigationRef.current?.navigate(ROUTES.itemDetailsScreen, { item: { id: itemId, type: 'share' } });
             } else {
                 const error = params.get('error_description');
                 showCustomToast('Error', error || 'Invalid or expired link');

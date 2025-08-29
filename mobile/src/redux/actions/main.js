@@ -1,7 +1,7 @@
 import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "../../utils/utils";
 import store from "../store";
 import types from "../types";
-import { ADD_ITEM, ADD_LISTS, BEERS, BOOKS, BOURBONS, GET_AVATARS_LIST, GET_ICONS_LIST, GET_ITEM_DETAIL_BY_ID, GET_ITEM_DETAIL_LIST_BY_LIST_ID, GET_LATEST_ADDED_ITEM, GET_USER_LIST, GET_USER_LIST_WITH_ITEM_COUNT, ITEM_BY_ID, LIST_BY_ID, MOVIES, PODCASTS, PODCASTS_EPISODES, PROFILE_BY_ID, PROFILE_DETAILS, RESTAURANTS, SEARCH_ITEMS, TV_SHOWS, WINES, } from "../../constants/urls";
+import { ADD_ITEM, ADD_LISTS, BEERS, BOOKS, BOURBONS, DELETE_ACCOUNT, GET_AVATARS_LIST, GET_COUNTRIES, GET_COUNTRY_STATE_CITIES, GET_COUNTRY_STATES, GET_ICONS_LIST, GET_ITEM_DETAIL_BY_ID, GET_ITEM_DETAIL_LIST_BY_LIST_ID, GET_LATEST_ADDED_ITEM, GET_USER_LIST, GET_USER_LIST_WITH_ITEM_COUNT, IMPORT_GOODREADS_LIST, ITEM_BY_ID, LIST_BY_ID, MOVIES, PODCASTS, PODCASTS_EPISODES, PROFILE_BY_ID, PROFILE_DETAILS, RESTAURANTS, SEARCH_COUNTRIES, SEARCH_ITEMS, SEND_FEEDBACK, TV_SHOWS, WINES, } from "../../constants/urls";
 
 const { dispatch } = store
 
@@ -58,6 +58,18 @@ export function addItem(data) {
     return apiPost(ADD_ITEM, data)
 }
 
+export function sendFeedback(data) {
+    return apiPost(SEND_FEEDBACK, data)
+}
+
+export function importGoodreadsListFile(data) {
+    return apiPost(IMPORT_GOODREADS_LIST, data)
+}
+
+export function deleteAccount(data) {
+    return apiPost(DELETE_ACCOUNT, data)
+}
+
 export function updateItem(item_id, data) {
     return apiPatch(`${ITEM_BY_ID}.${item_id}`, data)
 }
@@ -82,6 +94,18 @@ export function getItemDetailsById(id) {
     return apiGet(`${GET_ITEM_DETAIL_BY_ID}.${id}&select=*,lists(id,label,icon)`)
 }
 
+export function getCountries() {
+    return apiGet(GET_COUNTRIES)
+}
+
+export function getCountryStates(country) {
+    return apiGet(`${GET_COUNTRY_STATES}?p_country=${country}`)
+}
+
+export function getCountryStateCities(country, state) {
+    return apiGet(`${GET_COUNTRY_STATE_CITIES}?p_country=${country}&p_state_id=${state}`)
+}
+
 //external apis
 export function getSearchBooksList(searchText, page = 1) {
     return apiGet(`${BOOKS}?title=${searchText}&page=${page}`)
@@ -95,7 +119,10 @@ export function getSearchBeerList(searchText, page = 1) {
 export function getSearchTVShowsList(searchText, page = 1) {
     return apiGet(`${TV_SHOWS}?name=${searchText}&page=${page}`)
 }
-export function getSearchRestaurantsList(searchText, latitude, longitude, page = 1) {
+export function getSearchRestaurantsList(searchText, selectedCity, selectedState, page = 1) {
+    return apiGet(`${RESTAURANTS}?name=${searchText}&near=${selectedCity || ''}, ${selectedState || ''}&page=${page}`)
+}
+export function getSearchRestaurantsListByLocation(searchText, latitude, longitude, page = 1) {
     return apiGet(`${RESTAURANTS}?name=${searchText}&latitude=${latitude || ''}&longitude=${longitude || ''}&page=${page}`)
 }
 export function getSearchPodcastsList(searchText, page = 1) {
@@ -118,4 +145,8 @@ export function getSearchWinesList(searchText, page = 1) {
 
 export function getSearchItemsList(searchText, page = 1) {
     return apiGet(`${SEARCH_ITEMS}?or=(title.ilike.*${searchText}*,episode_title.like.*${searchText}*,series_title.ilike.*${searchText}*)&select=*,lists(id,label)`)
+}
+
+export function getSearchCountriesList(searchText, limit = 25, page = 0) {
+    return apiGet(`${SEARCH_COUNTRIES}?limit=${limit}&offset=${page}&order=city.asc&city=ilike.${searchText}*`)
 }

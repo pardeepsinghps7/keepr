@@ -40,6 +40,7 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 // import { FontAwesome } from '@expo/vector-icons';
 import DatePicker from 'react-native-date-picker';
+import CountryStateCityPicker from '../../components/CountryStateCityPicker';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
 const AddScreen = ({ navigation, route }) => {
@@ -111,6 +112,12 @@ const AddScreen = ({ navigation, route }) => {
     currentLocation: {},
     releaseDate: moment().toDate(),
     showDatePopup: false,
+    selectedCountry: null,
+    selectedState: null,
+    selectedStateName: null,
+    selectedCity: null,
+    isSearchListEmpty: false,
+    isCurrentLocationEnabled: false,
   });
 
   const {
@@ -121,6 +128,7 @@ const AddScreen = ({ navigation, route }) => {
     searchList, searchSeriesList, showDropdown, showSeriesDropdown, saveForLater, imageModalVisible, imageLoading,
     clientId, newelyAddedList, movieReleaseDate, variety, winery, province,
     tvShowsType, language, genres, publisher, currentLocation, releaseDate, showDatePopup,
+    selectedCountry, selectedState, selectedStateName, selectedCity, isSearchListEmpty, isCurrentLocationEnabled,
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -156,6 +164,11 @@ const AddScreen = ({ navigation, route }) => {
     publisher: '',
     showDropdown: false,
     releaseDate: moment().toDate(),
+    selectedCountry: null,
+    selectedState: null,
+    selectedStateName: null,
+    selectedCity: null,
+    isSearchListEmpty: false,
   }
 
   const [inputLayout, setInputLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
@@ -181,11 +194,7 @@ const AddScreen = ({ navigation, route }) => {
       });
       setOpen(false);
     }, [])
-  );
-
-  useEffect(() => {
-    getLocation();
-  }, []);
+  )
 
   // useEffect(() => {
   //   if (params?.item) {
@@ -214,16 +223,18 @@ const AddScreen = ({ navigation, route }) => {
       console.log('currentLocation response', currentLocationValue || {});
       updateState({
         currentLocation: currentLocationValue,
+        isCurrentLocationEnabled: true,
       });
     } catch (error) {
       console.log('getUserList failed:', error.message);
-      showCustomToast(LABELS.error, 'Enable location permissions in settings to continue.');
+      // showCustomToast(LABELS.error, 'Enable location permissions in settings to continue.');
     }
   }
 
   const init = async (isActive) => {
     updateState({ loading: true, });
     try {
+      await getLocation();
       const response = await actions.getUserListWithItemCount();
       console.log('getUserList response', response);
       const dropdownItems = response.map(item => ({
@@ -306,6 +317,13 @@ const AddScreen = ({ navigation, route }) => {
         language,
         genres,
         publisher,
+        selectedCountry,
+        selectedState,
+        selectedStateName,
+        selectedCity,
+        latitude: currentLocation?.latitude || null,
+        longitude: currentLocation?.longitude || null,
+        isCurrentLocationEnabled,
       };
       const payload = {
         list_id: selectedListId,
@@ -358,7 +376,9 @@ const AddScreen = ({ navigation, route }) => {
             : selectedListLabel.toLowerCase() === MISC.tvShows
               ? await actions.getSearchTVShowsList(query)
               : selectedListLabel.toLowerCase() === MISC.restaurants
-                ? await actions.getSearchRestaurantsList(query, currentLocation?.latitude, currentLocation?.longitude, 1)
+                ? (selectedCountry && selectedState && selectedCity)
+                  ? await actions.getSearchRestaurantsList(query, selectedCity, selectedState, 1)
+                  : await actions.getSearchRestaurantsListByLocation(query, currentLocation?.latitude, currentLocation?.longitude, 1)
                 : selectedListLabel.toLowerCase() === MISC.podcasts
                   ? await actions.getSearchPodcastEpisodeList(query, clientId)
                   : selectedListLabel.toLowerCase() === MISC.bourbon
@@ -368,11 +388,13 @@ const AddScreen = ({ navigation, route }) => {
 
       if (response && response.data.length > 0) {
         updateState({
+          isSearchListEmpty: false,
           searchList: response.data,
           showDropdown: true,
         });
       } else {
         updateState({
+          isSearchListEmpty: true,
           searchList: [],
           showDropdown: false,
         });
@@ -441,6 +463,11 @@ const AddScreen = ({ navigation, route }) => {
     console.log('client id in change text', clientId);
     if (selectedListLabel.toLowerCase() === MISC.podcasts) {
       updateState({ episodeTitle: text, showSeriesDropdown: false });
+    }
+    else if (selectedListLabel.toLowerCase() === MISC.restaurants
+      && (!selectedCountry || !selectedState || !selectedCity) && !isCurrentLocationEnabled) {
+      console.log(!selectedCountry);
+      showCustomToast(LABELS.error, 'Please select country, state and city first.');
     } else {
       updateState({ title: text, clientId: '' });
     }
@@ -744,6 +771,34 @@ const AddScreen = ({ navigation, route }) => {
                   </View>
                 </>}
 
+              {selectedListLabel.toLowerCase() === MISC.restaurants &&
+                <CountryStateCityPicker
+                  isCurrentLocationEnabled={isCurrentLocationEnabled}
+                  onCancel={(isDeleteCurrentLocation) => {
+                    updateState({
+                      selectedCountry: null,
+                      selectedState: null,
+                      selectedStateName: null,
+                      selectedCity: null,
+                      showDropdown: false,
+                      title: '',
+                      location: '',
+                      clientId: '',
+                      isCurrentLocationEnabled: isDeleteCurrentLocation ? false : isCurrentLocationEnabled,
+                    });
+                  }}
+                  onSelect={(data) => {
+                    console.log("Selected Data:", data);
+                    updateState({
+                      selectedCountry: data?.country || '',
+                      selectedState: data?.state_id || '',
+                      selectedStateName: data?.state_name || '',
+                      selectedCity: data?.city || '',
+                      title: '',
+                      location: '',
+                    });
+                  }}
+                />}
               {/* Title Input */}
               <View style={styles.searchBox}>
                 {selectedListLabel.toLowerCase() === MISC.podcasts
@@ -765,7 +820,8 @@ const AddScreen = ({ navigation, route }) => {
                       onChangeText={(val) => updateState({ publisher: val })}
                       label={LABELS.publisher}
                       mainViewProps={{ marginVertical: 12 }}
-                      // editable={false}
+                      editable={clientId.length === 0}
+                      style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
                       maxLength={100}
                       isOptional={true}
                     />
@@ -773,7 +829,10 @@ const AddScreen = ({ navigation, route }) => {
                   : <CustomInput
                     ref={inputRef}
                     onFocus={measureInput}
-                    placeholder={LABELS.typeSomethingHere}
+                    placeholder={
+                      selectedListLabel.toLowerCase() === MISC.restaurants
+                        ? LABELS.typeRestaurantNameToFind
+                        : LABELS.typeSomethingHere}
                     value={title}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={onChangeText}
@@ -818,13 +877,19 @@ const AddScreen = ({ navigation, route }) => {
                   )} */}
               </View>
 
+
+              {isSearchListEmpty && (title.length > 2)
+                && <Text style={{ color: COLORS.red }}>{MISC.searchListEmptyText}</Text>}
+
               {selectedListLabel.toLowerCase() === MISC.movies &&
                 <CustomInput
                   value={movieReleaseDate}
                   mainViewProps={{ marginVertical: 12 }}
                   placeholder="YYYY-MM-DD"
-                  editable={false}
-                  onPressIn={() => updateState({ showDatePopup: true })}
+                  editable={clientId.length === 0}
+                  style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
+                  showSoftInputOnFocus={false}
+                  onPressIn={() => clientId.length === 0 ? updateState({ showDatePopup: true }) : undefined}
                   label={LABELS.releaseDate}
                   isOptional={true}
                 />}
@@ -832,12 +897,14 @@ const AddScreen = ({ navigation, route }) => {
               {selectedListLabel.toLowerCase() === MISC.restaurants &&
                 <>
                   <CustomInput
-                    placeholder={LABELS.typeSomethingHere}
+                    placeholder={LABELS.typeRestaurantExactLocation}
                     value={location}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => updateState({ location: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                    label={LABELS.location}
+                    label={LABELS.address}
                     isOptional={true}
+                    editable={clientId.length === 0}
+                    style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
                   />
                 </>
               }
@@ -850,6 +917,8 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ brewery: val.replace(/[^A-Za-z0-9 ]/g, '') })}
                     label={LABELS.brewery}
                     isOptional={true}
+                    editable={clientId.length === 0}
+                    style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
                   />
                 </>
               }
@@ -862,7 +931,8 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ tvShowsType: val })}
                     label={LABELS.type}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={clientId.length === 0}
+                    style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -872,7 +942,8 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ language: val })}
                     label={LABELS.language}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={clientId.length === 0}
+                    style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -882,7 +953,8 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ genres: val })}
                     label={LABELS.genres}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={clientId.length === 0}
+                    style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -897,7 +969,8 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ variety: val })}
                     label={LABELS.variety}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={clientId.length === 0}
+                    style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -907,7 +980,8 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ winery: val })}
                     label={LABELS.winery}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={clientId.length === 0}
+                    style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -917,14 +991,15 @@ const AddScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ province: val })}
                     label={LABELS.province}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={clientId.length === 0}
+                    style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
                     maxLength={100}
                     isOptional={true}
                   />
                 </>
               }
 
-              {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine
+              {/* {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine
                 || selectedListLabel.toLowerCase() === MISC.tvShows) &&
                 <>
                   <CustomInput
@@ -954,7 +1029,7 @@ const AddScreen = ({ navigation, route }) => {
                     isOptional={true}
                   />
                 </>
-              }
+              } */}
 
               <TouchableOpacity onPress={() => updateState({ saveForLater: !saveForLater })} style={styles.checkboxContainer}>
                 <Ionicons
@@ -966,14 +1041,17 @@ const AddScreen = ({ navigation, route }) => {
               </TouchableOpacity>
 
               {/* Book Author Input */}
-              {selectedListLabel.toLowerCase() === MISC.books && <CustomInput
-                placeholder={LABELS.recommendedByPlaceholder}
-                value={author}
-                onChangeText={(val) => updateState({ author: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                label={LABELS.author}
-                mainViewProps={{ marginVertical: 12 }}
-                isOptional={true}
-              />}
+              {selectedListLabel.toLowerCase() === MISC.books &&
+                <CustomInput
+                  placeholder={LABELS.recommendedByPlaceholder}
+                  value={author}
+                  onChangeText={(val) => updateState({ author: val.replace(/[^A-Za-z0-9 ]/g, '') })}
+                  label={LABELS.author}
+                  mainViewProps={{ marginVertical: 12 }}
+                  isOptional={true}
+                  editable={clientId.length === 0}
+                  style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
+                />}
 
               <Text style={styles.label}>Status</Text>
               <View style={styles.radioGroup}>

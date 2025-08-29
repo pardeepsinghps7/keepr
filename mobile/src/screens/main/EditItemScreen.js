@@ -39,13 +39,14 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 // import { FontAwesome } from '@expo/vector-icons';
 import DatePicker from 'react-native-date-picker';
+import CountryStateCityPicker from '../../components/CountryStateCityPicker';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
 const EditItemScreen = ({ navigation, route }) => {
   const { params } = route
   const { item: itemDetails } = params
   const userData = useSelector((state) => state.auth.userData);
-  console.log('EditItemScreen details', itemDetails)
+  console.log('EditItemScreen details', itemDetails?.client_id?.length > 0)
   const { LABELS, BUTTONS, MISC } = STRINGS
   const isFocused = useIsFocused();
   const [open, setOpen] = useState(false);
@@ -110,6 +111,15 @@ const EditItemScreen = ({ navigation, route }) => {
     currentLocation: {},
     releaseDate: moment().toDate(),
     showDatePopup: false,
+    selectedCountry: itemDetails?.raw_json?.selectedCountry || null,
+    selectedState: itemDetails?.raw_json?.selectedState || null,
+    selectedStateName: itemDetails?.raw_json?.selectedStateName || null,
+    selectedCity: itemDetails?.raw_json?.selectedCity || null,
+    isSearchListEmpty: false,
+    isClientId: itemDetails?.client_id?.length === 0 ? true : false,
+    latitude: itemDetails?.raw_json?.latitude || null,
+    longitude: itemDetails?.raw_json?.longitude || null,
+    isCurrentLocationEnabled: itemDetails?.raw_json?.isCurrentLocationEnabled || false,
   });
 
   const {
@@ -120,6 +130,8 @@ const EditItemScreen = ({ navigation, route }) => {
     searchList, searchSeriesList, showDropdown, showSeriesDropdown, saveForLater, rating, imageModalVisible, imageLoading,
     clientId, movieReleaseDate, variety, winery, province,
     tvShowsType, language, genres, publisher, currentLocation, releaseDate, showDatePopup,
+    selectedCountry, selectedState, selectedStateName, selectedCity, isSearchListEmpty, isClientId, isCurrentLocationEnabled,
+    latitude, longitude,
   } = state;
 
   const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -144,9 +156,9 @@ const EditItemScreen = ({ navigation, route }) => {
     }
   }, [isFocused]);
 
-  useEffect(() => {
-    getLocation();
-  }, []);
+  // useEffect(() => {
+  //   getLocation();
+  // }, []);
 
 
   const getLocation = async () => {
@@ -244,6 +256,13 @@ const EditItemScreen = ({ navigation, route }) => {
         language,
         genres,
         publisher,
+        selectedCountry,
+        selectedState,
+        selectedStateName,
+        selectedCity,
+        latitude,
+        longitude,
+        isCurrentLocationEnabled,
       };
       const payload = {
         // list_id: selectedListId,
@@ -289,7 +308,9 @@ const EditItemScreen = ({ navigation, route }) => {
             : selectedListLabel.toLowerCase() === MISC.tvShows
               ? await actions.getSearchTVShowsList(query)
               : selectedListLabel.toLowerCase() === MISC.restaurants
-                ? await actions.getSearchRestaurantsList(query, currentLocation?.latitude, currentLocation?.longitude, 1)
+                ? (selectedCountry && selectedState && selectedCity)
+                  ? await actions.getSearchRestaurantsList(query, selectedCity, selectedState, 1)
+                  : await actions.getSearchRestaurantsListByLocation(query, latitude, longitude, 1)
                 : selectedListLabel.toLowerCase() === MISC.podcasts
                   ? await actions.getSearchPodcastEpisodeList(query, clientId)
                   : selectedListLabel.toLowerCase() === MISC.bourbon
@@ -299,11 +320,13 @@ const EditItemScreen = ({ navigation, route }) => {
 
       if (response && response.data.length > 0) {
         updateState({
+          isSearchListEmpty: false,
           searchList: response.data,
           showDropdown: true,
         });
       } else {
         updateState({
+          isSearchListEmpty: true,
           searchList: [],
           showDropdown: false,
         });
@@ -336,7 +359,7 @@ const EditItemScreen = ({ navigation, route }) => {
       }
     } catch (error) {
       console.log('getSearchBooksList failed:', error.message);
-      showCustomToast(LABELS.error, error.message);
+      // showCustomToast(LABELS.error, error.message);
     } finally {
       // updateState({ loading: false });
     }
@@ -346,6 +369,10 @@ const EditItemScreen = ({ navigation, route }) => {
     console.log('client id in change text', clientId);
     if (selectedListLabel.toLowerCase() === MISC.podcasts) {
       updateState({ episodeTitle: text, showSeriesDropdown: false });
+    } else if (selectedListLabel.toLowerCase() === MISC.restaurants
+      && (!selectedCountry || !selectedState || !selectedCity) && !isCurrentLocationEnabled) {
+      console.log(!selectedCountry);
+      showCustomToast(LABELS.error, 'Please select country, state and city first.');
     } else {
       updateState({ title: text, clientId: '' });
     }
@@ -574,13 +601,17 @@ const EditItemScreen = ({ navigation, route }) => {
                   <CustomInput
                     placeholder={LABELS.typeSomethingHere}
                     value={seriesTitle}
+                    editable={isClientId}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => updateState({ seriesTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
                     // onChangeText={onSeriesChangeText}
                     label={LABELS.seriesTitle}
                     isOptional={podcastType.label === MISC.episode}
+                    style={{
+                      backgroundColor: !isClientId ? COLORS.lighterGray : undefined
+                    }}
                   />
-                  {showSeriesDropdown && dataList.length > 0 && (seriesTitle.length > 0)
+                  {/* {showSeriesDropdown && dataList.length > 0 && (seriesTitle.length > 0)
                     && (
                       <View style={[styles.listAbsolute,]}>
                         <ScrollView horizontal
@@ -602,9 +633,29 @@ const EditItemScreen = ({ navigation, route }) => {
                           />
                         </ScrollView>
                       </View>
-                    )}
+                    )} */}
                 </View>
               </>}
+
+              {selectedListLabel.toLowerCase() === MISC.restaurants &&
+                <CountryStateCityPicker
+                  isCurrentLocationEnabled={isCurrentLocationEnabled}
+                  isDisable={true}
+                  selectedCountry={selectedCountry}
+                  selectedState={selectedState}
+                  selectedStateName={selectedStateName}
+                  selectedCity={selectedCity}
+                  onSelect={(data) => {
+                    console.log("Selected Data:", data);
+                    updateState({
+                      selectedCountry: data?.country || '',
+                      selectedState: data?.state || '',
+                      selectedStateName: data?.stateName || '',
+                      selectedCity: data?.city || '',
+                      title: '',
+                    });
+                  }}
+                />}
 
               <View style={styles.searchBox}>
                 {selectedListLabel.toLowerCase() === MISC.podcasts
@@ -615,10 +666,11 @@ const EditItemScreen = ({ navigation, route }) => {
                     value={episodeTitle}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => updateState({ episodeTitle: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                    // onChangeText={onChangeText}
+                    editable={isClientId}
                     maxLength={100}
                     label={LABELS.episodeTitle}
                     isOptional={podcastType.label === MISC.series}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                   />
                     <CustomInput
                       placeholder={LABELS.publisher}
@@ -626,16 +678,22 @@ const EditItemScreen = ({ navigation, route }) => {
                       onChangeText={(val) => updateState({ publisher: val })}
                       label={LABELS.publisher}
                       mainViewProps={{ marginVertical: 12 }}
-                      // editable={false}
+                      editable={isClientId}
                       maxLength={100}
                       isOptional={true}
+                      style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     />
                   </>
                   : <CustomInput
                     ref={inputRef}
                     onFocus={measureInput}
-                    placeholder={LABELS.typeSomethingHere}
+                    placeholder={
+                      selectedListLabel.toLowerCase() === MISC.restaurants
+                        ? LABELS.typeRestaurantNameToFind
+                        : LABELS.typeSomethingHere}
                     value={title}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={onChangeText}
                     maxLength={100}
@@ -668,13 +726,18 @@ const EditItemScreen = ({ navigation, route }) => {
                   )} */}
               </View>
 
+              {isSearchListEmpty && (title.length > 2)
+                && <Text style={{ color: COLORS.red }}>{MISC.searchListEmptyText}</Text>}
+
               {selectedListLabel.toLowerCase() === MISC.movies &&
                 <CustomInput
                   value={movieReleaseDate}
                   mainViewProps={{ marginVertical: 12 }}
                   placeholder="YYYY-MM-DD"
-                  editable={false}
-                  onPressIn={() => updateState({ showDatePopup: true })}
+                  // editable={false}
+                  editable={isClientId}
+                  style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
+                  onPressIn={() => isClientId ? updateState({ showDatePopup: true }) : undefined}
                   label={LABELS.releaseDate}
                   isOptional={true}
                 />}
@@ -682,11 +745,13 @@ const EditItemScreen = ({ navigation, route }) => {
               {selectedListLabel.toLowerCase() === MISC.restaurants &&
                 <>
                   <CustomInput
-                    placeholder={LABELS.typeSomethingHere}
+                    placeholder={LABELS.typeRestaurantExactLocation}
                     value={location}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => updateState({ location: val.replace(/[^A-Za-z0-9 ]/g, '') })}
-                    label={LABELS.location}
+                    label={LABELS.address}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     isOptional={true}
                   />
                 </>
@@ -699,6 +764,8 @@ const EditItemScreen = ({ navigation, route }) => {
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => updateState({ brewery: val.replace(/[^A-Za-z0-9 ]/g, '') })}
                     label={LABELS.brewery}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     isOptional={true}
                   />
                 </>
@@ -712,7 +779,8 @@ const EditItemScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ tvShowsType: val })}
                     label={LABELS.type}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -722,7 +790,8 @@ const EditItemScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ language: val })}
                     label={LABELS.language}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -732,7 +801,8 @@ const EditItemScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ genres: val })}
                     label={LABELS.genres}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -747,7 +817,8 @@ const EditItemScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ variety: val })}
                     label={LABELS.variety}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -757,7 +828,8 @@ const EditItemScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ winery: val })}
                     label={LABELS.winery}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     maxLength={100}
                     isOptional={true}
                   />
@@ -767,19 +839,22 @@ const EditItemScreen = ({ navigation, route }) => {
                     onChangeText={(val) => updateState({ province: val })}
                     label={LABELS.province}
                     mainViewProps={{ marginVertical: 12 }}
-                    // editable={false}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     maxLength={100}
                     isOptional={true}
                   />
                 </>
               }
 
-              {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine
+              {/* {(selectedListLabel.toLowerCase() === MISC.bourbon || selectedListLabel.toLowerCase() === MISC.wine
                 || selectedListLabel.toLowerCase() === MISC.tvShows) &&
                 <>
                   <CustomInput
                     placeholder={LABELS.typeSomethingHere}
                     value={year}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     onFocus={() => updateState({ showDropdown: false })}
                     mainViewProps={{ marginVertical: 12 }}
                     onChangeText={(val) => {
@@ -804,7 +879,7 @@ const EditItemScreen = ({ navigation, route }) => {
                     isOptional={true}
                   />
                 </>
-              }
+              } */}
 
               <TouchableOpacity onPress={() => updateState({ saveForLater: !saveForLater })} style={styles.checkboxContainer}>
                 <Ionicons
@@ -823,6 +898,8 @@ const EditItemScreen = ({ navigation, route }) => {
                 label={LABELS.author}
                 mainViewProps={{ marginVertical: 12 }}
                 isOptional={true}
+                editable={clientId.length === 0}
+                style={{ backgroundColor: clientId.length === 0 ? undefined : COLORS.lighterGray }}
               />}
 
               <Text style={styles.label}>Status</Text>
@@ -909,6 +986,8 @@ const EditItemScreen = ({ navigation, route }) => {
                     label={LABELS.imageUrl}
                     isOptional={true}
                     maxLength={150}
+                    editable={isClientId}
+                    style={{ backgroundColor: !isClientId ? COLORS.lighterGray : undefined }}
                     icon={'cloud-upload-outline'}
                     iconPress={() => updateState({ imageModalVisible: true })}
                   />

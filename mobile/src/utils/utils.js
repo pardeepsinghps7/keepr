@@ -40,12 +40,12 @@ export async function apiReq(endPoint, data, method, headers = {}, requestOption
 	}
 
 	try {
-		console.log('API CALL===> ', method,data, endPoint, headers)
+		console.log('API CALL===> ', isMultipart, method,data, endPoint, headers)
 		const response = await axios({
 			method,
 			url: endPoint,
 			headers,
-			timeout: 10000,
+			// timeout: 10000,
 			...(method.toLowerCase() === 'get' ? { params: data } : { data }),
 			...requestOptions,
 		});

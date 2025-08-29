@@ -6,6 +6,7 @@ const constants = {
     EMAIL: 'email',
     PASSWORD: 'password',
     CURRENT_PASSWORD: 'currentPassword',
+    APP_VERSION: '1.0.0',
 }
 
 export default constants

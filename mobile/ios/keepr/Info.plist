@@ -48,7 +48,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This app requires access to your camera to take photos or videos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires access to your photo library to select images.</string>
+	<string>This app requires access to select images and save files.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>UIAppFonts</key>
@@ -88,5 +88,7 @@
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs to get your location...</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Allow access to save files</string>
 </dict>
 </plist>
