@@ -34,7 +34,7 @@ import ListPopupModal from '../../components/ListPopupModal';
 import EditListModal from '../../components/EditListModal';
 import CustomRatings from '../../components/CustomRatings';
 import PreviewDocument from '../../components/PreviewDocument';
-import { SHARE_ITEM } from '../../constants/urls';
+import { SHARE_ITEM, SHARE_ITEM_URL } from '../../constants/urls';
 // import { FontAwesome } from '@expo/vector-icons';
 
 const ItemDetailsScreen = ({ navigation, route }) => {
@@ -130,7 +130,7 @@ const ItemDetailsScreen = ({ navigation, route }) => {
   const handleSharePress = () => {
     updateState({ listActionModalVisible: false });
     setTimeout(async () => {
-      await shareLink(`keepr://item/${routeItemData?.id}`);
+      await shareLink(`${SHARE_ITEM_URL}/${routeItemData?.id}`);
     }, 100);
   }
 
@@ -146,6 +146,25 @@ const ItemDetailsScreen = ({ navigation, route }) => {
   //   )
   // }
 
+
+  const handleSavePress = async () => {
+    Keyboard.dismiss();
+    const { id, user_id,created_at, lists, ...newObj } = dataList; // remove "id"
+console.log(newObj);
+    updateState({ loading: true });
+    try {
+      const response = await actions.addItem(newObj);
+      console.log('addItem response:', response);
+      navigation.goBack();
+      showCustomToast(LABELS.success, MISC.itemAddedSuccessfully);
+    } catch (error) {
+      console.log('addItem failed:', error.message);
+      showCustomToast(LABELS.error, error.message);
+    } finally {
+      updateState({ loading: false });
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <Loader modalVisible={loading} />
@@ -155,7 +174,10 @@ const ItemDetailsScreen = ({ navigation, route }) => {
         keyboardShouldPersistTaps="handled"
       >
 
-        <Header title={TITLES.itemDetails} isBack onMenuPress={onMenuPress} />
+        <Header
+          title={TITLES.itemDetails}
+          isBack
+          onMenuPress={routeItemData?.type === 'share' ? null : onMenuPress} />
         <FlatList
           data={[]}
           renderItem={null}
@@ -320,6 +342,11 @@ const ItemDetailsScreen = ({ navigation, route }) => {
                       </View>}
                   </>
                 }
+                {routeItemData?.type === 'share' &&
+                  <CustomButton
+                    title={BUTTONS.saveItemToTheList}
+                    onPress={handleSavePress}
+                  />}
                 {/* {dataList?.image_url?.length > 0 && <Image source={{ uri: dataList?.image_url }} style={styles.sampleImage} />} */}
 
               </View>

@@ -52,10 +52,6 @@ export default function Routes() {
             const refresh_token = params.get('refresh_token');
             const type = params.get('type');
 
-            // 🔹 Extract path from custom scheme (keepr://item/123)
-            const path = url.replace(/.*?:\/\//g, ''); // "item/123"
-            const segments = path.split('/'); // ["item", "123"]
-
             if (access_token && refresh_token) {
                 await setSession(access_token, refresh_token);
 
@@ -67,16 +63,18 @@ export default function Routes() {
                     navigationRef.current?.navigate(ROUTES.updatePassword);
                 }
             }
-            // 🔹 Handle item deep link
-            else if (segments[0] === 'item' && segments[1]) {
-                const itemId = segments[1];
-                console.log('🟢 Open Item Screen with ID:', itemId);
+            // 🔹 Handle item deep link with query param
+            else if (url.includes('open-item')) {
+                const parsedUrl = new URL(url);
+                const itemId = parsedUrl.searchParams.get('id');
 
-                // show a toast for now
-                showCustomToast('success', `Item ID: ${itemId}`);
-
-                // navigate to your item details screen
-                navigationRef.current?.navigate(ROUTES.itemDetailsScreen, { item: { id: itemId, type: 'share' } });
+                if (itemId) {
+                    console.log('🟢 Open Item Screen with ID:', itemId);
+                    showCustomToast('success', `Item ID: ${itemId}`);
+                    navigationRef.current?.navigate(ROUTES.itemDetailsScreen, {
+                        item: { id: itemId, type: 'share' }
+                    });
+                }
             } else {
                 const error = params.get('error_description');
                 showCustomToast('Error', error || 'Invalid or expired link');

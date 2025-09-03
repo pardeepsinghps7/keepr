@@ -9,6 +9,7 @@ export const getApiUrlWithoutRest = (endpoint) => API_BASE_URL + endpoint
 export const getApiUrl = (endpoint) => API_BASE_URL_WITH_REST + endpoint
 export const getExternalApiUrl = (endpoint) => EXTERNAL_BASE_URL_API + endpoint
 
+export const SHARE_ITEM_URL = 'https://keeprapi.trigma.in/open-app-item';
 export const PRIVACY_POLICY_URL = getApiUrlWithoutRest('/storage/v1/object/public/assets//privacy-policy.pdf');
 export const TERMS_CONDITIONS_URL = getApiUrlWithoutRest('/storage/v1/object/public/assets//terms-conditions-agreement.pdf');
 //Get
