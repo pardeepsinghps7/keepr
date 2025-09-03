@@ -28,7 +28,7 @@ def openapp_with_item(item_id):
     Handles deep links like:
     https://keeprapi.trigma.in/open-app/abc123
     """
-    return render_template('open-app.html', item_id=item_id)
+    return render_template('open-app-item.html', item_id=item_id)
 
 @static_pages.route('/.well-known/apple-app-site-association', methods=['GET'])
 def apple_app_site_association():
