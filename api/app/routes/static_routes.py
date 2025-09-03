@@ -22,6 +22,14 @@ def success():
 def openapp():
     return render_template('open-app.html')
 
+@static_pages.route('/open-app-item/<item_id>')
+def openapp_with_item(item_id):
+    """
+    Handles deep links like:
+    https://keeprapi.trigma.in/open-app/abc123
+    """
+    return render_template('open-app.html', item_id=item_id)
+
 @static_pages.route('/.well-known/apple-app-site-association', methods=['GET'])
 def apple_app_site_association():
     # Adjust path to point directly to project-root/.well-known/apple-app-site-association

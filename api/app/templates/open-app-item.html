@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+    <meta charset="UTF-8" />
+    <script>
+        function openApp() {
+            // Injected dynamically from Flask (if item_id provided in route)
+            const itemId = "{{ item_id | default('', true) }}";
+
+            // Construct deep link for the app
+            const appLink = itemId
+                ? "keepr://app/open-item?id=" + itemId
+                : "keepr://app/home";
+
+            // Web fallback URL
+            const fallbackUrl = itemId
+                ? "/item/" + itemId
+                : "/";
+
+            // Try opening the app
+            window.location = appLink;
+
+            // Fallback if app doesn't open
+            setTimeout(() => {
+                window.location = fallbackUrl;
+            }, 1500);
+        }
+    </script>
+</head>
+<body onload="openApp()">
+    <p>Opening app... If it doesn't open, you'll be redirected shortly.</p>
+</body>
+</html>
