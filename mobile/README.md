@@ -274,7 +274,7 @@ SUPABASE_ANON_KEY=your_supabase_anon_key
 ### Add New Item
 
 <p align="center">
-  <img src="docs/screenshots/add-item.webp" width="300" />
+  <img src="docs/screenshots/add_item.webp" width="300" />
 </p>
 
 ### Authentication
